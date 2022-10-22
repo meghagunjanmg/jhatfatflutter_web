@@ -324,30 +324,34 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   //Method for generate otp from firebase
   Future<void> generateOtp(String contact) async {
-    var smsOTPSent = (String verId, [int? forceCodeResend]) {
-      verificationId = verId;
-      print("** "+verificationId);
-    };
+    // var smsOTPSent = (String verId, [int? forceCodeResend]) {
+    //   verificationId = verId;
+    //   print("** "+verificationId);
+    // };
+    // try {
+    //   await _auth.verifyPhoneNumber(
+    //       phoneNumber: contact,
+    //       codeAutoRetrievalTimeout: (String verId) {
+    //         verificationId = verId;
+    //       },
+    //       codeSent: smsOTPSent,
+    //       timeout: const Duration(seconds: 60),
+    //       verificationCompleted: (AuthCredential phoneAuthCredential) {
+    //       },
+    //       verificationFailed: (Exception exception) {
+    //         // Navigator.pop(context, exception.message);
+    //       });
+    //
+    // } catch (e) {
+    //   handleError(e as FirebaseAuthException);
+    //   // Navigator.pop(context, (e as PlatformException).message);
+    // }
+
     try {
-      await _auth.verifyPhoneNumber(
-          phoneNumber: contact,
-          codeAutoRetrievalTimeout: (String verId) {
-            verificationId = verId;
-          },
-          codeSent: smsOTPSent,
-          timeout: const Duration(seconds: 60),
-          verificationCompleted: (AuthCredential phoneAuthCredential) {
-          },
-          verificationFailed: (Exception exception) {
-            // Navigator.pop(context, exception.message);
-          });
-
+      confirmationResult = await _auth.signInWithPhoneNumber(contact);
     } catch (e) {
-      handleError(e as FirebaseAuthException);
-      // Navigator.pop(context, (e as PlatformException).message);
+      print("otp send error :  "+e.toString());
     }
-
-    confirmationResult = await _auth.signInWithPhoneNumber(contact);
   }
 
   //Method for verify otp entered by user
@@ -370,7 +374,7 @@ class _OtpVerifyState extends State<OtpVerify> {
       hitService(smsOTP, context);
 
     } catch (e) {
-      print(e.toString());
+      print("otp verify error :  "+e.toString());
 
       handleError(e as FirebaseAuthException);
     }
