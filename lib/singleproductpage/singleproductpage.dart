@@ -94,25 +94,44 @@ class SingleProductState extends State<SingleProductPage> {
     );
   }
 
-  void ClearCart() {
-    DatabaseHelper db = DatabaseHelper.instance;
-    db.deleteAllRestProdcut();
-    getCartItem2();
+  Future<void> ClearCart() async {
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // db.deleteAllRestProdcut();
+    // getCartItem2();
+    // setState(() {
+    //   restrocart = 0;
+    // });
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
+    var db1 = await factory.openDatabase(DatabaseHelper.addontable);
+    await store.drop(db);
+    await store.drop(db1);
     setState(() {
       restrocart = 0;
     });
   }
   void getCartItem2() async {
-    DatabaseHelper db = DatabaseHelper.instance;
-    db.getResturantOrderList().then((value) {
-      List<RestaurantCartItem> tagObjs =
-      value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
-      if(tagObjs.isNotEmpty) {
-        setState(() {
-          restrocart=1;
-        });
-      }
-    });
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // db.getResturantOrderList().then((value) {
+    //   List<RestaurantCartItem> tagObjs =
+    //   value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
+    //   if(tagObjs.isNotEmpty) {
+    //     setState(() {
+    //       restrocart=1;
+    //     });
+    //   }
+    // });
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
+    int size = await store.count(db);
+    if(size!=0){
+      setState(() {
+        restrocart = 1;
+      });
+    }
+
   }
 
   void getCartCount() {

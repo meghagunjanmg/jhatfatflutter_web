@@ -724,6 +724,12 @@ class OrderPageState extends State<OrderPage> {
     getOnParcelGointOrders();
   }
 
+  bool showMyDialog(BuildContext context) {
+    bool result = false;
+
+    return result;
+  }
+
   void getCancelledHistory() async {
     setState(() {
       isFetch = true;
@@ -852,28 +858,47 @@ class OrderPageState extends State<OrderPage> {
                                           if (onGoingOrders[t].order_status ==
                                               'Cancelled') {
                                           } else {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    OrderMapPage(
-                                                  pageTitle:
-                                                     VendorName[t],
-                                                  ongoingOrders:
-                                                      onGoingOrders[t],
-                                                  currency: currency,
-                                                      user_id:onGoingOrders[t].cart_id.toString(),
-                                                ),
-                                              ),
-                                            ).then((value) {
-                                              if (khit == 0) {
-                                                getAllThreeData();
-                                              } else if (khit == 1) {
-                                                getCancelledHistory();
-                                              } else if (khit == 2) {
-                                                getCompletedHistory();
-                                              }
-                                            });
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return new AlertDialog(
+                                                    content: Text(
+                                                      'For Live Tracking use mobile application.',
+                                                    ),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: const Text('OK'),
+                                                        onPressed: () {
+                                                          Navigator.of(context).pop(true);
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  OrderMapPage(
+                                                                    pageTitle:
+                                                                    VendorName[t],
+                                                                    ongoingOrders:
+                                                                    onGoingOrders[t],
+                                                                    currency: currency,
+                                                                    user_id:onGoingOrders[t].cart_id.toString(),
+                                                                  ),
+                                                            ),
+                                                          ).then((value) {
+                                                            if (khit == 0) {
+                                                              getAllThreeData();
+                                                            } else if (khit == 1) {
+                                                              getCancelledHistory();
+                                                            } else if (khit == 2) {
+                                                              getCompletedHistory();
+                                                            }
+                                                          });
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                }
+                                            );
+
                                           }
                                         },
                                         behavior: HitTestBehavior.opaque,
@@ -1052,28 +1077,55 @@ class OrderPageState extends State<OrderPage> {
                                                     .order_status ==
                                                 'Cancelled') {
                                             } else {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      OrderMapRestPage(
-                                                    pageTitle:
-                                                        '${onRestGoingOrders[t].vendor_name}',
-                                                    ongoingOrders:
-                                                        onRestGoingOrders[t],
-                                                    currency: currency,
-                                                        user_id:onGoingOrders[t].cart_id.toString(),
-                                                  ),
-                                                ),
-                                              ).then((value) {
-                                                if (khit == 0) {
-                                                  getAllThreeData();
-                                                } else if (khit == 1) {
-                                                  getCancelledHistory();
-                                                } else if (khit == 2) {
-                                                  getCompletedHistory();
-                                                }
-                                              });
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (
+                                                      BuildContext context) {
+                                                    return new AlertDialog(
+                                                      content: Text(
+                                                        'For Live Tracking use mobile application.',
+                                                      ),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          child: const Text(
+                                                              'OK'),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                context).pop(
+                                                                true);
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (
+                                                                    context) =>
+                                                                    OrderMapRestPage(
+                                                                      pageTitle:
+                                                                      '${onRestGoingOrders[t]
+                                                                          .vendor_name}',
+                                                                      ongoingOrders:
+                                                                      onRestGoingOrders[t],
+                                                                      currency: currency,
+                                                                      user_id: onGoingOrders[t]
+                                                                          .cart_id
+                                                                          .toString(),
+                                                                    ),
+                                                              ),
+                                                            ).then((value) {
+                                                              if (khit == 0) {
+                                                                getAllThreeData();
+                                                              } else
+                                                              if (khit == 1) {
+                                                                getCancelledHistory();
+                                                              } else
+                                                              if (khit == 2) {
+                                                                getCompletedHistory();
+                                                              }
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    );
+                                                  });
                                             }
                                           },
                                           behavior: HitTestBehavior.opaque,
@@ -1466,29 +1518,51 @@ class OrderPageState extends State<OrderPage> {
                                             if (onParcelGoingOrders[t]
                                                     .orderStatus ==
                                                 'Cancelled') {
-                                            } else {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      OrderMapParcelPage (
-                                                        pageTitle:
-                                                        '${onParcelGoingOrders[t].vendorName}',
-                                                        ongoingOrders:
-                                                        onParcelGoingOrders[t],
-                                                        currency: currency,
-                                                        user_id: onParcelGoingOrders[t].cartId.toString()
-                                                  ),
-                                                ),
-                                              ).then((value) {
-                                                if (khit == 0) {
-                                                  getAllThreeData();
-                                                } else if (khit == 1) {
-                                                  getCancelledHistory();
-                                                } else if (khit == 2) {
-                                                  getCompletedHistory();
-                                                }
-                                              });
+                                            }
+                                            else{
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (
+                                                      BuildContext context) {
+                                                    return new AlertDialog(
+                                                      content: Text(
+                                                        'For Live Tracking use mobile application.',
+                                                      ),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          child: const Text(
+                                                              'OK'),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                context).pop(
+                                                                true);
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    OrderMapParcelPage (
+                                                                        pageTitle:
+                                                                        '${onParcelGoingOrders[t].vendorName}',
+                                                                        ongoingOrders:
+                                                                        onParcelGoingOrders[t],
+                                                                        currency: currency,
+                                                                        user_id: onParcelGoingOrders[t].cartId.toString()
+                                                                    ),
+                                                              ),
+                                                            ).then((value) {
+                                                              if (khit == 0) {
+                                                                getAllThreeData();
+                                                              } else if (khit == 1) {
+                                                                getCancelledHistory();
+                                                              } else if (khit == 2) {
+                                                                getCompletedHistory();
+                                                              }
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    );
+                                                  });
                                             }
                                           },
                                           behavior: HitTestBehavior.opaque,

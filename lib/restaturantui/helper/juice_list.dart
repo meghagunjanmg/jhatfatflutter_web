@@ -48,30 +48,32 @@ class _JuiceListState extends State<JuiceList> {
   }
 
   void getResCartItem() async {
-    DatabaseHelper db = DatabaseHelper.instance;
-    db.getResturantOrderList().then((value) {
-      List<RestaurantCartItem> tagObjs =
-      value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
-      setState(() {
-        cartListII = List.from(tagObjs);
-      });
-      print('cart value :- ${cartListII.toString()}');
-      for (int i = 0; i < cartListII.length; i++) {
-        print('${cartListII[i].varient_id}');
-        db
-            .getAddOnListWithPrice(int.parse('${cartListII[i].varient_id}'))
-            .then((values) {
-          print('${values}');
-          List<AddonCartItem> tagObjsd =
-          values.map((tagJson) => AddonCartItem.fromJson(tagJson)).toList();
-          if (tagObjsd != null) {
-            setState(() {
-              cartListII[i].addon = tagObjsd;
-            });
-          }
-        });
-      }
-    });
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // db.getResturantOrderList().then((value) {
+    //   List<RestaurantCartItem> tagObjs =
+    //   value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
+    //   setState(() {
+    //     cartListII = List.from(tagObjs);
+    //   });
+    //   print('cart value :- ${cartListII.toString()}');
+    //   for (int i = 0; i < cartListII.length; i++) {
+    //     print('${cartListII[i].varient_id}');
+    //     db
+    //         .getAddOnListWithPrice(int.parse('${cartListII[i].varient_id}'))
+    //         .then((values) {
+    //       print('${values}');
+    //       List<AddonCartItem> tagObjsd =
+    //       values.map((tagJson) => AddonCartItem.fromJson(tagJson)).toList();
+    //       if (tagObjsd != null) {
+    //         setState(() {
+    //           cartListII[i].addon = tagObjsd;
+    //         });
+    //       }
+    //     });
+    //   }
+    // });
+
+
   }
 
   showMyDialog(BuildContext context) {
@@ -238,86 +240,87 @@ class _JuiceListState extends State<JuiceList> {
                                 {
                                   currentIndex = index;
                                   print(index);
-                                  DatabaseHelper db =
-                                      DatabaseHelper.instance;
-                                  db.getRestProdQty(
-                                      '${widget.categoryListNew[index].variant[0].variant_id}')
-                                      .then((value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        widget.categoryListNew[index].variant[0].addOnQty = value;
-                                      });
-                                    } else {
-                                      if (widget.categoryListNew[index].variant[0].addOnQty > 0) {
-                                        setState(() {
-                                          widget.categoryListNew[index].variant[0].addOnQty = 0;
-                                        });
-                                      }
-                                    }
-                                    db.getAddOnList(
-                                        '${widget.categoryListNew[index].variant[0].variant_id}')
-                                        .then((valued) {
-                                      List<AddonList> addOnlist = [];
-                                      if (valued != null &&
-                                          valued.length > 0) {
-                                        addOnlist = valued
-                                            .map((e) =>
-                                            AddonList.fromJson(e))
-                                            .toList();
-                                        for (int i = 0;
-                                        i < widget.categoryListNew[index].addons.length;
-                                        i++) {
-                                          int ind = addOnlist.indexOf(
-                                              AddonList(
-                                                  '${widget.categoryListNew[index].addons[i].addon_id}'));
-                                          if (ind != null && ind >= 0) {
-                                            setState(() {
-                                              widget.categoryListNew[index].addons[i].isAdd =
-                                              true;
-                                            });
-                                          }
-                                        }
-                                      }
-
-                                      db.calculateTotalRestAdonA(
-                                          '${widget.categoryListNew[index].variant[0].variant_id}')
-                                          .then((value1) {
-                                        double priced = 0.0;
-                                        if (value != null) {
-                                          var tagObjsJson =
-                                          value1 as List;
-                                          dynamic totalAmount_1 =
-                                          tagObjsJson[0]['Total'];
-                                          if (totalAmount_1 != null) {
-                                            setState(() {
-                                              priced = double.parse(
-                                                  '${totalAmount_1}');
-                                            });
-                                          }
-                                        }
-                                        if(grocercart==1){
-                                          print("ALREADY");
-                                          showMyDialog(context);
-                                        }
-                                        else {
-                                          productDescriptionModalBottomSheets(
-                                              context,
-                                              grocercart,
-                                              height,
-                                              widget.categoryListNew[index],
-                                              0,
-                                              addOnlist,
-                                              widget.currencySymbol,
-                                              priced,
-                                              widget
-                                                  .onVerificationDone())
-                                              .then((value) {
-                                            widget.onVerificationDone();
-                                          });
-                                        }
-                                      });
+                                  // DatabaseHelper db =
+                                  //     DatabaseHelper.instance;
+                                  // db.getRestProdQty(
+                                  //     '${widget.categoryListNew[index].variant[0].variant_id}')
+                                  //     .then((value) {
+                                  //   if (value != null) {
+                                  //     setState(() {
+                                  //       widget.categoryListNew[index].variant[0].addOnQty = value;
+                                  //     });
+                                  //   } else {
+                                  //     if (widget.categoryListNew[index].variant[0].addOnQty > 0) {
+                                  //       setState(() {
+                                  //         widget.categoryListNew[index].variant[0].addOnQty = 0;
+                                  //       });
+                                  //     }
+                                  //   }
+                                  //   db.getAddOnList(
+                                  //       '${widget.categoryListNew[index].variant[0].variant_id}')
+                                  //       .then((valued) {
+                                  //     List<AddonList> addOnlist = [];
+                                  //     if (valued != null &&
+                                  //         valued.length > 0) {
+                                  //       addOnlist = valued
+                                  //           .map((e) =>
+                                  //           AddonList.fromJson(e))
+                                  //           .toList();
+                                  //       for (int i = 0;
+                                  //       i < widget.categoryListNew[index].addons.length;
+                                  //       i++) {
+                                  //         int ind = addOnlist.indexOf(
+                                  //             AddonList(
+                                  //                 '${widget.categoryListNew[index].addons[i].addon_id}'));
+                                  //         if (ind != null && ind >= 0) {
+                                  //           setState(() {
+                                  //             widget.categoryListNew[index].addons[i].isAdd =
+                                  //             true;
+                                  //           });
+                                  //         }
+                                  //       }
+                                  //     }
+                                  //
+                                  //     db.calculateTotalRestAdonA(
+                                  //         '${widget.categoryListNew[index].variant[0].variant_id}')
+                                  //         .then((value1) {
+                                  //       double priced = 0.0;
+                                  //       if (value != null) {
+                                  //         var tagObjsJson =
+                                  //         value1 as List;
+                                  //         dynamic totalAmount_1 =
+                                  //         tagObjsJson[0]['Total'];
+                                  //         if (totalAmount_1 != null) {
+                                  //           setState(() {
+                                  //             priced = double.parse(
+                                  //                 '${totalAmount_1}');
+                                  //           });
+                                  //         }
+                                  //       }
+                                  //
+                                  //     });
+                                  //   });
+                                  // });
+                                  if(grocercart==1){
+                                    print("ALREADY");
+                                    showMyDialog(context);
+                                  }
+                                  else {
+                                    productDescriptionModalBottomSheets(
+                                        context,
+                                        grocercart,
+                                        height,
+                                        widget.categoryListNew[index],
+                                        0,
+                                        [],
+                                        widget.currencySymbol,
+                                        0,
+                                        widget
+                                            .onVerificationDone())
+                                        .then((value) {
+                                      widget.onVerificationDone();
                                     });
-                                  });
+                                  }
                                 }
                               },
                               child: Container(
@@ -357,86 +360,88 @@ class _JuiceListState extends State<JuiceList> {
                                 {
                                   currentIndex = index;
                                   print(index);
-                                  DatabaseHelper db =
-                                      DatabaseHelper.instance;
-                                  db.getRestProdQty(
-                                      '${widget.categoryListNew[index].variant[0].variant_id}')
-                                      .then((value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        widget.categoryListNew[index].variant[0].addOnQty = value;
-                                      });
-                                    } else {
-                                      if (widget.categoryListNew[index].variant[0].addOnQty > 0) {
-                                        setState(() {
-                                          widget.categoryListNew[index].variant[0].addOnQty = 0;
-                                        });
-                                      }
-                                    }
-                                    db.getAddOnList(
-                                        '${widget.categoryListNew[index].variant[0].variant_id}')
-                                        .then((valued) {
-                                      List<AddonList> addOnlist = [];
-                                      if (valued != null &&
-                                          valued.length > 0) {
-                                        addOnlist = valued
-                                            .map((e) =>
-                                            AddonList.fromJson(e))
-                                            .toList();
-                                        for (int i = 0;
-                                        i < widget.categoryListNew[index].addons.length;
-                                        i++) {
-                                          int ind = addOnlist.indexOf(
-                                              AddonList(
-                                                  '${widget.categoryListNew[index].addons[i].addon_id}'));
-                                          if (ind != null && ind >= 0) {
-                                            setState(() {
-                                              widget.categoryListNew[index].addons[i].isAdd =
-                                              true;
-                                            });
-                                          }
-                                        }
-                                      }
+                                  // DatabaseHelper db =
+                                  //     DatabaseHelper.instance;
+                                  // db.getRestProdQty(
+                                  //     '${widget.categoryListNew[index].variant[0].variant_id}')
+                                  //     .then((value) {
+                                  //   if (value != null) {
+                                  //     setState(() {
+                                  //       widget.categoryListNew[index].variant[0].addOnQty = value;
+                                  //     });
+                                  //   } else {
+                                  //     if (widget.categoryListNew[index].variant[0].addOnQty > 0) {
+                                  //       setState(() {
+                                  //         widget.categoryListNew[index].variant[0].addOnQty = 0;
+                                  //       });
+                                  //     }
+                                  //   }
+                                  //   db.getAddOnList(
+                                  //       '${widget.categoryListNew[index].variant[0].variant_id}')
+                                  //       .then((valued) {
+                                  //     List<AddonList> addOnlist = [];
+                                  //     if (valued != null &&
+                                  //         valued.length > 0) {
+                                  //       addOnlist = valued
+                                  //           .map((e) =>
+                                  //           AddonList.fromJson(e))
+                                  //           .toList();
+                                  //       for (int i = 0;
+                                  //       i < widget.categoryListNew[index].addons.length;
+                                  //       i++) {
+                                  //         int ind = addOnlist.indexOf(
+                                  //             AddonList(
+                                  //                 '${widget.categoryListNew[index].addons[i].addon_id}'));
+                                  //         if (ind != null && ind >= 0) {
+                                  //           setState(() {
+                                  //             widget.categoryListNew[index].addons[i].isAdd =
+                                  //             true;
+                                  //           });
+                                  //         }
+                                  //       }
+                                  //     }
+                                  //
+                                  //     db.calculateTotalRestAdonA(
+                                  //         '${widget.categoryListNew[index].variant[0].variant_id}')
+                                  //         .then((value1) {
+                                  //       double priced = 0.0;
+                                  //       if (value != null) {
+                                  //         var tagObjsJson =
+                                  //         value1 as List;
+                                  //         dynamic totalAmount_1 =
+                                  //         tagObjsJson[0]['Total'];
+                                  //         if (totalAmount_1 != null) {
+                                  //           setState(() {
+                                  //             priced = double.parse(
+                                  //                 '${totalAmount_1}');
+                                  //           });
+                                  //         }
+                                  //       }
 
-                                      db.calculateTotalRestAdonA(
-                                          '${widget.categoryListNew[index].variant[0].variant_id}')
-                                          .then((value1) {
-                                        double priced = 0.0;
-                                        if (value != null) {
-                                          var tagObjsJson =
-                                          value1 as List;
-                                          dynamic totalAmount_1 =
-                                          tagObjsJson[0]['Total'];
-                                          if (totalAmount_1 != null) {
-                                            setState(() {
-                                              priced = double.parse(
-                                                  '${totalAmount_1}');
-                                            });
-                                          }
-                                        }
-                                        if(grocercart==1){
-                                          print("ALREADY");
-                                          showMyDialog(context);
-                                        }
-                                        else {
-                                          productDescriptionModalBottomSheets(
-                                              context,
-                                              grocercart,
-                                              height,
-                                              widget.categoryListNew[index],
-                                              0,
-                                              addOnlist,
-                                              widget.currencySymbol,
-                                              priced,
-                                              widget
-                                                  .onVerificationDone())
-                                              .then((value) {
-                                            widget.onVerificationDone();
-                                          });
-                                        }
-                                      });
+                                  //     });
+                                  //   });
+                                  // });
+
+                                  if(grocercart==1){
+                                    print("ALREADY");
+                                    showMyDialog(context);
+                                  }
+                                  else {
+                                    productDescriptionModalBottomSheets(
+                                        context,
+                                        grocercart,
+                                        height,
+                                        widget.categoryListNew[index],
+                                        0,
+                                        [],
+                                        widget.currencySymbol,
+                                        1,
+                                        widget
+                                            .onVerificationDone())
+                                        .then((value) {
+                                      widget.onVerificationDone();
                                     });
-                                  });
+                                  }
                                 }
                               },
                               child: Container(
@@ -473,86 +478,87 @@ class _JuiceListState extends State<JuiceList> {
                               onTap: () {
                                 currentIndex = index;
                                 print(index);
-                                DatabaseHelper db =
-                                    DatabaseHelper.instance;
-                                db.getRestProdQty(
-                                    '${widget.categoryListNew[index].variant[0].variant_id}')
-                                    .then((value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      widget.categoryListNew[index].variant[0].addOnQty = value;
-                                    });
-                                  } else {
-                                    if (widget.categoryListNew[index].variant[0].addOnQty > 0) {
-                                      setState(() {
-                                        widget.categoryListNew[index].variant[0].addOnQty = 0;
-                                      });
-                                    }
-                                  }
-                                  db.getAddOnList(
-                                      '${widget.categoryListNew[index].variant[0].variant_id}')
-                                      .then((valued) {
-                                    List<AddonList> addOnlist = [];
-                                    if (valued != null &&
-                                        valued.length > 0) {
-                                      addOnlist = valued
-                                          .map((e) =>
-                                          AddonList.fromJson(e))
-                                          .toList();
-                                      for (int i = 0;
-                                      i < widget.categoryListNew[index].addons.length;
-                                      i++) {
-                                        int ind = addOnlist.indexOf(
-                                            AddonList(
-                                                '${widget.categoryListNew[index].addons[i].addon_id}'));
-                                        if (ind != null && ind >= 0) {
-                                          setState(() {
-                                            widget.categoryListNew[index].addons[i].isAdd =
-                                            true;
-                                          });
-                                        }
-                                      }
-                                    }
-
-                                    db.calculateTotalRestAdonA(
-                                        '${widget.categoryListNew[index].variant[0].variant_id}')
-                                        .then((value1) {
-                                      double priced = 0.0;
-                                      if (value != null) {
-                                        var tagObjsJson =
-                                        value1 as List;
-                                        dynamic totalAmount_1 =
-                                        tagObjsJson[0]['Total'];
-                                        if (totalAmount_1 != null) {
-                                          setState(() {
-                                            priced = double.parse(
-                                                '${totalAmount_1}');
-                                          });
-                                        }
-                                      }
-                                      if(grocercart==1){
-                                        print("ALREADY");
-                                        showMyDialog(context);
-                                      }
-                                      else {
-                                        productDescriptionModalBottomSheets(
-                                            context,
-                                            grocercart,
-                                            height,
-                                            widget.categoryListNew[index],
-                                            0,
-                                            addOnlist,
-                                            widget.currencySymbol,
-                                            priced,
-                                            widget
-                                                .onVerificationDone())
-                                            .then((value) {
-                                          widget.onVerificationDone();
-                                        });
-                                      }
-                                    });
+                                // DatabaseHelper db =
+                                //     DatabaseHelper.instance;
+                                // db.getRestProdQty(
+                                //     '${widget.categoryListNew[index].variant[0].variant_id}')
+                                //     .then((value) {
+                                //   if (value != null) {
+                                //     setState(() {
+                                //       widget.categoryListNew[index].variant[0].addOnQty = value;
+                                //     });
+                                //   } else {
+                                //     if (widget.categoryListNew[index].variant[0].addOnQty > 0) {
+                                //       setState(() {
+                                //         widget.categoryListNew[index].variant[0].addOnQty = 0;
+                                //       });
+                                //     }
+                                //   }
+                                //   db.getAddOnList(
+                                //       '${widget.categoryListNew[index].variant[0].variant_id}')
+                                //       .then((valued) {
+                                //     List<AddonList> addOnlist = [];
+                                //     if (valued != null &&
+                                //         valued.length > 0) {
+                                //       addOnlist = valued
+                                //           .map((e) =>
+                                //           AddonList.fromJson(e))
+                                //           .toList();
+                                //       for (int i = 0;
+                                //       i < widget.categoryListNew[index].addons.length;
+                                //       i++) {
+                                //         int ind = addOnlist.indexOf(
+                                //             AddonList(
+                                //                 '${widget.categoryListNew[index].addons[i].addon_id}'));
+                                //         if (ind != null && ind >= 0) {
+                                //           setState(() {
+                                //             widget.categoryListNew[index].addons[i].isAdd =
+                                //             true;
+                                //           });
+                                //         }
+                                //       }
+                                //     }
+                                //
+                                //     db.calculateTotalRestAdonA(
+                                //         '${widget.categoryListNew[index].variant[0].variant_id}')
+                                //         .then((value1) {
+                                //       double priced = 0.0;
+                                //       if (value != null) {
+                                //         var tagObjsJson =
+                                //         value1 as List;
+                                //         dynamic totalAmount_1 =
+                                //         tagObjsJson[0]['Total'];
+                                //         if (totalAmount_1 != null) {
+                                //           setState(() {
+                                //             priced = double.parse(
+                                //                 '${totalAmount_1}');
+                                //           });
+                                //         }
+                                //       }
+                                //
+                                //     });
+                                //   });
+                                // });
+                                if(grocercart==1){
+                                  print("ALREADY");
+                                  showMyDialog(context);
+                                }
+                                else {
+                                  productDescriptionModalBottomSheets(
+                                      context,
+                                      grocercart,
+                                      height,
+                                      widget.categoryListNew[index],
+                                      0,
+                                      [],
+                                      widget.currencySymbol,
+                                      1,
+                                      widget
+                                          .onVerificationDone())
+                                      .then((value) {
+                                    widget.onVerificationDone();
                                   });
-                                });
+                                }
                               },
                               child: Container(
                                 height: 30.0,
@@ -628,7 +634,7 @@ class _JuiceListState extends State<JuiceList> {
   void getCartItem() async {
     var store = intMapStoreFactory.store();
     var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
+    var db = await factory.openDatabase(DatabaseHelper.table);
     int size = await store.count(db);
     if(size!=0){
       setState(() {
@@ -662,19 +668,19 @@ Future productDescriptionModalBottomSheets(
   }
   double width = MediaQuery.of(context).size.width;
 
-  DatabaseHelper db = DatabaseHelper.instance;
-  db.getAddOnList('${item.variant[getIn].variant_id}').then((valued) {
-    List<AddonList> addOnlist = [];
-    if (valued != null && valued.length > 0) {
-      addOnlist = valued.map((e) => AddonList.fromJson(e)).toList();
-      for (int i = 0; i < item.addons.length; i++) {
-        int ind = addOnlist.indexOf(AddonList('${item.addons[i].addon_id}'));
-        if (ind != null && ind >= 0) {
-          item.addons[i].isAdd = true;
-        }
-      }
-    }
-  });
+  // DatabaseHelper db = DatabaseHelper.instance;
+  // db.getAddOnList('${item.variant[getIn].variant_id}').then((valued) {
+  //   List<AddonList> addOnlist = [];
+  //   if (valued != null && valued.length > 0) {
+  //     addOnlist = valued.map((e) => AddonList.fromJson(e)).toList();
+  //     for (int i = 0; i < item.addons.length; i++) {
+  //       int ind = addOnlist.indexOf(AddonList('${item.addons[i].addon_id}'));
+  //       if (ind != null && ind >= 0) {
+  //         item.addons[i].isAdd = true;
+  //       }
+  //     }
+  //   }
+  // });
 
   return showModalBottomSheet(
       context: context,
@@ -682,344 +688,427 @@ Future productDescriptionModalBottomSheets(
       isScrollControlled: true,
       builder: (BuildContext bc) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setState)
+        {
+          setAddOrMinusProdcutQty(ResturantVarient items,
+              BuildContext context, index, produtId, productName,
+              qty) async {
+            print('tb - ${qty}');
 
-              setAddOrMinusProdcutQty(ResturantVarient items,
-                  BuildContext context, index, produtId, productName,
-                  qty) async {
-                print('tb - ${qty}');
-                DatabaseHelper db = DatabaseHelper.instance;
-                db.getRestProductcount('${items.variant_id}').then((value) {
-                  print('value d - $value');
-                  var vae = {
-                    DatabaseHelper.productId: produtId,
-                    DatabaseHelper.storeName: productName,
-                    DatabaseHelper.varientId: '${items.variant_id}',
-                    DatabaseHelper.productName: productName,
-                    DatabaseHelper.price:
-                    ((double.parse('${items.price}') * qty)),
-                    DatabaseHelper.addQnty: qty,
-                    DatabaseHelper.unit: items.unit,
-                    DatabaseHelper.quantitiy: items.quantity
-                  };
-                  if (value == 0) {
-                    db.insertRaturantOrder(vae).then((valueaa) {
-                      db
-                          .calculateTotalRestAdonA('${items.variant_id}')
-                          .then((value1) {
-                        double pricedd = 0.0;
-                        if (value != null) {
-                          var tagObjsJson = value1 as List;
-                          dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                          print('${totalAmount_1}');
-                          if (totalAmount_1 != null) {
-                            setState(() {
-                              pricedd = double.parse('${totalAmount_1}');
-                              item.variant[getIn].addOnQty = qty;
-                              price =
-                                  (double.parse(
-                                      '${item.variant[getIn].price}') *
-                                      qty) +
-                                      pricedd;
-                            });
-                          } else {
-                            setState(() {
-                              item.variant[getIn].addOnQty = qty;
-                              price =
-                                  (double.parse(
-                                      '${item.variant[getIn].price}') *
-                                      qty) +
-                                      pricedd;
-                            });
-                          }
-                        } else {
-                          setState(() {
-                            item.variant[getIn].addOnQty = qty;
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    qty) +
-                                    pricedd;
-                          });
-                        }
-                      });
-                    });
-                  }
+            var store = intMapStoreFactory.store();
+            var factory = databaseFactoryWeb;
+            var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
+            var key = await store.record(produtId).add(db, <String, Object?>{
+              'varient_id': produtId,
+              'store_name': productName.toString(),
+              "add_qnty": qty,
+              "qnty": items.quantity,
+              "unit": items.unit,
+              "price": items.price,
+              "product_name": productName.toString(),
+            });
 
-                  else {
-                    if (qty == 0) {
-                      db.deleteResProduct('${items.variant_id}').then((value2) {
-                        db
-                            .deleteAddOn(int.parse('${items.variant_id}'))
-                            .then((value) {
-                          db
-                              .calculateTotalRestAdonA('${items.variant_id}')
-                              .then((value1) {
-                            double pricedd = 0.0;
-                            if (value != null) {
-                              var tagObjsJson = value1 as List;
-                              dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                              print('${totalAmount_1}');
-                              if (totalAmount_1 != null) {
-                                setState(() {
-                                  pricedd = double.parse('${totalAmount_1}');
-                                  item.variant[getIn].addOnQty = qty;
-                                  price = (double.parse(
-                                      '${item.variant[getIn].price}') *
-                                      qty) +
-                                      pricedd;
-                                });
-                              } else {
-                                setState(() {
-                                  item.variant[getIn].addOnQty = qty;
-                                  price = (double.parse(
-                                      '${item.variant[getIn].price}') *
-                                      qty) +
-                                      pricedd;
-                                });
-                              }
-                            } else {
-                              setState(() {
-                                item.variant[getIn].addOnQty = qty;
-                                price = (double.parse(
-                                    '${item.variant[getIn].price}') *
-                                    qty) +
-                                    pricedd;
-                              });
-                            }
-                          });
-                        });
-                      });
-                    } else {
-                      db
-                          .updateRestProductData(vae, '${items.variant_id}')
-                          .then((vay) {
-                        db
-                            .calculateTotalRestAdonA('${items.variant_id}')
-                            .then((value1) {
-                          double pricedd = 0.0;
-                          if (value != null) {
-                            var tagObjsJson = value1 as List;
-                            dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                            print('${totalAmount_1}');
-                            if (totalAmount_1 != null) {
-                              setState(() {
-                                pricedd = double.parse('${totalAmount_1}');
-                                item.variant[getIn].addOnQty = qty;
-                                price = (double.parse(
-                                    '${item.variant[getIn].price}') *
-                                    qty) +
-                                    pricedd;
-                              });
-                            } else {
-                              setState(() {
-                                item.variant[getIn].addOnQty = qty;
-                                price = (double.parse(
-                                    '${item.variant[getIn].price}') *
-                                    qty) +
-                                    pricedd;
-                              });
-                            }
-                          } else {
-                            setState(() {
-                              item.variant[getIn].addOnQty = qty;
-                              price =
-                                  (double.parse(
-                                      '${item.variant[getIn].price}') *
-                                      qty) +
-                                      pricedd;
-                            });
-                          }
-                        });
-                      });
-                    }
-                  }
-                }).catchError((e) {
-                  print(e);
-                });
+            var value = await store.record(produtId).get(db);
+            Map map2 = Map.from(value!);
+            print(map2);
+            if (produtId.toString() == map2.values.elementAt(0).toString()) {
+              var key1 = await store.record(produtId).delete(db);
+
+              var key = await store.record(produtId).add(db, <String, Object?>{
+                'varient_id': produtId,
+                'store_name': productName.toString(),
+                "add_qnty": qty,
+                "qnty": items.quantity,
+                "unit": items.unit,
+                "price":  items.price * qty,
+                "product_name": productName.toString(),
+              });
+              print("SAME VAR " + key.toString());
+            }
+
+            if (qty == 0) {
+              await store.record(produtId).delete(db);
+            }
+            setState(() {
+              item.variant[getIn].addOnQty = qty;
+              price =
+                  (double.parse(
+                      '${item.variant[getIn].price}') *
+                      qty);
+            });
+
+
+            // DatabaseHelper db = DatabaseHelper.instance;
+            // db.getRestProductcount('${items.variant_id}').then((value) {
+            //   print('value d - $value');
+            //   var vae = {
+            //     DatabaseHelper.productId: produtId,
+            //     DatabaseHelper.storeName: productName,
+            //     DatabaseHelper.varientId: '${items.variant_id}',
+            //     DatabaseHelper.productName: productName,
+            //     DatabaseHelper.price:
+            //     ((double.parse('${items.price}') * qty)),
+            //     DatabaseHelper.addQnty: qty,
+            //     DatabaseHelper.unit: items.unit,
+            //     DatabaseHelper.quantitiy: items.quantity
+            //   };
+            //   if (value == 0) {
+            //     db.insertRaturantOrder(vae).then((valueaa) {
+            //       db
+            //           .calculateTotalRestAdonA('${items.variant_id}')
+            //           .then((value1) {
+            //         double pricedd = 0.0;
+            //         if (value != null) {
+            //           var tagObjsJson = value1 as List;
+            //           dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+            //           print('${totalAmount_1}');
+            //           if (totalAmount_1 != null) {
+            //             setState(() {
+            //               pricedd = double.parse('${totalAmount_1}');
+            //               item.variant[getIn].addOnQty = qty;
+            //               price =
+            //                   (double.parse(
+            //                       '${item.variant[getIn].price}') *
+            //                       qty) +
+            //                       pricedd;
+            //             });
+            //           } else {
+            //             setState(() {
+            //               item.variant[getIn].addOnQty = qty;
+            //               price =
+            //                   (double.parse(
+            //                       '${item.variant[getIn].price}') *
+            //                       qty) +
+            //                       pricedd;
+            //             });
+            //           }
+            //         } else {
+            //           setState(() {
+            //             item.variant[getIn].addOnQty = qty;
+            //             price =
+            //                 (double.parse('${item.variant[getIn].price}') *
+            //                     qty) +
+            //                     pricedd;
+            //           });
+            //         }
+            //       });
+            //     });
+            //   }
+            //
+            //   else {
+            //     if (qty == 0) {
+            //       db.deleteResProduct('${items.variant_id}').then((value2) {
+            //         db
+            //             .deleteAddOn(int.parse('${items.variant_id}'))
+            //             .then((value) {
+            //           db
+            //               .calculateTotalRestAdonA('${items.variant_id}')
+            //               .then((value1) {
+            //             double pricedd = 0.0;
+            //             if (value != null) {
+            //               var tagObjsJson = value1 as List;
+            //               dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+            //               print('${totalAmount_1}');
+            //               if (totalAmount_1 != null) {
+            //                 setState(() {
+            //                   pricedd = double.parse('${totalAmount_1}');
+            //                   item.variant[getIn].addOnQty = qty;
+            //                   price = (double.parse(
+            //                       '${item.variant[getIn].price}') *
+            //                       qty) +
+            //                       pricedd;
+            //                 });
+            //               } else {
+            //                 setState(() {
+            //                   item.variant[getIn].addOnQty = qty;
+            //                   price = (double.parse(
+            //                       '${item.variant[getIn].price}') *
+            //                       qty) +
+            //                       pricedd;
+            //                 });
+            //               }
+            //             } else {
+            //               setState(() {
+            //                 item.variant[getIn].addOnQty = qty;
+            //                 price = (double.parse(
+            //                     '${item.variant[getIn].price}') *
+            //                     qty) +
+            //                     pricedd;
+            //               });
+            //             }
+            //           });
+            //         });
+            //       });
+            //     } else {
+            //       db
+            //           .updateRestProductData(vae, '${items.variant_id}')
+            //           .then((vay) {
+            //         db
+            //             .calculateTotalRestAdonA('${items.variant_id}')
+            //             .then((value1) {
+            //           double pricedd = 0.0;
+            //           if (value != null) {
+            //             var tagObjsJson = value1 as List;
+            //             dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+            //             print('${totalAmount_1}');
+            //             if (totalAmount_1 != null) {
+            //               setState(() {
+            //                 pricedd = double.parse('${totalAmount_1}');
+            //                 item.variant[getIn].addOnQty = qty;
+            //                 price = (double.parse(
+            //                     '${item.variant[getIn].price}') *
+            //                     qty) +
+            //                     pricedd;
+            //               });
+            //             } else {
+            //               setState(() {
+            //                 item.variant[getIn].addOnQty = qty;
+            //                 price = (double.parse(
+            //                     '${item.variant[getIn].price}') *
+            //                     qty) +
+            //                     pricedd;
+            //               });
+            //             }
+            //           } else {
+            //             setState(() {
+            //               item.variant[getIn].addOnQty = qty;
+            //               price =
+            //                   (double.parse(
+            //                       '${item.variant[getIn].price}') *
+            //                       qty) +
+            //                       pricedd;
+            //             });
+            //           }
+            //         });
+            //       });
+            //     }
+            //   }
+            // }).catchError((e) {
+            //   print(e);
+            // });
+          }
+
+          Future<dynamic> setAddOnToDatabase(isSelected,
+              AddOns addon, variant_id, int indexaa) async {
+            var store = intMapStoreFactory.store();
+            var factory = databaseFactoryWeb;
+            var db = await factory.openDatabase(DatabaseHelper.addontable);
+
+              var key = await store.record(addon.addon_id).add(
+                  db, <String, Object?>{
+                'varient_id': variant_id.toString(),
+                'addonname': addon.addon_name,
+                "addonid": addon.addon_id,
+                "price": addon.addon_price,
+              });
+              print("RES CART add "+key.toString());
+
+              setState(() {
+                item.addons[indexaa].isAdd = true;
+                isSelected = true;
+                price =
+                    (double.parse('${item.variant[getIn].price}') *
+                        item.variant[getIn].addOnQty) +
+                        addon.addon_price;
+              });
+
+
+            // var vae = {
+                //   DatabaseHelper.varientId: '${variant_id}',
+                //   DatabaseHelper.addonid: '${addon.addon_id}',
+                //   DatabaseHelper.price: addon.addon_price,
+                //   DatabaseHelper.addonName: addon.addon_name,
+                //   DatabaseHelper.storeName: "Store",
+                // };
+                // await db.insertAddOn(vae).then((value) {
+                //   print('ADDONADD $value');
+                //   if (value != null && value == 1) {
+                //     db.calculateTotalRestAdonA('${variant_id}').then((value1) {
+                //       double pricedd = 0.0;
+                //       print('${value1}');
+                //       if (value != null) {
+                //         var tagObjsJson = value1 as List;
+                //         dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+                //         print('${totalAmount_1}');
+                //         if (totalAmount_1 != null) {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = true;
+                //             isSelected = true;
+                //             pricedd = double.parse('${totalAmount_1}');
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         } else {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = true;
+                //             isSelected = true;
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         }
+                //       } else {
+                //         setState(() {
+                //           item.addons[indexaa].isAdd = true;
+                //           isSelected = true;
+                //           price =
+                //               (double.parse('${item.variant[getIn].price}') *
+                //                   item.variant[getIn].addOnQty) +
+                //                   pricedd;
+                //         });
+                //       }
+                //     });
+                //   } else {
+                //     db.calculateTotalRestAdonA('${variant_id}').then((value1) {
+                //       double pricedd = 0.0;
+                //       print('${value1}');
+                //       if (value != null) {
+                //         var tagObjsJson = value1 as List;
+                //         dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+                //         print('${totalAmount_1}');
+                //         if (totalAmount_1 != null) {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = false;
+                //             isSelected = false;
+                //             pricedd = double.parse('${totalAmount_1}');
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         } else {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = false;
+                //             isSelected = false;
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         }
+                //       } else {
+                //         setState(() {
+                //           item.addons[indexaa].isAdd = false;
+                //           isSelected = false;
+                //           price =
+                //               (double.parse('${item.variant[getIn].price}') *
+                //                   item.variant[getIn].addOnQty) +
+                //                   pricedd;
+                //         });
+                //       }
+                //     });
+                //   }
+                //   print("ADDONADD"+value.toString());
+                //   return value;
+                // }).catchError((e) {
+                //   print("ADDONADD"+e.toString());
+                //
+                //   return null;
+                // });
               }
 
-              Future<dynamic> setAddOnToDatabase(isSelected, DatabaseHelper db,
+              Future<dynamic> deleteAddOn(isSelected,
                   AddOns addon, variant_id, int indexaa) async {
-                var vae = {
-                  DatabaseHelper.varientId: '${variant_id}',
-                  DatabaseHelper.addonid: '${addon.addon_id}',
-                  DatabaseHelper.price: addon.addon_price,
-                  DatabaseHelper.addonName: addon.addon_name,
-                  DatabaseHelper.storeName: "Store",
-                };
-                await db.insertAddOn(vae).then((value) {
-                  print('ADDONADD $value');
-                  if (value != null && value == 1) {
-                    db.calculateTotalRestAdonA('${variant_id}').then((value1) {
-                      double pricedd = 0.0;
-                      print('${value1}');
-                      if (value != null) {
-                        var tagObjsJson = value1 as List;
-                        dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                        print('${totalAmount_1}');
-                        if (totalAmount_1 != null) {
-                          setState(() {
-                            item.addons[indexaa].isAdd = true;
-                            isSelected = true;
-                            pricedd = double.parse('${totalAmount_1}');
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        } else {
-                          setState(() {
-                            item.addons[indexaa].isAdd = true;
-                            isSelected = true;
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          item.addons[indexaa].isAdd = true;
-                          isSelected = true;
-                          price =
-                              (double.parse('${item.variant[getIn].price}') *
-                                  item.variant[getIn].addOnQty) +
-                                  pricedd;
-                        });
-                      }
-                    });
-                  } else {
-                    db.calculateTotalRestAdonA('${variant_id}').then((value1) {
-                      double pricedd = 0.0;
-                      print('${value1}');
-                      if (value != null) {
-                        var tagObjsJson = value1 as List;
-                        dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                        print('${totalAmount_1}');
-                        if (totalAmount_1 != null) {
-                          setState(() {
-                            item.addons[indexaa].isAdd = false;
-                            isSelected = false;
-                            pricedd = double.parse('${totalAmount_1}');
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        } else {
-                          setState(() {
-                            item.addons[indexaa].isAdd = false;
-                            isSelected = false;
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          item.addons[indexaa].isAdd = false;
-                          isSelected = false;
-                          price =
-                              (double.parse('${item.variant[getIn].price}') *
-                                  item.variant[getIn].addOnQty) +
-                                  pricedd;
-                        });
-                      }
-                    });
-                  }
-                  print("ADDONADD"+value.toString());
-                  return value;
-                }).catchError((e) {
-                  print("ADDONADD"+e.toString());
+                {
+                  var store = intMapStoreFactory.store();
+                  var factory = databaseFactoryWeb;
+                  var db = await factory.openDatabase(DatabaseHelper.addontable);
 
-                  return null;
-                });
-              }
+                  var key1 = await store.record(addon.addon_id).delete(db);
+                  setState(() {
+                    item.addons[indexaa].isAdd = false;
+                    isSelected = false;
+                    price =
+                    (double.parse('${item.variant[getIn].price}')) ;
+                  });
+                  print("RES CART del "+key1.toString());
+                }
 
-              Future<dynamic> deleteAddOn(isSelected, DatabaseHelper db,
-                  AddOns addon, variant_id, int indexaa) async {
-                await db.deleteAddOnId('${addon.addon_id}').then((value) {
-                  if (value != null && value > 0) {
-                    db.calculateTotalRestAdonA('${variant_id}').then((value1) {
-                      double pricedd = 0.0;
-                      if (value != null) {
-                        var tagObjsJson = value1 as List;
-                        dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                        print('${totalAmount_1}');
-                        if (totalAmount_1 != null) {
-                          setState(() {
-                            item.addons[indexaa].isAdd = false;
-                            isSelected = false;
-                            pricedd = double.parse('${totalAmount_1}');
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        } else {
-                          setState(() {
-                            item.addons[indexaa].isAdd = false;
-                            isSelected = false;
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          item.addons[indexaa].isAdd = false;
-                          isSelected = false;
-                          price =
-                              (double.parse('${item.variant[getIn].price}') *
-                                  item.variant[getIn].addOnQty) +
-                                  pricedd;
-                        });
-                      }
-                    });
-                  } else {
-                    db.calculateTotalRestAdonA('${variant_id}').then((value1) {
-                      double pricedd = 0.0;
-                      if (value != null) {
-                        var tagObjsJson = value1 as List;
-                        dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-                        if (totalAmount_1 != null) {
-                          setState(() {
-                            item.addons[indexaa].isAdd = true;
-                            isSelected = true;
-                            pricedd = double.parse('${totalAmount_1}');
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        } else {
-                          setState(() {
-                            item.addons[indexaa].isAdd = true;
-                            isSelected = true;
-                            price =
-                                (double.parse('${item.variant[getIn].price}') *
-                                    item.variant[getIn].addOnQty) +
-                                    pricedd;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          item.addons[indexaa].isAdd = true;
-                          isSelected = true;
-                          price =
-                              (double.parse('${item.variant[getIn].price}') *
-                                  item.variant[getIn].addOnQty) +
-                                  pricedd;
-                        });
-                      }
-                    });
-                  }
-                  return value;
-                }).catchError((e) {
-                  return null;
-                });
+
+                // await db.deleteAddOnId('${addon.addon_id}').then((value) {
+                //   if (value != null && value > 0) {
+                //     db.calculateTotalRestAdonA('${variant_id}').then((value1) {
+                //       double pricedd = 0.0;
+                //       if (value != null) {
+                //         var tagObjsJson = value1 as List;
+                //         dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+                //         print('${totalAmount_1}');
+                //         if (totalAmount_1 != null) {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = false;
+                //             isSelected = false;
+                //             pricedd = double.parse('${totalAmount_1}');
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         } else {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = false;
+                //             isSelected = false;
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         }
+                //       } else {
+                //         setState(() {
+                //           item.addons[indexaa].isAdd = false;
+                //           isSelected = false;
+                //           price =
+                //               (double.parse('${item.variant[getIn].price}') *
+                //                   item.variant[getIn].addOnQty) +
+                //                   pricedd;
+                //         });
+                //       }
+                //     });
+                //   } else {
+                //     db.calculateTotalRestAdonA('${variant_id}').then((value1) {
+                //       double pricedd = 0.0;
+                //       if (value != null) {
+                //         var tagObjsJson = value1 as List;
+                //         dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+                //         if (totalAmount_1 != null) {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = true;
+                //             isSelected = true;
+                //             pricedd = double.parse('${totalAmount_1}');
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         } else {
+                //           setState(() {
+                //             item.addons[indexaa].isAdd = true;
+                //             isSelected = true;
+                //             price =
+                //                 (double.parse('${item.variant[getIn].price}') *
+                //                     item.variant[getIn].addOnQty) +
+                //                     pricedd;
+                //           });
+                //         }
+                //       } else {
+                //         setState(() {
+                //           item.addons[indexaa].isAdd = true;
+                //           isSelected = true;
+                //           price =
+                //               (double.parse('${item.variant[getIn].price}') *
+                //                   item.variant[getIn].addOnQty) +
+                //                   pricedd;
+                //         });
+                //       }
+                //     });
+                //   }
+                //   return value;
+                // }).catchError((e) {
+                //   return null;
+                // });
               }
 
               return Wrap(
@@ -1277,230 +1366,230 @@ Future productDescriptionModalBottomSheets(
                                             if (item.variant[getIn]
                                                 .addOnQty >
                                                 0) {
-                                              DatabaseHelper db =
-                                                  DatabaseHelper.instance;
-                                              db
-                                                  .getCountAddon(
-                                                  '${item.addons[indexw]
-                                                      .addon_id}')
-                                                  .then((value) {
-                                                print('addon count $value');
-                                                if (value != null &&
-                                                    value > 0) {
-                                                  deleteAddOn(
-                                                      (item.addons[indexw]
-                                                          .isAdd !=
-                                                          null &&
-                                                          item
-                                                              .addons[
-                                                          indexw]
-                                                              .isAdd)
-                                                          ? true
-                                                          : false,
-                                                      db,
-                                                      item.addons[
-                                                      indexw],
-                                                      item
-                                                          .variant[
-                                                      getIn]
-                                                          .variant_id,
-                                                      indexw)
-                                                      .then((value) {
-                                                    print(
-                                                        'addon deleted $value');
-                                                  }).catchError((e) {
-                                                    print(e);
-                                                  });
-                                                } else {
-                                                  var vae = {
-                                                    DatabaseHelper
-                                                        .varientId:
-                                                    '${item.variant[getIn]
-                                                        .variant_id}',
-                                                    DatabaseHelper.addonid:
-                                                    '${item.addons[indexw]
-                                                        .addon_id}',
-                                                    DatabaseHelper.price:
-                                                    item.addons[indexw]
-                                                        .addon_price,
-                                                    DatabaseHelper
-                                                        .addonName:
-                                                    item.addons[indexw]
-                                                        .addon_name
-                                                  };
-                                                  db
-                                                      .insertAddOn(vae)
-                                                      .then((value) {
-                                                    print(
-                                                        'addon add $value');
-                                                    if (value != null &&
-                                                        value > 0) {
-                                                      db
-                                                          .calculateTotalRestAdonA(
-                                                          '${item.variant[getIn]
-                                                              .variant_id}')
-                                                          .then((value1) {
-                                                        double pricedd =
-                                                        0.0;
-                                                        print('${value1}');
-                                                        if (value != null) {
-                                                          var tagObjsJson =
-                                                          value1
-                                                          as List;
-                                                          dynamic
-                                                          totalAmount_1 =
-                                                          tagObjsJson[0]
-                                                          ['Total'];
-                                                          print(
-                                                              '${totalAmount_1}');
-                                                          if (totalAmount_1 !=
-                                                              null) {
-                                                            setState(() {
-                                                              item
-                                                                  .addons[
-                                                              indexw]
-                                                                  .isAdd = true;
-                                                              pricedd = double
-                                                                  .parse(
-                                                                  '${totalAmount_1}');
-                                                              // item.varients[getIn].addOnQty = qty;
-                                                              price =
-                                                                  (double.parse(
-                                                                      '${item
-                                                                          .variant[getIn]
-                                                                          .price}') *
-                                                                      item
-                                                                          .variant[getIn]
-                                                                          .addOnQty) +
-                                                                      pricedd;
-                                                            });
-                                                          } else {
-                                                            setState(() {
-                                                              item
-                                                                  .addons[
-                                                              indexw]
-                                                                  .isAdd = true;
-                                                              // item.varients[getIn].addOnQty = qty;
-                                                              price =
-                                                                  (double.parse(
-                                                                      '${item
-                                                                          .variant[getIn]
-                                                                          .price}') *
-                                                                      item
-                                                                          .variant[getIn]
-                                                                          .addOnQty) +
-                                                                      pricedd;
-                                                            });
-                                                          }
-                                                        } else {
-                                                          setState(() {
-                                                            item
-                                                                .addons[
-                                                            indexw]
-                                                                .isAdd = true;
-                                                            price =
-                                                                (double.parse(
-                                                                    '${item
-                                                                        .variant[getIn]
-                                                                        .price}') *
-                                                                    item
-                                                                        .variant[getIn]
-                                                                        .addOnQty) +
-                                                                    pricedd;
-                                                          });
-                                                        }
-                                                      });
-                                                    } else {
-                                                      db
-                                                          .calculateTotalRestAdonA(
-                                                          '${item.variant[getIn]
-                                                              .variant_id}')
-                                                          .then((value1) {
-                                                        double pricedd =
-                                                        0.0;
-                                                        print('${value1}');
-                                                        if (value != null) {
-                                                          var tagObjsJson =
-                                                          value1
-                                                          as List;
-                                                          dynamic
-                                                          totalAmount_1 =
-                                                          tagObjsJson[0]
-                                                          ['Total'];
-                                                          print(
-                                                              '${totalAmount_1}');
-                                                          if (totalAmount_1 !=
-                                                              null) {
-                                                            setState(() {
-                                                              item
-                                                                  .addons[
-                                                              indexw]
-                                                                  .isAdd =
-                                                              false;
-                                                              pricedd = double
-                                                                  .parse(
-                                                                  '${totalAmount_1}');
-                                                              price =
-                                                                  (double.parse(
-                                                                      '${item
-                                                                          .variant[getIn]
-                                                                          .price}') *
-                                                                      item
-                                                                          .variant[getIn]
-                                                                          .addOnQty) +
-                                                                      pricedd;
-                                                            });
-                                                          } else {
-                                                            setState(() {
-                                                              item
-                                                                  .addons[
-                                                              indexw]
-                                                                  .isAdd =
-                                                              false;
-                                                              // item.varients[getIn].addOnQty = qty;
-                                                              price =
-                                                                  (double.parse(
-                                                                      '${item
-                                                                          .variant[getIn]
-                                                                          .price}') *
-                                                                      item
-                                                                          .variant[getIn]
-                                                                          .addOnQty) +
-                                                                      pricedd;
-                                                            });
-                                                          }
-                                                        } else {
-                                                          setState(() {
-                                                            item
-                                                                .addons[
-                                                            indexw]
-                                                                .isAdd = false;
-                                                            price =
-                                                                (double.parse(
-                                                                    '${item
-                                                                        .variant[getIn]
-                                                                        .price}') *
-                                                                    item
-                                                                        .variant[getIn]
-                                                                        .addOnQty) +
-                                                                    pricedd;
-                                                          });
-                                                        }
-                                                      });
-                                                    }
-                                                    return value;
-                                                  }).catchError((e) {
-                                                    return null;
-                                                  });
-                                                }
-                                              }).catchError((e) {
-                                                print(e);
-                                              });
-                                            } else {
-                                              Toast.show(
-                                                  'Add first product to add addon!',
-                                                  duration: Toast.lengthShort,
-                                                  gravity: Toast.bottom);
+                                              // DatabaseHelper db =
+                                              //     DatabaseHelper.instance;
+                                              //   db.getCountAddon(
+                                              //       '${item.addons[indexw]
+                                              //           .addon_id}')
+                                              //       .then((value) {
+                                              //     print('addon count $value');
+                                              //     if (value != null &&
+                                              //         value > 0) {
+                                              //       deleteAddOn(
+                                              //           (item.addons[indexw]
+                                              //               .isAdd !=
+                                              //               null &&
+                                              //               item
+                                              //                   .addons[
+                                              //               indexw]
+                                              //                   .isAdd)
+                                              //               ? true
+                                              //               : false,
+                                              //           db,
+                                              //           item.addons[
+                                              //           indexw],
+                                              //           item
+                                              //               .variant[
+                                              //           getIn]
+                                              //               .variant_id,
+                                              //           indexw)
+                                              //           .then((value) {
+                                              //         print(
+                                              //             'addon deleted $value');
+                                              //       }).catchError((e) {
+                                              //         print(e);
+                                              //       });
+                                              //     } else {
+                                              //       var vae = {
+                                              //         DatabaseHelper
+                                              //             .varientId:
+                                              //         '${item.variant[getIn]
+                                              //             .variant_id}',
+                                              //         DatabaseHelper.addonid:
+                                              //         '${item.addons[indexw]
+                                              //             .addon_id}',
+                                              //         DatabaseHelper.price:
+                                              //         item.addons[indexw]
+                                              //             .addon_price,
+                                              //         DatabaseHelper
+                                              //             .addonName:
+                                              //         item.addons[indexw]
+                                              //             .addon_name
+                                              //       };
+                                              //       db
+                                              //           .insertAddOn(vae)
+                                              //           .then((value) {
+                                              //         print(
+                                              //             'addon add $value');
+                                              //         if (value != null &&
+                                              //             value > 0) {
+                                              //           db
+                                              //               .calculateTotalRestAdonA(
+                                              //               '${item.variant[getIn]
+                                              //                   .variant_id}')
+                                              //               .then((value1) {
+                                              //             double pricedd =
+                                              //             0.0;
+                                              //             print('${value1}');
+                                              //             if (value != null) {
+                                              //               var tagObjsJson =
+                                              //               value1
+                                              //               as List;
+                                              //               dynamic
+                                              //               totalAmount_1 =
+                                              //               tagObjsJson[0]
+                                              //               ['Total'];
+                                              //               print(
+                                              //                   '${totalAmount_1}');
+                                              //               if (totalAmount_1 !=
+                                              //                   null) {
+                                              //                 setState(() {
+                                              //                   item
+                                              //                       .addons[
+                                              //                   indexw]
+                                              //                       .isAdd = true;
+                                              //                   pricedd = double
+                                              //                       .parse(
+                                              //                       '${totalAmount_1}');
+                                              //                   // item.varients[getIn].addOnQty = qty;
+                                              //                   price =
+                                              //                       (double.parse(
+                                              //                           '${item
+                                              //                               .variant[getIn]
+                                              //                               .price}') *
+                                              //                           item
+                                              //                               .variant[getIn]
+                                              //                               .addOnQty) +
+                                              //                           pricedd;
+                                              //                 });
+                                              //               } else {
+                                              //                 setState(() {
+                                              //                   item
+                                              //                       .addons[
+                                              //                   indexw]
+                                              //                       .isAdd = true;
+                                              //                   // item.varients[getIn].addOnQty = qty;
+                                              //                   price =
+                                              //                       (double.parse(
+                                              //                           '${item
+                                              //                               .variant[getIn]
+                                              //                               .price}') *
+                                              //                           item
+                                              //                               .variant[getIn]
+                                              //                               .addOnQty) +
+                                              //                           pricedd;
+                                              //                 });
+                                              //               }
+                                              //             } else {
+                                              //               setState(() {
+                                              //                 item
+                                              //                     .addons[
+                                              //                 indexw]
+                                              //                     .isAdd = true;
+                                              //                 price =
+                                              //                     (double.parse(
+                                              //                         '${item
+                                              //                             .variant[getIn]
+                                              //                             .price}') *
+                                              //                         item
+                                              //                             .variant[getIn]
+                                              //                             .addOnQty) +
+                                              //                         pricedd;
+                                              //               });
+                                              //             }
+                                              //           });
+                                              //         } else {
+                                              //           db
+                                              //               .calculateTotalRestAdonA(
+                                              //               '${item.variant[getIn]
+                                              //                   .variant_id}')
+                                              //               .then((value1) {
+                                              //             double pricedd =
+                                              //             0.0;
+                                              //             print('${value1}');
+                                              //             if (value != null) {
+                                              //               var tagObjsJson =
+                                              //               value1
+                                              //               as List;
+                                              //               dynamic
+                                              //               totalAmount_1 =
+                                              //               tagObjsJson[0]
+                                              //               ['Total'];
+                                              //               print(
+                                              //                   '${totalAmount_1}');
+                                              //               if (totalAmount_1 !=
+                                              //                   null) {
+                                              //                 setState(() {
+                                              //                   item
+                                              //                       .addons[
+                                              //                   indexw]
+                                              //                       .isAdd =
+                                              //                   false;
+                                              //                   pricedd = double
+                                              //                       .parse(
+                                              //                       '${totalAmount_1}');
+                                              //                   price =
+                                              //                       (double.parse(
+                                              //                           '${item
+                                              //                               .variant[getIn]
+                                              //                               .price}') *
+                                              //                           item
+                                              //                               .variant[getIn]
+                                              //                               .addOnQty) +
+                                              //                           pricedd;
+                                              //                 });
+                                              //               } else {
+                                              //                 setState(() {
+                                              //                   item
+                                              //                       .addons[
+                                              //                   indexw]
+                                              //                       .isAdd =
+                                              //                   false;
+                                              //                   // item.varients[getIn].addOnQty = qty;
+                                              //                   price =
+                                              //                       (double.parse(
+                                              //                           '${item
+                                              //                               .variant[getIn]
+                                              //                               .price}') *
+                                              //                           item
+                                              //                               .variant[getIn]
+                                              //                               .addOnQty) +
+                                              //                           pricedd;
+                                              //                 });
+                                              //               }
+                                              //             } else {
+                                              //               setState(() {
+                                              //                 item
+                                              //                     .addons[
+                                              //                 indexw]
+                                              //                     .isAdd = false;
+                                              //                 price =
+                                              //                     (double.parse(
+                                              //                         '${item
+                                              //                             .variant[getIn]
+                                              //                             .price}') *
+                                              //                         item
+                                              //                             .variant[getIn]
+                                              //                             .addOnQty) +
+                                              //                         pricedd;
+                                              //               });
+                                              //             }
+                                              //           });
+                                              //         }
+                                              //         return value;
+                                              //       }).catchError((e) {
+                                              //         return null;
+                                              //       });
+                                              //     }
+                                              //   }).catchError((e) {
+                                              //     print(e);
+                                              //   });
+                                              // } else {
+                                              //   Toast.show(
+                                              //       'Add first product to add addon!',
+                                              //       duration: Toast.lengthShort,
+                                              //       gravity: Toast.bottom);
+                                              // }
                                             }
                                           },
                                           child:
@@ -1511,12 +1600,12 @@ Future productDescriptionModalBottomSheets(
                                               setState(() {
                                                 item.addons[indexw].isAdd = value;
                                               });
+
                                                 if(value==true){
-                                                  setAddOnToDatabase(item.variant[0].isSelected, db, item.addons[indexw], item.variant[0].variant_id, indexw);
+                                                  setAddOnToDatabase(item.variant[0].isSelected, item.addons[indexw], item.variant[0].product_id, indexw);
                                                 }
                                                 else{
-                                                  deleteAddOn(item.variant[0].isSelected, db, item.addons[indexw], item.variant[0].variant_id, indexw);
-
+                                                  deleteAddOn(item.variant[0].isSelected,item.addons[indexw], item.variant[0].product_id, indexw);
                                                 }
 
                                             },
@@ -1570,15 +1659,15 @@ Future productDescriptionModalBottomSheets(
                           padding: EdgeInsets.all(fixPadding),
                           child: InkWell(
                             onTap: () async {
-                              DatabaseHelper db = DatabaseHelper.instance;
-                              db.queryResturantProdCount().then((value) {
-                                if (value != null && value > 0) {} else {
-                                  Toast.show(
-                                      'Add some product into cart to continue!',
-                                      duration: Toast.lengthShort,
-                                      gravity: Toast.bottom);
-                                }
-                              });
+                              // DatabaseHelper db = DatabaseHelper.instance;
+                              // db.queryResturantProdCount().then((value) {
+                              //   if (value != null && value > 0) {} else {
+                              //     Toast.show(
+                              //         'Add some product into cart to continue!',
+                              //         duration: Toast.lengthShort,
+                              //         gravity: Toast.bottom);
+                              //   }
+                              // });
                               // Navigator.of(context).pushNamed()
                             },
                             child: Container(

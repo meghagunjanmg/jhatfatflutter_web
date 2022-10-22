@@ -100,25 +100,25 @@ class OrderPlaced extends StatelessWidget {
         Row(
             children: <Widget>[
 
-              Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      primary: kMainColor,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 20),
-                      textStyle: TextStyle(
-                          color: kWhiteColor, fontWeight: FontWeight.w400)),
-                  onPressed: () {
-                        CallAPI('$order_id',context);
-                    },
-
-                  child: Text("Start Tracking")
-              ),
-        ),
+        //       Padding(
+        //   padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
+        //       child: ElevatedButton(
+        //           style: ElevatedButton.styleFrom(
+        //               shape: RoundedRectangleBorder(
+        //                 borderRadius: BorderRadius.circular(30.0),
+        //               ),
+        //               primary: kMainColor,
+        //               padding: EdgeInsets.symmetric(
+        //                   horizontal: 50, vertical: 20),
+        //               textStyle: TextStyle(
+        //                   color: kWhiteColor, fontWeight: FontWeight.w400)),
+        //           onPressed: () {
+        //                 CallAPI('$order_id',context);
+        //             },
+        //
+        //           child: Text("Start Tracking")
+        //       ),
+        // ),
 
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),

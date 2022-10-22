@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:html';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
@@ -29,11 +30,11 @@ import 'package:jhatfat/bean/cartdetails.dart';
 import 'package:jhatfat/bean/cartitem.dart';
 import 'package:jhatfat/bean/orderarray.dart';
 import 'package:jhatfat/bean/paymentstatus.dart';
-import 'package:jhatfat/databasehelper/dbhelper.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../bean/Product.dart';
 import '../bean/resturantbean/restaurantcartitem.dart';
+import '../databasehelper/dbhelper.dart';
 import '../restaturantui/pages/payment_restaurant_page.dart';
 
 class oneViewCart extends StatefulWidget {
@@ -159,30 +160,80 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void getResCartItem() async {
-    DatabaseHelper db = DatabaseHelper.instance;
-    db.getResturantOrderList().then((value) {
-      List<RestaurantCartItem> tagObjs =
-      value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
-      setState(() {
-        cartListII = List.from(tagObjs);
-        isCartFetch = true;
-      });
-      for (int i = 0; i < cartListII.length; i++) {
-        print('${cartListII[i].varient_id}');
-        db
-            .getAddOnListWithPrice(int.parse('${cartListII[i].varient_id}'))
-            .then((values) {
-          List<AddonCartItem> tagObjsd =
-          values.map((tagJson) => AddonCartItem.fromJson(tagJson)).toList();
-          setState(() {
-            cartListII[i].addon = tagObjsd;
-          });
-        });
+
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
+
+    final recordSnapshot = await store.find(await db);
+    List<RestaurantCartItem> product = recordSnapshot.map((snapshot){
+      final product = RestaurantCartItem.fromJson(snapshot.value);
+      return product;
+    }).toList();
+
+    var db1 = await factory.openDatabase(DatabaseHelper.addontable);
+    final recordSnapshot1 = await store.find(db1);
+    List<AddonCartItem> product1 = recordSnapshot1.map((snapshot){
+      final product1 = AddonCartItem.fromJson(snapshot.value);
+      return product1;
+    }).toList();
+
+    List<RestaurantCartItem> tagObjs = [];
+    for(int i=0;i<product.length;i++) {
+      List<AddonCartItem> tag = [];
+      print("RES CART add get "+product1.toString());
+      for(int j =0;j<product1.length;j++){
+        print("RES CART add get "+j.toString()+ " "+product1[j].toString());
+        if(product1[j].varient_id.toString() == product[i].varient_id.toString()){
+                tag.add(product1[j]);
+         print("RES CART add same "+tag.toString());
+       }
       }
-      setState(() {
-        isCartFetch = false;
-      });
+      tagObjs.add(new RestaurantCartItem(
+          product[i].varient_id,
+          product[i].store_name,
+          product[i].add_qnty,
+          product[i].qnty,
+          product[i].unit,
+          product[i].price,
+          product[i].product_name,
+          tag));
+    }
+    setState(() {
+      isCartFetch = true;
+      cartListII.clear();
+      cartListII = List.from(tagObjs);
     });
+
+    print("RES CART "+cartListII.toString());
+
+    getCatC();
+
+
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // db.getResturantOrderList().then((value) {
+    //   List<RestaurantCartItem> tagObjs =
+    //   value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
+    //   setState(() {
+    //     cartListII = List.from(tagObjs);
+    //     isCartFetch = true;
+    //   });
+    //   for (int i = 0; i < cartListII.length; i++) {
+    //     print('${cartListII[i].varient_id}');
+    //     db
+    //         .getAddOnListWithPrice(int.parse('${cartListII[i].varient_id}'))
+    //         .then((values) {
+    //       List<AddonCartItem> tagObjsd =
+    //       values.map((tagJson) => AddonCartItem.fromJson(tagJson)).toList();
+    //       setState(() {
+    //         cartListII[i].addon = tagObjsd;
+    //       });
+    //     });
+    //   }
+    //   setState(() {
+    //     isCartFetch = false;
+    //   });
+    // });
   }
 
   void prepareData(firstDate) {
@@ -327,42 +378,76 @@ class _oneViewCartState extends State<oneViewCart> {
     });
   }
 
-  void addOrMinusProduct2( product_id, product_name, unit, price,
-      quantity, itemCount,
-      varient_id, index, price_d) async {
-    DatabaseHelper db = DatabaseHelper.instance;
-    Future<int?> existing = db.getRestProductcount(int.parse(varient_id));
-    existing.then((value) {
-      var vae = {
-        DatabaseHelper.productId: product_id,
-        DatabaseHelper.productName: product_name,
-        DatabaseHelper.price: (price_d * itemCount),
-        DatabaseHelper.unit: unit,
-        DatabaseHelper.quantitiy: quantity,
-        DatabaseHelper.addQnty: itemCount,
-        DatabaseHelper.varientId: varient_id
-      };
+  void addOrMinusProduct2( produtId, productName, unit, price,
+      quantity, itemquan,
+      varient_id,price_d) async {
 
-      if (value == 0) {
-        db.insertRaturantOrder(vae);
-      }
-      else {
-        if (itemCount==0) {
-          db.deleteResProduct(varient_id).then((value) {
-            db.deleteAddOn(varient_id);
-          });
-          getResCartItem();
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
+    var value = await store.record(produtId).get(db);
+    Map map2 = Map.from(value!);
+    print(map2);
+    if (produtId.toString() == map2.values.elementAt(0).toString()) {
+      var key1 = await store.record(produtId).delete(db);
+      var key = await store.record(produtId).add(db, <String, Object?>{
+        'varient_id': produtId,
+        'store_name': productName.toString(),
+        "add_qnty": itemquan,
+        "qnty": quantity,
+        "unit": unit,
+        "price": (price_d * itemquan),
+        "product_name": productName.toString(),
+      });
+      print("SAME VAR " + key.toString());
+    }
 
-        } else {
-          db.updateRestProductData(vae, varient_id);
-        }
-      }
-      if (itemCount == 0) {
-        getResCartItem();
-      }
-    });
+    if (itemquan == 0) {
+      await store.record(produtId).delete(db);
+      Navigator.pop(context);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomeOrderAccount(3)),
+            (Route<dynamic> route) => true,
+      );
+    }
 
+    getResCartItem();
     getCatC();
+
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // Future<int?> existing = db.getRestProductcount(int.parse(varient_id));
+    // existing.then((value) {
+    //   var vae = {
+    //     DatabaseHelper.productId: product_id,
+    //     DatabaseHelper.productName: product_name,
+    //     DatabaseHelper.price: (price_d * itemCount),
+    //     DatabaseHelper.unit: unit,
+    //     DatabaseHelper.quantitiy: quantity,
+    //     DatabaseHelper.addQnty: itemCount,
+    //     DatabaseHelper.varientId: varient_id
+    //   };
+    //
+    //   if (value == 0) {
+    //     db.insertRaturantOrder(vae);
+    //   }
+    //   else {
+    //     if (itemCount==0) {
+    //       db.deleteResProduct(varient_id).then((value) {
+    //         db.deleteAddOn(varient_id);
+    //       });
+    //       getResCartItem();
+    //
+    //     } else {
+    //       db.updateRestProductData(vae, varient_id);
+    //     }
+    //   }
+    //   if (itemCount == 0) {
+    //     getResCartItem();
+    //   }
+    // });
+    //
+    // getCatC();
   }
 
   Widget timewidget(BuildContext context, double itemHeight, double itemWidth) {
@@ -556,8 +641,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                 cartListII[index].qnty,
                                 cartListII[index].add_qnty,
                                 cartListII[index].varient_id,
-                                index,
-                                price_d);
+                                price_d
+                            );
                           }
                           ,
                           child: Icon(
@@ -593,8 +678,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                 cartListII[index].qnty,
                                 cartListII[index].add_qnty,
                                 cartListII[index].varient_id,
-                                index,
-                                price_d);
+                                price_d
+                            );
                           },
                           child: Icon(
                             Icons.add,
@@ -673,10 +758,17 @@ class _oneViewCartState extends State<oneViewCart> {
 
 
   void deleteAddOn(addonid) async {
-    DatabaseHelper db = DatabaseHelper.instance;
-    db.deleteAddOnId(int.parse(addonid)).then((value) {
-      getResCartItem();
-    });
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // db.deleteAddOnId(int.parse(addonid)).then((value) {
+    //   getResCartItem();
+    // });
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.addontable);
+
+    var key1 = await store.record(addonid).delete(db);
+    getResCartItem();
+
   }
   void getCatC() async {
     if (cartListI.isNotEmpty) {
@@ -697,29 +789,43 @@ class _oneViewCartState extends State<oneViewCart> {
       });
     }
 
+     if (cartListII.isNotEmpty) {
+       var Amount=0.0;
+       for(int i=0;i<cartListII.length;i++) {
+         if(cartListII[i].addon.isNotEmpty){
+           for(int j = 0;j<cartListII[i].addon.length;j++){
+             Amount = cartListII.elementAt(i).price + cartListII.elementAt(i).addon[j].price + Amount;
+           }
+         }
+        else Amount = cartListII.elementAt(i).price + Amount;
+       }
+       setState(() {
+         totalAmount = Amount;
+       });
+     }
 
-    if (cartListII.isNotEmpty) {
-      DatabaseHelper db = DatabaseHelper.instance;
-      db.calculateTotalRest().then((value) {
-        db.calculateTotalRestAdon().then((valued) {
-          var tagObjsJson = value as List;
-          var tagObjsJsond = valued as List;
-          setState(() {
-            dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-            dynamic totalAmount_2 = tagObjsJsond[0]['Total'];
-
-            if (value.isEmpty) {
-              if (valued.isEmpty) {}
-              else {
-                totalAmount = totalAmount_1 + totalAmount_2;
-              }
-            } else {
-                totalAmount = totalAmount_1;
-            }
-          });
-        });
-      });
-    }
+    // if (cartListII.isNotEmpty) {
+    //   DatabaseHelper db = DatabaseHelper.instance;
+    //   db.calculateTotalRest().then((value) {
+    //     db.calculateTotalRestAdon().then((valued) {
+    //       var tagObjsJson = value as List;
+    //       var tagObjsJsond = valued as List;
+    //       setState(() {
+    //         dynamic totalAmount_1 = tagObjsJson[0]['Total'];
+    //         dynamic totalAmount_2 = tagObjsJsond[0]['Total'];
+    //
+    //         if (value.isEmpty) {
+    //           if (valued.isEmpty) {}
+    //           else {
+    //             totalAmount = totalAmount_1 + totalAmount_2;
+    //           }
+    //         } else {
+    //             totalAmount = totalAmount_1;
+    //         }
+    //       });
+    //     });
+    //   });
+    // }
   }
 
   void callThisMethod(bool isVisible) {
@@ -2141,7 +2247,12 @@ class _oneViewCartState extends State<oneViewCart> {
     var store = intMapStoreFactory.store();
     var factory = databaseFactoryWeb;
     var db = await factory.openDatabase(DatabaseHelper.table);
+    var db1 = await factory.openDatabase(DatabaseHelper.resturantOrder);
+    var db2 = await factory.openDatabase(DatabaseHelper.addontable);
     await store.drop(db);
+    await store.drop(db1);
+    await store.drop(db2);
+
     Navigator.pop(context);
           Navigator.pushAndRemoveUntil(
             context,

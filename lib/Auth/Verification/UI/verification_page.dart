@@ -52,14 +52,15 @@ class OtpVerify extends StatefulWidget {
 
 class _OtpVerifyState extends State<OtpVerify> {
   final TextEditingController _controller = TextEditingController();
+  ConfirmationResult? confirmationResult;
   late FirebaseMessaging messaging;
   bool isDialogShowing = false;
   dynamic token = 'token';
   var showDialogBox = false;
   var verificaitonPin = "";
-  late String phoneNo;
-  late String smsOTP="";
-  late String verificationId;
+  String phoneNo='';
+  String smsOTP="";
+  String verificationId='';
   String errorMessage = '';
   String contact = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -222,9 +223,11 @@ class _OtpVerifyState extends State<OtpVerify> {
                       showDialogBox = true;
                     });
                   }
-                  hitService("123456", context);
 
-                  ///verifyOtp();
+
+                  //// hitService("123456", context);
+
+                   verifyOtp();
                   },
                 child: Container(
                   alignment: Alignment.center,
@@ -334,7 +337,6 @@ class _OtpVerifyState extends State<OtpVerify> {
           codeSent: smsOTPSent,
           timeout: const Duration(seconds: 60),
           verificationCompleted: (AuthCredential phoneAuthCredential) {
-            verifyOtp();
           },
           verificationFailed: (Exception exception) {
             // Navigator.pop(context, exception.message);
@@ -344,6 +346,8 @@ class _OtpVerifyState extends State<OtpVerify> {
       handleError(e as FirebaseAuthException);
       // Navigator.pop(context, (e as PlatformException).message);
     }
+
+    confirmationResult = await _auth.signInWithPhoneNumber(contact);
   }
 
   //Method for verify otp entered by user
@@ -358,6 +362,7 @@ class _OtpVerifyState extends State<OtpVerify> {
         verificationId: verificationId,
         smsCode: smsOTP,
       );
+        UserCredential userCredential = await confirmationResult!.confirm(smsOTP);
 
        await _auth.signInWithCredential(credential);
 
@@ -374,19 +379,11 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   //Method for handle the errors
   void handleError(FirebaseAuthException error) {
-
-    switch (error.code) {
-      case 'ERROR_INVALID_VERIFICATION_CODE':
-        FocusScope.of(context).requestFocus(FocusNode());
+     FocusScope.of(context).requestFocus(FocusNode());
         setState(() {
           errorMessage = 'Invalid Code';
         });
         showAlertDialog(context, 'Invalid Code');
-        break;
-      default:
-        showAlertDialog(context, error.message.toString());
-        break;
-    }
   }
 
   //Basic alert dialogue for alert errors and confirmations
