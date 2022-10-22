@@ -40,7 +40,7 @@ class SetLocation extends StatefulWidget {
   SetLocationState createState() => SetLocationState(lat, lng);
 }
 
-GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey,baseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api');
+GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey,baseUrl: 'https://cors.sh/playground/https://maps.googleapis.com/maps/api');
 
 class SetLocationState extends State<SetLocation> {
   dynamic lat;
