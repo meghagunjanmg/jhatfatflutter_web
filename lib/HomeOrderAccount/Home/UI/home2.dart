@@ -571,7 +571,7 @@ class _HomeState extends State<Home> {
                           clipBehavior: Clip.hardEdge,
                           child: Container(
                             height: 250,
-                            width: 300,
+                            width: 500,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                             decoration: BoxDecoration(
                               color: white_color,
@@ -607,7 +607,7 @@ class _HomeState extends State<Home> {
                           clipBehavior: Clip.hardEdge,
                           child: Container(
                             height: 250,
-                            width: 300,
+                            width: 500,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                             decoration: BoxDecoration(
                               color: white_color,
