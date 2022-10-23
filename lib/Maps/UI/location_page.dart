@@ -209,14 +209,13 @@ class SetLocationState extends State<SetLocation> {
   }
 
   Future<Null> displayPrediction(Prediction p) async {
-    GoogleApiHeaders apiHeaders = GoogleApiHeaders();
-   print("HEADERS" + apiHeaders.getHeaders().toString());
 
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
-        baseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-       apiHeaders: await GoogleApiHeaders().getHeaders(),
+      baseUrl: 'https://maps.googleapis.com/maps/api',
+      apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
+
     PlacesDetailsResponse detail =
             await _places.getDetailsByPlaceId(p.placeId!);
         final lat = detail.result.geometry!.location.lat;

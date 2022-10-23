@@ -324,10 +324,10 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   //Method for generate otp from firebase
   Future<void> generateOtp(String contact) async {
-    // var smsOTPSent = (String verId, [int? forceCodeResend]) {
-    //   verificationId = verId;
-    //   print("** "+verificationId);
-    // };
+    var smsOTPSent = (String verId, [int? forceCodeResend]) {
+      verificationId = verId;
+      print("** "+verificationId);
+    };
     // try {
     //   await _auth.verifyPhoneNumber(
     //       phoneNumber: contact,
@@ -361,23 +361,28 @@ class _OtpVerifyState extends State<OtpVerify> {
       showAlertDialog(context, 'please enter 6 digit otp');
       return;
     }
-    try {
-      final AuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsOTP,
-      );
-        UserCredential userCredential = await confirmationResult!.confirm(smsOTP);
 
-       await _auth.signInWithCredential(credential);
+    await confirmationResult!.confirm(smsOTP);
+  ///  await _auth.signInWithPhoneNumber(contact);
 
-      print(smsOTP);
-      hitService(smsOTP, context);
 
-    } catch (e) {
-      print("otp verify error :  "+e.toString());
+    print(smsOTP);
+    hitService(smsOTP, context);
 
-      handleError(e as FirebaseAuthException);
-    }
+    // try {
+    //   final AuthCredential credential = PhoneAuthProvider.credential(
+    //     verificationId: verificationId,
+    //     smsCode: smsOTP,
+    //   );
+    //
+    //  await _auth.signInWithCredential(credential);
+
+    //
+    // } catch (e) {
+    //   print("otp verify error :  "+e.toString());
+    //
+    //   handleError(e as FirebaseAuthException);
+    // }
 
   }
 
