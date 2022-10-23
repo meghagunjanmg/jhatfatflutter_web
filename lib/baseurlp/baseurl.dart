@@ -9,6 +9,7 @@ var subsbanner = baseUrl + "subsbanner";
 var bigbanner = baseUrl + "bigbanner";
 var registerApi = baseUrl + "user_register";
 var verifyPhone = baseUrl + "verify_phone";
+var autocomplete = baseUrl + "autocomplete";
 var userRegistration = baseUrl + "checkuser";
 var userProfile = baseUrl + "myprofile";
 var forgotPassword = baseUrl + "forgot_password";

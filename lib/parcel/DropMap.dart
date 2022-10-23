@@ -191,6 +191,7 @@ class SetLocationState extends State<SetLocation> {
       apiKey: apiKey,
       onError: onError,
       mode: Mode.overlay, // or Mode.fullscreen
+      proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
       language: 'en',
       components: [Component(Component.country, 'in')],
     );
@@ -208,7 +209,7 @@ class SetLocationState extends State<SetLocation> {
   Future<Null> displayPrediction(Prediction p) async {
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
-      baseUrl: 'https://maps.googleapis.com/maps/api',
+      baseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
 

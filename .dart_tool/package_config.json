@@ -272,6 +272,36 @@
       "languageVersion": "2.14"
     },
     {
+      "name": "flutter_google_places_sdk",
+      "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_google_places_sdk-0.3.2+2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_google_places_sdk_android",
+      "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_google_places_sdk_android-0.1.2+3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_google_places_sdk_ios",
+      "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_google_places_sdk_ios-0.1.2+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_google_places_sdk_platform_interface",
+      "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_google_places_sdk_platform_interface-0.2.4+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_google_places_sdk_web",
+      "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_google_places_sdk_web-0.1.3+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_html",
       "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_html-3.0.0-alpha.6",
       "packageUri": "lib/",
@@ -1094,7 +1124,7 @@
       "languageVersion": "2.18"
     }
   ],
-  "generated": "2022-10-23T12:03:05.087635Z",
+  "generated": "2022-10-23T19:41:07.772905Z",
   "generator": "pub",
   "generatorVersion": "2.18.0"
 }
