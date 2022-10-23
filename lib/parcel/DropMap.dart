@@ -208,6 +208,8 @@ class SetLocationState extends State<SetLocation> {
   Future<Null> displayPrediction(Prediction p) async {
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
+      baseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
     PlacesDetailsResponse detail =
