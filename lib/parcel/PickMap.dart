@@ -187,6 +187,7 @@ class SetLocationState extends State<SetLocation> {
     //   print(e);
     // });
 
+
     final Prediction? p = await PlacesAutocomplete.show(
       context: context,
       apiKey: apiKey,
@@ -211,7 +212,7 @@ class SetLocationState extends State<SetLocation> {
 
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
-      baseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+      baseUrl: 'https://maps.googleapis.com/maps/api',
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
     PlacesDetailsResponse detail =

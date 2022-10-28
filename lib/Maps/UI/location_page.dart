@@ -40,7 +40,7 @@ class SetLocation extends StatefulWidget {
   SetLocationState createState() => SetLocationState(lat, lng);
 }
 
-GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey,baseUrl: 'https://cors.sh/playground/https://maps.googleapis.com/maps/api');
+GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey,baseUrl: 'https://maps.googleapis.com/maps/api');
 
 class SetLocationState extends State<SetLocation> {
   dynamic lat;
@@ -188,6 +188,9 @@ class SetLocationState extends State<SetLocation> {
     // }).catchError((e) {
     //   print(e);
     // });
+    Map<String,String> headers = new Map();
+    headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
+    headers.putIfAbsent("origin", () => "*");
 
     final Prediction? p = await PlacesAutocomplete.show(
       context: context,
@@ -196,6 +199,7 @@ class SetLocationState extends State<SetLocation> {
       mode: Mode.overlay, // or Mode.fullscreen
       proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
       language: 'en',
+      headers: headers,
       components: [Component(Component.country, 'in')],
     );
 
@@ -213,7 +217,7 @@ class SetLocationState extends State<SetLocation> {
 
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
-      baseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+      baseUrl: 'https://maps.googleapis.com/maps/api',
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
 
