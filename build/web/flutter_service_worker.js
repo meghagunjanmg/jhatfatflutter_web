@@ -8,7 +8,7 @@ const RESOURCES = {
 "canvaskit/profiling/canvaskit.js": "38164e5a72bdad0faa4ce740c9b8e564",
 "canvaskit/profiling/canvaskit.wasm": "95a45378b69e77af5ed2bc72b2209b94",
 "manifest.json": "418d915c956d9753844e261ca8337237",
-"main.dart.js": "1719a698f3e4e6c08e307e217d76fb70",
+"main.dart.js": "76c4bbda4ecdc389f756f52ff2a21a54",
 "flutter.js": "f85e6fb278b0fd20c349186fb46ae36d",
 "assets/packages/flutter_paystack/assets/images/paystack.png": "0b8db920412edd7d8b40e7e7e01ac439",
 "assets/packages/flutter_paystack/assets/images/paystack_icon.png": "5b143d4fa4eb48496adc052b89849025",
@@ -297,7 +297,7 @@ const RESOURCES = {
 "assets/packages/flutter_google_places_hoc081098/assets/google_black.png": "97f2acfb6e993a0c4134d9d04dff21e2",
 "assets/packages/flutter_google_places_hoc081098/assets/google_white.png": "40bc3ae5444eae0b9228d83bfd865158",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
-"assets/NOTICES": "b062cfc2ce34abcf2de3ade988e12e96",
+"assets/NOTICES": "e5cbf3ce290571e0879dd60e522329c3",
 "assets/fonts/MaterialIcons-Regular.otf": "95db9098c58fd6db106f1116bae85a0b",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/images/profile.png": "bee658ed6c3f73a082d092a7fa681680",
@@ -383,7 +383,7 @@ const RESOURCES = {
 "assets/assets/icon.png": "8d7bf92ec4ae72c52f5226973eb337ac",
 "assets/assets/google.png": "ec692ca35c238103cb9748fe899b3d8d",
 "assets/assets/driver-marker.png": "aa6374f0119caf338978fb6095d6340a",
-"assets/assets/kindacode.csv": "10638dd1c89486472bf7b9a937695406",
+"assets/assets/kindacode.csv": "c508b83b9ad1dd672fe95101201e0a33",
 "assets/assets/restaurant_location.jpg": "a800c8e3d74145ba856ccc3e560f2701",
 "assets/assets/restaurant/restaurant_5.png": "027a908272d12fdcfff8c03c640b583c",
 "assets/assets/restaurant/restaurant_2.png": "620509e7db0c53c91da3975a1b52c141",
@@ -438,8 +438,8 @@ const RESOURCES = {
 "icons/Icon-512.png": "2faff43ef5c59c9502895bf1f8b8f48a",
 "version.json": "779ef964a80dbdf4de128f0362ee909f",
 "sqlite3.wasm": "8010ee2ce690165ca56f2664b61d6f60",
-"index.html": "8c61f4ff031f2d006100c821b8965939",
-"/": "8c61f4ff031f2d006100c821b8965939"
+"index.html": "354b53188be87857c156f38f7bf82b1f",
+"/": "354b53188be87857c156f38f7bf82b1f"
 };
 
 // The application shell files that are downloaded before a service worker can

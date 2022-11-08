@@ -314,10 +314,10 @@ class _OtpVerifyState extends State<OtpVerify> {
         });
       });
     } else {
-      // messaging.getToken().then((value) {
-      //   token = value;
-      //   // hitService(verificaitonPin, context);
-      // });
+      messaging.getToken().then((value) {
+        token = value;
+         hitService(verificaitonPin, context);
+      });
     }
   }
 
@@ -362,12 +362,18 @@ class _OtpVerifyState extends State<OtpVerify> {
       return;
     }
 
-    await confirmationResult!.confirm(smsOTP);
+    try {
+      await confirmationResult!.confirm(smsOTP);
+
+      print(smsOTP);
+      hitService(smsOTP, context);
+
+    } catch (e) {
+      print(e);
+      handleError(e as FirebaseAuthException);
+    }
   ///  await _auth.signInWithPhoneNumber(contact);
 
-
-    print(smsOTP);
-    hitService(smsOTP, context);
 
     // try {
     //   final AuthCredential credential = PhoneAuthProvider.credential(

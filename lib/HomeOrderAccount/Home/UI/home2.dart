@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dio/dio.dart';
 import 'package:location/location.dart' as loc;
+import 'package:dio/dio.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +12,9 @@ import 'package:geocoder2/geocoder2.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:responsive_grid/responsive_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:toast/toast.dart';
@@ -39,8 +41,11 @@ import 'package:jhatfat/restaturantui/ui/resturanthome.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../Themes/constantfile.dart';
+import '../../../Themes/style.dart';
 import '../../../bean/adminsetting.dart';
+import '../../../restaturantui/pages/rasturantlistpage.dart';
 import '../../../restaturantui/pages/restaurant.dart';
+import '../../../subscription/SubscribeStore.dart';
 import '../Closed.dart';
 import 'appcategory/appcategory.dart';
 
@@ -78,6 +83,7 @@ class _HomeState extends State<Home> {
   List<BannerDetails> topBannerImage = [];
   List<VendorList> nearStores = [];
   List<VendorList> newnearStores = [];
+  List<Vendors> substores = [];
   List<VendorList> nearStoresShimmer = [
     VendorList(),
     VendorList(),
@@ -112,11 +118,14 @@ class _HomeState extends State<Home> {
 
   static String id="";
 
+  bool subscription = false;
 
   @override
   void initState() {
     super.initState();
-      getData();
+    checksubscription();
+
+    getData();
   }
 
 
@@ -154,7 +163,7 @@ class _HomeState extends State<Home> {
     }).catchError((e) {});
   }
   void callThisMethod(bool isVisible) {
-   getData();
+    getData();
   }
   void _getLocation(context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -176,15 +185,19 @@ class _HomeState extends State<Home> {
         String lanstring = ln.toStringAsFixed(8); // '2.35'
         double lngs = double.parse(lanstring);
 
-        await  prefs.setString("lat", latstring);
-        await  prefs.setString("lng", lanstring);
+        prefs.setString("lat", latstring);
+        prefs.setString("lng", lanstring);
 
         setState(() {
           lat = lats;
           lng = lngs;
         });
-        print("BackLATLONG" + lat.toString() + lng.toString());
-        ///// List<Placemark> placemarks = await placemarkFromCoordinates(lats, lngs);
+
+        //double lat = position.latitude;
+        //double lat = 29.006057;
+        //double lng = position.longitude;
+        //double lng = 77.027535;
+
 
         Dio dio = Dio();  //initilize dio package
         String apiurl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lats,$lngs&key=$apiKey";
@@ -212,7 +225,6 @@ class _HomeState extends State<Home> {
         }else{
           print("error while fetching geoconding data");
         }
-
 
         calladminsetting();
 
@@ -253,422 +265,314 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return
       VisibilityDetector(
-        key: Key(_HomeState.id),
-    onVisibilityChanged: (VisibilityInfo info) {
-    bool isVisible = info.visibleFraction != 0;
-    callThisMethod(isVisible);
-    },
-    child:
-    Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: CustomAppBar(
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.location_searching,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                _getLocation(context);
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.account_circle,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, PageRoutes.accountPage);
-                // do something
-              },
-            ),
-          ],
-          color: kMainColor,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Icon(
-              Icons.location_on,
-              color: Colors.white,
-            ),
-          ),
-
-          titleWidget:
-          GestureDetector(
-            onTap: () async {
-              print("SENDINGLATLNG  " + lat.toString() + lng.toString());
-              BackLatLng back = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LocationPage(lat, lng)));
-
-              getBackResult(back.lat, back.lng);
-            },
-
-            child: (cityName.toString()=="null")?
-            Text(
-              "NO LOCATION SELECTED",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white),
-            )
-                :
-            Text(
-              cityName!,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white),
-            )
-          ),
-        ),
-      ),
-      body: Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              (admins!.surge==1)
-                  ?
-              Padding(
-                  padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                  child:
-                    Text(
-                      admins!.surgeMsg.toString(),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 16,color: Colors.blue),
-                    )
-
-              )
-                  :
-          Padding(
-            padding: EdgeInsets.only(top: 8.0, left: 24.0),
-            child: Text(
-                    "",
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12),
-                  )
-          ),
-              Padding(
-                padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                child: Row(
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: ()async {
-
-                        await showDialog(
-                            context: context,
-                            builder: (_) => Dialog(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: white_color,
-                                borderRadius:
-                                BorderRadius.circular(20.0),
-                              ),
-                              child: Image.network(
-                                TopImage,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                        )
-                        );
-                      },
-                    child: Text(
-                      admins!.topMessage.toString(),
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1,
+          key: Key(_HomeState.id),
+          onVisibilityChanged: (VisibilityInfo info) {
+            bool isVisible = info.visibleFraction != 0;
+            callThisMethod(isVisible);
+          },
+          child:
+          Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(60.0),
+              child: CustomAppBar(
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.location_searching,
+                      color: Colors.white,
                     ),
-                ),
-          ],
-              ),
-              ),
-              SizedBox(
-                  height: 20
-              ),
-
-              Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width * 0.85,
-                height: 52,
-                padding: EdgeInsets.only(left: 5),
-
-                child: TypeAheadField(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    autofocus: false,
-                    style: DefaultTextStyle
-                        .of(context)
-                        .style
-                        .copyWith(fontStyle: FontStyle.italic),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          borderSide: BorderSide(color: Colors.black)),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          borderSide: BorderSide(color: Colors.black)),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: kHintColor,
-                      ),
-                      hintText: 'Search Store,Restaurant...',
-                    ),
+                    onPressed: () {
+                      _getLocation(context);
+                    },
                   ),
-                  suggestionsCallback: (pattern) async {
-                    return await BackendService.getSuggestions(
-                        pattern, lat, lng);
+                  IconButton(
+                    icon: Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, PageRoutes.accountPage);
+                      // do something
+                    },
+                  ),
+                ],
+                color: kMainColor,
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                  ),
+                ),
+
+                titleWidget:
+                GestureDetector(
+                  onTap: () async {
+                    print("SENDINGLATLNG  " + lat.toString() + lng.toString());
+                    BackLatLng back = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LocationPage(lat, lng)));
+
+                    getBackResult(back.lat, back.lng);
                   },
-                  itemBuilder: (context, Vendors suggestion) {
-                    return ListTile(
-                        title: Text('${suggestion.str1}'),
-                        subtitle: Text('${suggestion.str2}'
-                        )
-                    );
-                  },
-                  hideOnError: true,
-                  onSuggestionSelected: (Vendors detail) async {
-                    if (detail.uiType == "grocery" ||
-                        detail.uiType == "Grocery" ||
-                        detail.uiType == 1) {
-                      Navigator.push(context, MaterialPageRoute
-                        (builder: (context) =>
-                      new AppCategory(
-                          detail.vendorName.toString(), detail.vendorId,
-                          detail.distance)));
-                    }
-                    else if (detail.uiType == "resturant" ||
-                        detail.uiType == "Resturant" ||
-                        detail.uiType == 2) {
-                      for (int i = 0; i < rest_nearStores.length; i++) {
-                        if (rest_nearStores
-                            .elementAt(i)
-                            .vendor_id == detail.vendorId) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      Restaurant_Sub(
-                                          rest_nearStores.elementAt(i),
-                                          currency)));
-                        }
-                      }
-                    }
-                  },
+                  child: Text(
+                    cityName!,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
+                  ),
                 ),
               ),
-              // Container(
-              //   width: MediaQuery
-              //       .of(context)
-              //       .size
-              //       .width * 0.85,
-              //   height: 52,
-              //   padding: EdgeInsets.only(left: 5),
-              //   decoration: BoxDecoration(
-              //       color: scaffoldBgColor,
-              //       borderRadius: BorderRadius.circular(50)),
-              //   child: TextFormField(
-              //     decoration: InputDecoration(
-              //       border: InputBorder.none,
-              //       prefixIcon: Icon(
-              //         Icons.search,
-              //         color: kHintColor,
-              //       ),
-              //       hintText: 'Search store...',
-              //     ),
-              //     controller: searchController,
-              //     cursorColor: kMainColor,
-              //     keyboardType: TextInputType.text,
-              //     textInputAction: TextInputAction.done,
-              //     autofocus: false,
-              //       onChanged: (value) {
-              //               if(value.length>5) callSearch();
-              //       },
-              //     onTap: () {
-              //
-              //     },
-              //   ),
-              // ),
-
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: GridView.count(
-                  crossAxisCount: 5,
-                  crossAxisSpacing: 0,
-                  mainAxisSpacing: 0,
-                  childAspectRatio: 100 / 90,
-                  controller: ScrollController(keepScrollOffset: false),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  // childAspectRatio: itemWidth/(itemHeight),
-                  children: (nearStores != null && nearStores.length > 0)
-                      ? nearStores.map((e) {
-                    return ReusableCard(
-                      cardChild: CardContent(
-                        image: '${imageBaseUrl}${e.categoryImage}',
-                        text: '${e.categoryName}',
-                        uiType: e.uiType,
-                        vendorCategoryId: '${e.vendorCategoryId}',
-                        context: context,
-                      ),
-                    );
-                  }).toList()
-
-                      : nearStoresShimmer.map((e) {
-                    return ReusableCard(
-                        cardChild: Shimmer(
-                          duration: Duration(seconds: 3),
-                          //Default value
-                          color: Colors.white,
-                          //Default value
-                          enabled: true,
-                          //Default value
-                          direction: ShimmerDirection.fromLTRB(),
-                          //Default Value
-                          child: Container(
-                            color: kTransparentColor,
-                          ),
-                        ),
-                        onPress: () {});
-                  }).toList(),
-                ),
-              ),
-
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            body: Container(
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Builder(
-                  builder: (context) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute
-                          (builder: (context) =>
-                        new AppCategory(pickBannerImage[0].vendorName,
-                            pickBannerImage[0].vendorId, "22")));
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 10),
-                        child: Material(
-                          borderRadius:
-                          BorderRadius.circular(20.0),
-                          clipBehavior: Clip.hardEdge,
-                          child: Container(
-                            height: 250,
-                            width: 500,
-//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                            decoration: BoxDecoration(
-                              color: white_color,
-                              borderRadius:
-                              BorderRadius.circular(20.0),
-                            ),
-                            child: Image.network(
-                              pickImage,
-                              fit: BoxFit.fill,
+                    (admins!.surge==1)
+                        ?
+                    Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 24.0),
+                        child:
+                        Text(
+                          admins!.surgeMsg.toString(),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 16,color: Colors.blue),
+                        )
+
+                    )
+                        :
+                    Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 24.0),
+                        child: Text(
+                          "",
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 12),
+                        )
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 8.0, left: 24.0),
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: ()async {
+
+                              await showDialog(
+                                  context: context,
+                                  builder: (_) => Dialog(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: white_color,
+                                        borderRadius:
+                                        BorderRadius.circular(20.0),
+                                      ),
+                                      child: Image.network(
+                                        TopImage,
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  )
+                              );
+                            },
+                            child: Text(
+                              admins!.topMessage.toString(),
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .bodyText1,
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                    SizedBox(
+                        height: 20
+                    ),
 
-                ),
-              ),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                child: Builder(
-                  builder: (context) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, PageRoutes.subscription);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 10),
-                        child: Material(
-                          borderRadius:
-                          BorderRadius.circular(20.0),
-                          clipBehavior: Clip.hardEdge,
-                          child: Container(
-                            height: 250,
-                            width: 500,
-//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                            decoration: BoxDecoration(
-                              color: white_color,
-                              borderRadius:
-                              BorderRadius.circular(20.0),
+                    Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width * 0.85,
+                      height: 52,
+                      padding: EdgeInsets.only(left: 5),
+
+                      child: TypeAheadField(
+                        textFieldConfiguration: TextFieldConfiguration(
+                          autofocus: false,
+                          style: DefaultTextStyle
+                              .of(context)
+                              .style
+                              .copyWith(fontStyle: FontStyle.italic),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                borderSide: BorderSide(color: Colors.black)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                borderSide: BorderSide(color: Colors.black)),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: kHintColor,
                             ),
-                            child: Image.network(
-                              subsImage,
-                              fit: BoxFit.fill,
-                            ),
+                            hintText: 'Search Store,Restaurant...',
                           ),
                         ),
+                        suggestionsCallback: (pattern) async {
+                          return await BackendService.getSuggestions(
+                              pattern, lat, lng);
+                        },
+                        itemBuilder: (context, Vendors suggestion) {
+                          return ListTile(
+                              title: Text('${suggestion.str1}'),
+                              subtitle: Text('${suggestion.str2}'
+                              )
+                          );
+                        },
+                        hideOnError: true,
+                        onSuggestionSelected: (Vendors detail) async {
+                          if (detail.uiType == "grocery" ||
+                              detail.uiType == "Grocery" ||
+                              detail.uiType == 1) {
+                            Navigator.push(context, MaterialPageRoute
+                              (builder: (context) =>
+                            new AppCategory(
+                                detail.vendorName.toString(), detail.vendorId,
+                                detail.distance)));
+                          }
+                          else if (detail.uiType == "resturant" ||
+                              detail.uiType == "Resturant" ||
+                              detail.uiType == 2) {
+                            for (int i = 0; i < rest_nearStores.length; i++) {
+                              if (rest_nearStores
+                                  .elementAt(i)
+                                  .vendor_id == detail.vendorId) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            Restaurant_Sub(
+                                                rest_nearStores.elementAt(i),
+                                                currency)));
+                              }
+                            }
+                          }
+                        },
                       ),
-                    );
-                  },
+                    ),
+                    // Container(
+                    //   width: MediaQuery
+                    //       .of(context)
+                    //       .size
+                    //       .width * 0.85,
+                    //   height: 52,
+                    //   padding: EdgeInsets.only(left: 5),
+                    //   decoration: BoxDecoration(
+                    //       color: scaffoldBgColor,
+                    //       borderRadius: BorderRadius.circular(50)),
+                    //   child: TextFormField(
+                    //     decoration: InputDecoration(
+                    //       border: InputBorder.none,
+                    //       prefixIcon: Icon(
+                    //         Icons.search,
+                    //         color: kHintColor,
+                    //       ),
+                    //       hintText: 'Search store...',
+                    //     ),
+                    //     controller: searchController,
+                    //     cursorColor: kMainColor,
+                    //     keyboardType: TextInputType.text,
+                    //     textInputAction: TextInputAction.done,
+                    //     autofocus: false,
+                    //       onChanged: (value) {
+                    //               if(value.length>5) callSearch();
+                    //       },
+                    //     onTap: () {
+                    //
+                    //     },
+                    //   ),
+                    // ),
 
-                ),
-              ),
-                ]
-              ),
+                    Padding(
+                        padding: EdgeInsets.all(20),
+                        child:
+                        ResponsiveGridList(
+                          rowMainAxisAlignment: MainAxisAlignment.center,
+                          squareCells: true,
+                          desiredItemWidth: 120,
+                          shrinkWrap: true,
+                          minSpacing: 2, children:
+                        (nearStores != null && nearStores.length > 0)
+                            ? nearStores.map((e) {
+                          return ReusableCard(
+                            cardChild: CardContent(
+                              image: '${imageBaseUrl}${e.categoryImage}',
+                              text: '${e.categoryName}',
+                              uiType: e.uiType,
+                              vendorCategoryId: '${e.vendorCategoryId}',
+                              context: context,
+                            ),
+                          );
+                        }).toList()
+                            : nearStoresShimmer.map((e) {
+                          return ReusableCard(
+                              cardChild: Shimmer(
+                                duration: Duration(seconds: 3),
+                                //Default value
+                                color: Colors.white,
+                                //Default value
+                                enabled: true,
+                                //Default value
+                                direction: ShimmerDirection.fromLTRB(),
+                                //Default Value
+                                child: Container(
+                                  color: kTransparentColor,
+                                ),
+                              ),
+                              onPress: () {});
+                        }).toList(),
+                        )
+                    ),
 
-              Visibility(
-                visible: (!isFetch && listImage.length == 0) ? false : true,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 5),
-                  child: CarouselSlider(
-                      options: CarouselOptions(
-                        height: 450.0,
-                        autoPlay: true,
-                        initialPage: 0,
-                        viewportFraction: 0.9,
-                        enableInfiniteScroll: true,
-                        reverse: false,
-                        autoPlayInterval: Duration(seconds: 3),
-                        autoPlayAnimationDuration: Duration(milliseconds: 800),
-                        autoPlayCurve: Curves.fastOutSlowIn,
-                        scrollDirection: Axis.horizontal,
-                      ),
-                      items: (listImage != null && listImage.length > 0)
-                          ? listImage.map((e) {
-                        return Builder(
+                    ResponsiveGridList(
+                        rowMainAxisAlignment: MainAxisAlignment.center,
+                        desiredItemWidth: MediaQuery
+                            .of(context)
+                            .size
+                            .width - 200,
+                        shrinkWrap: true,
+                        minSpacing: 2, children:[
+                      Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Builder(
                           builder: (context) {
                             return InkWell(
                               onTap: () {
-                                hitbannerVendor(e);
+                                Navigator.push(context, MaterialPageRoute
+                                  (builder: (context) =>
+                                new AppCategory(pickBannerImage[0].vendorName,
+                                    pickBannerImage[0].vendorId, "22")));
                               },
                               child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 10),
+                                padding: EdgeInsets.all(20),
                                 child: Material(
-                                  elevation: 5,
                                   borderRadius:
                                   BorderRadius.circular(20.0),
                                   clipBehavior: Clip.hardEdge,
                                   child: Container(
-                                    height: 450,
-                                    width: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .width *
-                                        0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                                     decoration: BoxDecoration(
                                       color: white_color,
@@ -676,150 +580,274 @@ class _HomeState extends State<Home> {
                                       BorderRadius.circular(20.0),
                                     ),
                                     child: Image.network(
-                                      imageBaseUrl + e.bannerImage,
+                                      pickImage,
                                       fit: BoxFit.fill,
+                                      height: 150,
                                     ),
                                   ),
                                 ),
                               ),
                             );
                           },
-                        );
-                      }).toList()
-                          : listImages.map((e) {
-                        return Builder(builder: (context) {
-                          return Container(
-                            height: 450,
-                            width:
-                            MediaQuery
-                                .of(context)
-                                .size
-                                .width * 0.90,
-                            margin: EdgeInsets.symmetric(horizontal: 5.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                    ]),
+
+                    ( !subscription )?
+                    ResponsiveGridList(
+                        rowMainAxisAlignment: MainAxisAlignment.center,
+                        desiredItemWidth: MediaQuery
+                            .of(context)
+                            .size
+                            .width  - 200,
+                        shrinkWrap: true,
+                        minSpacing: 2, children:[
+                      Padding(
+                        padding: EdgeInsets.only(top: 2, bottom: 2),
+                        child: Builder(
+                          builder: (context) {
+                            return InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, PageRoutes.subscription);
+
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 10),
+                                child: Material(
+                                  borderRadius:
+                                  BorderRadius.circular(20.0),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Container(
+//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                    decoration: BoxDecoration(
+                                      color: white_color,
+                                      borderRadius:
+                                      BorderRadius.circular(20.0),
+                                    ),
+                                    child: Image.network(
+                                      subsImage,
+                                      fit: BoxFit.fill,
+                                      height: 150,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ])
+                        :
+                    Padding(
+                        padding: EdgeInsets.only(top: 5, bottom: 2),
+                        child:
+                        Column(
+                            children: <Widget>[
+
+                              Padding(
+                                  padding: EdgeInsets.all(fixPadding),
+                                  child:
+                                  Column(
+                                      children:[
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 8.0, left: 24.0,right: 24.0),
+                                          child:
+                                          Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Subscribed stores',
+                                                  style: headingStyle,
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        PageTransition(
+                                                            type: PageTransitionType
+                                                                .bottomToTop,
+                                                            child: SubscribeStore()));
+                                                  },
+                                                  child: Text('View all', style: moreStyle),
+                                                ),
+                                              ]),
+                                        ),
+                                        SizedBox(
+                                          height: 150,
+                                          width: MediaQuery. of(context). size. width,
+                                          child:
+                                          ListView.builder(
+                                            itemCount: (substores.length/2).toInt()+1,
+                                            scrollDirection: Axis.horizontal,
+                                            itemBuilder: (BuildContext context, int index) =>
+                                                Padding(padding: const EdgeInsets.all(2.0),
+                                                  child: InkWell(onTap: () {
+                                                    Navigator.push(context, MaterialPageRoute
+                                                      (builder: (context) =>
+                                                    new AppCategory(
+                                                        substores[index].vendorName.toString(), substores[index].vendorId,
+                                                        substores[index].distance)));
+                                                  },
+                                                    child: Container(
+                                                      width: 120.0,
+                                                      child: ListTile(
+                                                          title: Image.network('${imageBaseUrl}${substores[index].vendorLogo}',
+                                                            width: 100.0,
+                                                            height: 100.0,),
+                                                          subtitle: Container(
+                                                            alignment: Alignment.topCenter,
+                                                            child: Text(substores[index].vendorName!),
+                                                          )
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                          ),
+                                        )
+                                      ]
+                                  )
+                              ),
+                            ])),
+                    Visibility(
+                      visible: (!isFetch && listImage.length == 0) ? false : true,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 5),
+                        child: CarouselSlider(
+                            options: CarouselOptions(
+                              height: 200.0,
+                              autoPlay: true,
+                              initialPage: 0,
+                              viewportFraction: 0.9,
+                              enableInfiniteScroll: true,
+                              reverse: false,
+                              autoPlayInterval: Duration(seconds: 3),
+                              autoPlayAnimationDuration: Duration(milliseconds: 800),
+                              autoPlayCurve: Curves.fastOutSlowIn,
+                              scrollDirection: Axis.horizontal,
                             ),
-                            child: Shimmer(
-                              duration: Duration(seconds: 3),
-                              //Default value
-                              color: Colors.white,
-                              //Default value
-                              enabled: true,
-                              //Default value
-                              direction: ShimmerDirection.fromLTRB(),
-                              //Default Value
-                              child: Container(
-                                color: kTransparentColor,
+                            items: (listImage != null && listImage.length > 0)
+                                ? listImage.map((e) {
+                              return Builder(
+                                builder: (context) {
+                                  return InkWell(
+                                    onTap: () {
+                                      hitbannerVendor(e);
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 10),
+                                      child: Material(
+                                        elevation: 5,
+                                        borderRadius:
+                                        BorderRadius.circular(20.0),
+                                        clipBehavior: Clip.hardEdge,
+                                        child: Container(
+                                          height: 200,
+                                          width: MediaQuery
+                                              .of(context)
+                                              .size
+                                              .width - 200,
+//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                          decoration: BoxDecoration(
+                                            color: white_color,
+                                            borderRadius:
+                                            BorderRadius.circular(20.0),
+                                          ),
+                                          child: Image.network(
+                                            imageBaseUrl + e.bannerImage,
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }).toList()
+                                : listImages.map((e) {
+                              return Builder(builder: (context) {
+                                return Container(
+                                  height: 200,
+                                  width:
+                                  MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width * 0.90,
+                                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  child: Shimmer(
+                                    duration: Duration(seconds: 3),
+                                    //Default value
+                                    color: Colors.white,
+                                    //Default value
+                                    enabled: true,
+                                    //Default value
+                                    direction: ShimmerDirection.fromLTRB(),
+                                    //Default Value
+                                    child: Container(
+                                      color: kTransparentColor,
+                                    ),
+                                  ),
+                                );
+                              });
+                            }).toList()),
+                      ),
+                    ),
+
+
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Builder(
+                        builder: (context) {
+                          return InkWell(
+                            onTap: () {
+                              ////hitService1();
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Material(
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                                clipBehavior: Clip.hardEdge,
+                                child: Container(
+//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                  decoration: BoxDecoration(
+                                    color: white_color,
+                                    borderRadius:
+                                    BorderRadius.circular(20.0),
+                                  ),
+                                  child: Image.network(
+                                    bigImage,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
                               ),
                             ),
                           );
-                        });
-                      }).toList()),
-                ),
-              ),
+                        },
 
-
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Builder(
-                  builder: (context) {
-                    return InkWell(
-                      onTap: () {
-                        ////hitService1();
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 10),
-                        child: Material(
-                          borderRadius:
-                          BorderRadius.circular(20.0),
-                          clipBehavior: Clip.hardEdge,
-                          child: Container(
-                            height: 500,
-                            width: 800,
-//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                            decoration: BoxDecoration(
-                              color: white_color,
-                              borderRadius:
-                              BorderRadius.circular(20.0),
-                            ),
-                            child: Image.network(
-                              bigImage,
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
                       ),
-                    );
-                  },
+                    ),
 
+                    Text(
+                      admins!.bottomMessage.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+
+
+                  ],
                 ),
               ),
+            ),
+          )
 
-              Text(
-                    admins!.bottomMessage.toString(),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12),
-                  )
-
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child: GridView.count(
-              //     crossAxisCount: 1,
-              //     childAspectRatio: 50/25,
-              //     controller: ScrollController(keepScrollOffset: false),
-              //     shrinkWrap: true,
-              //     scrollDirection: Axis.vertical,
-              //     children: (newnearStores != null && newnearStores.length > 0)
-              //         ?
-              //     newnearStores.map((e) {
-              //       if(e.vendors.toString().length!=null) {
-              //         return ReusableCard(
-              //           cardChild: CardContentNew(
-              //               image: '${imageBaseUrl}${e.category_image}',
-              //               text: '${e.category_name}',
-              //               list: e.vendors,
-              //               ui_type: e.ui_type,
-              //               id: e.vendor_category_id,
-              //               context: context,
-              //               lat: lat,
-              //               lng: lng
-              //           ),
-              //           // onPress: () => hitNavigator(
-              //           //     context,
-              //           //     e.category_name,
-              //           //     e.ui_type,
-              //           //     e.vendor_category_id),
-              //         );
-              //       }
-              //     }).toList()
-              //         : nearStoresShimmer.map((e) {
-              //       return ReusableCard(
-              //           cardChild: Shimmer(
-              //             duration: Duration(seconds: 3),
-              //             //Default value
-              //             color: Colors.white,
-              //             //Default value
-              //             enabled: true,
-              //             //Default value
-              //             direction: ShimmerDirection.fromLTRB(),
-              //             //Default Value
-              //             child: Container(
-              //               color: kTransparentColor,
-              //             ),
-              //           ),
-              //           onPress: () {});
-              //     }).toList(),
-              //   ),
-              // ),
-            ],
-          ),
-        ),
-      ),
-    )
-
-    );
+      );
   }
 
   void getBackResult(latss, lngss) async {
@@ -831,8 +859,6 @@ class _HomeState extends State<Home> {
     // prefs.setString("lat", latss.toStringAsFixed(8));
     // prefs.setString("lng", lngss.toStringAsFixed(8));
 
-    print("BackLATLONG" + lat.toString() + lng.toString());
-   ///// List<Placemark> placemarks = await placemarkFromCoordinates(lats, lngs);
 
     Dio dio = Dio();  //initilize dio package
     String apiurl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lats,$lngs&key=$apiKey";
@@ -849,7 +875,7 @@ class _HomeState extends State<Home> {
 
           setState(() {
             cityName = firstresult["formatted_address"]; //get the address
-             });
+          });
 
           await  prefs.setString("addr", cityName.toString());
 
@@ -860,22 +886,6 @@ class _HomeState extends State<Home> {
     }else{
       print("error while fetching geoconding data");
     }
-
-
-    //
-    // setState(() async {
-    //   cityName = (placemarks
-    //       .elementAt(0)
-    //       .subLocality
-    //       .toString()) + " ( " + (placemarks
-    //       .elementAt(0)
-    //       .locality
-    //       .toString()) + " )".toUpperCase();
-    //
-    //   await  prefs.setString("addr", cityName.toString());
-    //
-    // });
-
 
     calladminsetting();
 
@@ -1091,8 +1101,8 @@ class _HomeState extends State<Home> {
   void hitNavigator(context, category_name, ui_type, vendor_category_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (ui_type == "grocery" || ui_type == "Grocery" || ui_type == "1") {
-      await  prefs.setString("vendor_cat_id", '${vendor_category_id}');
-      await  prefs.setString("ui_type", '${ui_type}');
+      prefs.setString("vendor_cat_id", '${vendor_category_id}');
+      prefs.setString("ui_type", '${ui_type}');
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -1101,8 +1111,8 @@ class _HomeState extends State<Home> {
     } else if (ui_type == "resturant" ||
         ui_type == "Resturant" ||
         ui_type == "2") {
-      await prefs.setString("vendor_cat_id", '${vendor_category_id}');
-      await prefs.setString("ui_type", '${ui_type}');
+      prefs.setString("vendor_cat_id", '${vendor_category_id}');
+      prefs.setString("ui_type", '${ui_type}');
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -1110,16 +1120,16 @@ class _HomeState extends State<Home> {
     } else if (ui_type == "pharmacy" ||
         ui_type == "Pharmacy" ||
         ui_type == "3") {
-      await  prefs.setString("vendor_cat_id", '${vendor_category_id}');
-      await  prefs.setString("ui_type", '${ui_type}');
+      prefs.setString("vendor_cat_id", '${vendor_category_id}');
+      prefs.setString("ui_type", '${ui_type}');
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
                   StoresPharmaPage('${category_name}', vendor_category_id)));
     } else if (ui_type == "parcal" || ui_type == "Parcal" || ui_type == "4") {
-      await prefs.setString("vendor_cat_id", '${vendor_category_id}');
-      await prefs.setString("ui_type", '${ui_type}');
+      prefs.setString("vendor_cat_id", '${vendor_category_id}');
+      prefs.setString("ui_type", '${ui_type}');
       hitService1();
 
       // Navigator.push(
@@ -1188,19 +1198,19 @@ class _HomeState extends State<Home> {
 
     try {
       setState(() {
-            cityName = pref.getString("addr").toString();
-            lat = double.parse(pref.getString("lat").toString());
-            lng = double.parse(pref.getString("lng").toString());
-          });
+        cityName = pref.getString("addr")!;
+        lat = double.parse(pref.getString("lat")!);
+        lng = double.parse(pref.getString("lng")!);
+      });
       print("HOME_ORDER_HOME"+lat.toString()+lng.toString());
     } catch (e) {
       print(e);
     }
 
     if(pref.getString("lat")==null || pref.getString("lat").toString().isEmpty)
-{
-  _getLocation(context);
-}
+    {
+      _getLocation(context);
+    }
 
 
     calladminsetting();
@@ -1290,8 +1300,8 @@ class _HomeState extends State<Home> {
   hitNavigator1(BuildContext context, lat, lng, vendor_name, vendor_id,
       distance) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await   prefs.setString("pr_vendor_id", '${vendor_id}');
-    await  prefs.setString("pr_store_name", '${vendor_name}');
+    prefs.setString("pr_vendor_id", '${vendor_id}');
+    prefs.setString("pr_store_name", '${vendor_name}');
 
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return ParcelLocation();
@@ -1330,6 +1340,43 @@ class _HomeState extends State<Home> {
       }
     });
   }
+  void checksubscription() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var url = checksubs;
+    Uri myUri = Uri.parse(url);
+    var value = await http.post(myUri , body: {
+      'user_phone': prefs.getString('user_phone')});
+    var jsonData = jsonDecode(value.body.toString());
+    print("Substore "+jsonData.toString());
+    if (jsonData['status'] == "1") {
+      setState(() {
+        subscription = true;
+        callSubStore();
+      });
+    }
+    else {
+      setState(() {
+        subscription = false;
+      });
+    }
+  }
+  void callSubStore() async {
+    var url = subsstore;
+    Uri myUri = Uri.parse(url);
+    var value = await http.get(myUri);
+    var jsonData = jsonDecode(value.body.toString());
+    if (jsonData['status'] == "1") {
+      var tagObjsJson = jsonDecode(value.body)['data'] as List;
+      List<Vendors> tagObjs = tagObjsJson
+          .map((tagJson) => Vendors.fromJson(tagJson))
+          .toList();
+      setState(() {
+        substores.clear();
+        substores = tagObjs;
+      });
+    }
+  }
 
   void calladminsetting() async {
     var url = adminsettings;
@@ -1337,8 +1384,8 @@ class _HomeState extends State<Home> {
     var value = await http.get(myUri);
     var jsonData = jsonDecode(value.body.toString());
     if (jsonData['status'] == "1") {
-        admins = Adminsetting.fromJson(jsonData['data']);
-        print("ADMIN RES: " + admins!.cityadminId.toString());
+      admins = Adminsetting.fromJson(jsonData['data']);
+      print("ADMIN RES: " + admins!.cityadminId.toString());
       if(admins!.status==1) {
         FirebaseMessaging messaging = FirebaseMessaging.instance;
         messaging.getToken().then((value) {
@@ -1350,9 +1397,9 @@ class _HomeState extends State<Home> {
         hitBannerUrl();
         pickbanner();
         hitRestaurantService();
-        // location.changeSettings(
-        //     interval: 300, accuracy: loc.LocationAccuracy.high);
-        // location.enableBackgroundMode(enable: true);
+        location.changeSettings(
+            interval: 300, accuracy: loc.LocationAccuracy.high);
+        location.enableBackgroundMode(enable: true);
       }
       else {
         Navigator.pushAndRemoveUntil(
@@ -1362,6 +1409,21 @@ class _HomeState extends State<Home> {
                 (Route<dynamic> route) => false);
       }
     }
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((value) {
+      print(value);
+    });
+
+
+    getCurrency();
+    Topbanner();
+    hitService(lat.toString(), lng.toString());
+    hitBannerUrl();
+    pickbanner();
+    hitRestaurantService();
+    location.changeSettings(
+        interval: 300, accuracy: loc.LocationAccuracy.high);
+    location.enableBackgroundMode(enable: true);
 
   }
 }
