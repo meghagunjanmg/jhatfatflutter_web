@@ -91,7 +91,7 @@ class AddressTile2 extends StatelessWidget {
 }
 
 
-  class SetLocationState extends State<SetLocation> {
+class SetLocationState extends State<SetLocation> {
   bool value = false;
   String pickup = '';
   String pickuplat = '';
@@ -133,18 +133,18 @@ class AddressTile2 extends StatelessWidget {
         pickuplng = pickaddresslng!;
       }
 
-        if(dropaddress==null){
-          drop = "";
+      if(dropaddress==null){
+        drop = "";
 
-          droplat = "";
-          droplng = "";
-        }
-        else {
-          drop = dropaddress;
+        droplat = "";
+        droplng = "";
+      }
+      else {
+        drop = dropaddress;
 
-          droplat = dropaddresslat!;
-          droplng = dropaddresslng!;
-        }
+        droplat = dropaddresslat!;
+        droplng = dropaddresslng!;
+      }
 
     });
   }
@@ -171,7 +171,7 @@ class AddressTile2 extends StatelessWidget {
 
   void callThisMethod() async {
     SharedPreferences prefs =
-        await SharedPreferences.getInstance();
+    await SharedPreferences.getInstance();
 
     prefs.remove("pickupLocation");
     prefs.remove("dropLocation");
@@ -198,203 +198,202 @@ class AddressTile2 extends StatelessWidget {
 
     return
       Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50.0),
-        child: CustomAppBar(
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context) => new HomeOrderAccount(0)));
-              /* Write listener code here */ },
-            child: Icon(
-              Icons.arrow_back,  // add custom icons also
-            ),
-          ),
-          titleWidget: Text(
-            'Set Pick & Drop Location',
-            style: TextStyle(fontSize: 16.7, color: black_color),
-          ),
-        ),
-      ),
-      body:
-      SafeArea(
-    child:
-    SingleChildScrollView(
-    child:
-    Padding(
-    padding: const EdgeInsets.only(left: 18.0,right: 18.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
-          child: AddressTile1(),
-        ),
-
-        Padding(
-          padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
-          child: Text(          "Pickup Address: "+ '${pickup}',
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.start,
-          style:
-          TextStyle(color: Colors.black, fontSize: 14),
-        ),
-        ),
-
-      Padding(
-        padding:  EdgeInsets.only(left: 18.0,right: 18.0),
-        child: AddressTile2(),
-      ),
-
-      Padding(
-        padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
-        child: Text(
-          "Drop Address: "+ '${drop}',
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.start,
-          style:
-          TextStyle(color: Colors.black, fontSize: 14),
-        ),
-      ),
-        Padding(
-          padding: EdgeInsets.all(18.0),
-          child: TextField(
-            controller: recievernamecontroler,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Enter Receiver Name',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(18.0),
-          child: TextField(
-            keyboardType: TextInputType.number,
-            maxLength: 10,
-            controller: recievercontactcontroler,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Enter Receiver Contact no.',
-
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(18.0),
-          child: TextField(
-            controller: parcelcontroler,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Enter Package Content',
-
-            ),
-          ),
-        ),
-
-        Padding(
-          padding: EdgeInsets.all(18.0),
-          child: TextField(
-            controller: instructioncontroler,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              prefixIcon: Image.asset(
-                "images/custom/ic_instruction.png",
-                height: 10.3,
-              ),
-              contentPadding:EdgeInsets.all(20.0),
-              hintText: ' Any Instruction? (Do not ring bell)',
-            ),
-          ),
-        ),
-
-        Wrap(
-            children: <Widget>[
-        CheckboxListTile(
-        subtitle: GestureDetector(
-    onTap: (){
-      Navigator.pushNamed(context, PageRoutes.tncPage);
-    },
-      child: Text(
-      'Terms & Condition.',
-          style: TextStyle(color: Colors.green, fontSize: 10,),
-        ),
-    ),
-          title: Text(style: TextStyle( fontSize: 10,color: Colors.black),
-              "By confirming i accept this order does not contain illegal/restricted items.Delivery partner may ask to verify the contents of the package and could choose to refuse the task if the items are not verified."),
-          value: value,
-          onChanged: (bool? value) {
-            setState(() {
-              this.value = value!;
-            });
-          },
-          controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
-        ),
-        ],
-        ),
-
-        (value)
-         ?
-          Container(
-              alignment: Alignment.center,
-              height: 150,
-              margin: EdgeInsets.all(12),
-              child:
-              ElevatedButton(
-                style:
-                ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: 20,horizontal: 100)),
-                  backgroundColor:
-                  MaterialStateProperty.all<Color>(kMainColor),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),),
-                onPressed: () {
-                  callApi(pickup,pickuplat,pickuplng,drop,droplat,droplng);
-
-                },
-                child: Text(
-                  'Continue',
-                  style:
-                  TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400),
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+            child: CustomAppBar(
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.push(context,MaterialPageRoute(builder: (context) => new HomeOrderAccount(0)));
+                  /* Write listener code here */ },
+                child: Icon(
+                  Icons.arrow_back,  // add custom icons also
                 ),
+              ),
+              titleWidget: Text(
+                'Set Pick & Drop Location',
+                style: TextStyle(fontSize: 16.7, color: black_color),
+              ),
+            ),
+          ),
+          body:
+          SafeArea(
+              child:
+              SingleChildScrollView(
+                  child:
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18.0,right: 18.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
+                          child: Text(          "Pickup Address: "+ '${pickup}',
+                            textDirection: TextDirection.ltr,
+                            textAlign: TextAlign.start,
+                            style:
+                            TextStyle(color: Colors.black, fontSize: 14),
+                          ),
+                        ),
+
+                        Padding(
+                          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
+                          child: AddressTile1(),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
+                          child: Text(
+                            "Drop Address: "+ '${drop}',
+                            textDirection: TextDirection.ltr,
+                            textAlign: TextAlign.start,
+                            style:
+                            TextStyle(color: Colors.black, fontSize: 14),
+                          ),
+                        ),
+                        Padding(
+                          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
+                          child: AddressTile2(),
+                        ),
+
+                        Padding(
+                          padding: EdgeInsets.all(18.0),
+                          child: TextField(
+                            controller: recievernamecontroler,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter Receiver Name',
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(18.0),
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            maxLength: 10,
+                            controller: recievercontactcontroler,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter Receiver Contact no.',
+
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(18.0),
+                          child: TextField(
+                            controller: parcelcontroler,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter Package Content',
+
+                            ),
+                          ),
+                        ),
+
+                        Padding(
+                          padding: EdgeInsets.all(18.0),
+                          child: TextField(
+                            controller: instructioncontroler,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              prefixIcon: Image.asset(
+                                "images/custom/ic_instruction.png",
+                                height: 10.3,
+                              ),
+                              contentPadding:EdgeInsets.all(20.0),
+                              hintText: ' Any Instruction? (Do not ring bell)',
+                            ),
+                          ),
+                        ),
+
+                        Wrap(
+                          children: <Widget>[
+                            CheckboxListTile(
+                              subtitle: GestureDetector(
+                                onTap: (){
+                                  Navigator.pushNamed(context, PageRoutes.tncPage);
+                                },
+                                child: Text(
+                                  'Terms & Condition.',
+                                  style: TextStyle(color: Colors.green, fontSize: 10,),
+                                ),
+                              ),
+                              title: Text(style: TextStyle( fontSize: 10,color: Colors.black),
+                                  "By confirming i accept this order does not contain illegal/restricted items.Delivery partner may ask to verify the contents of the package and could choose to refuse the task if the items are not verified."),
+                              value: value,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  this.value = value!;
+                                });
+                              },
+                              controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+                            ),
+                          ],
+                        ),
+
+                        (value)
+                            ?
+                        Container(
+                            alignment: Alignment.center,
+                            height: 150,
+                            margin: EdgeInsets.all(12),
+                            child:
+                            ElevatedButton(
+                              style:
+                              ButtonStyle(
+                                padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: 20,horizontal: 100)),
+                                backgroundColor:
+                                MaterialStateProperty.all<Color>(kMainColor),
+                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),),
+                              onPressed: () {
+                                callApi(pickup,pickuplat,pickuplng,drop,droplat,droplng);
+
+                              },
+                              child: Text(
+                                'Continue',
+                                style:
+                                TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400),
+                              ),
+                            )
+                        )
+                            :
+                        Container(
+                          margin: EdgeInsets.all(12),
+                          alignment: Alignment.center,
+                          height: 150,
+                          child:
+                          ElevatedButton(
+                            style:
+                            ButtonStyle(
+                              padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: 20,horizontal: 100)),
+                              backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.grey),
+                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),),
+
+                            onPressed: () {
+
+                            },
+                            child: Text(
+                              'Continue',
+                              style:
+                              TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        ),
+
+                      ],
+
+                    ),
+                  )
               )
           )
-              :
-          Container(
-            margin: EdgeInsets.all(12),
-            alignment: Alignment.center,
-            height: 150,
-            child:
-            ElevatedButton(
-              style:
-              ButtonStyle(
-                padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: 20,horizontal: 100)),
-                backgroundColor:
-                MaterialStateProperty.all<Color>(Colors.grey),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),),
-
-              onPressed: () {
-
-              },
-              child: Text(
-                'Continue',
-                style:
-                TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400),
-              ),
-            ),
-          ),
-
-      ],
-
-    ),
-      )
-    )
-      )
       );
   }
 
@@ -465,4 +464,4 @@ class AddressTile2 extends StatelessWidget {
     return 12742 * asin(sqrt(a));
   }
 
-  }
+}

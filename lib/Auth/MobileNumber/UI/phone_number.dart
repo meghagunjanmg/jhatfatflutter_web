@@ -32,7 +32,7 @@ class PhoneNumberState extends State<PhoneNumber> {
   static const String id = 'phone_number';
   final TextEditingController _controller = TextEditingController();
   String isoCode = '+91';
-int numberLimit = 10;
+  int numberLimit = 10;
   var showDialogBox = false;
 
   @override
@@ -157,17 +157,7 @@ int numberLimit = 10;
                       ),
                     ),
                   ),
-                  // Positioned(
-                  //   bottom: 52.0,
-                  //   height: 100,
-                  //   width: MediaQuery.of(context).size.width,
-                  //   child: Image.asset(
-                  //     "images/logos/Delivery.gif",
-                  //     width: MediaQuery.of(context).size.width, //footer image
-                  //     height: 100,
-                  //
-                  //   ),
-                  // ),
+
                   PositionedDirectional(
                       bottom: 0.0,
                       width: MediaQuery.of(context).size.width,
@@ -208,7 +198,7 @@ int numberLimit = 10;
                                   enabled: !showDialogBox,
                                   decoration: InputDecoration(
                                     hintText:
-                                        AppLocalizations.of(context)!.mobileText.toString(),
+                                    AppLocalizations.of(context)!.mobileText.toString(),
                                     border: InputBorder.none,
                                     counter: Offstage(),
                                     contentPadding: EdgeInsets.only(left: 30),
@@ -242,19 +232,21 @@ int numberLimit = 10;
                                     setState(() {
                                       showDialogBox = false;
                                     });
-                                    Toast.show("Enter valid mobile number!", duration: Toast.lengthShort, gravity:  Toast.bottom);
+                                    Toast.show("Enter Valid mobile number!", duration: Toast.lengthShort, gravity:  Toast.bottom);
                                   } else {
-                                            store(_controller.text);
+                                    store(_controller.text);
                                     hitService(isoCode, _controller.text, context);
                                   }
                                 }
                               },
-                                child: Text(
-                                  AppLocalizations.of(context)!.continueText.toString(),
-                                  style: TextStyle(
-                                      color: kWhiteColor,
-                                      fontWeight: FontWeight.w400),
-                                ),
+                              child:
+                              Text(
+                                AppLocalizations.of(context)!.continueText.toString(),
+                                style: TextStyle(
+                                    color: kWhiteColor,
+                                    overflow: TextOverflow.visible,
+                                    fontWeight: FontWeight.w400),
+                              ),
                             ),
                           ],
                         ),

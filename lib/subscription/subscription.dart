@@ -19,6 +19,8 @@ import 'package:jhatfat/bean/couponlist.dart';
 import 'package:jhatfat/bean/paymentstatus.dart';
 import 'package:jhatfat/bean/subscriptionlist.dart';
 
+import '../HomeOrderAccount/home_order_account.dart';
+
 class Subscription extends StatefulWidget {
 
   Subscription();
@@ -120,6 +122,22 @@ class SubscritionState extends State<Subscription> {
               textColor: Colors.white,
               fontSize: 16.0
           );
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) {
+                return HomeOrderAccount(0);
+              }), (Route<dynamic> route) => false);
+        }
+
+        else{
+          Fluttertoast.showToast(
+              msg: jsonData['message'],
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
         }
       }
     }).catchError((e) {
@@ -213,85 +231,85 @@ class SubscritionState extends State<Subscription> {
             padding: const EdgeInsets.all(16),
             itemCount: planlist.length,
             itemBuilder: (context, i) {
-    return(
-    Container(
-    child: Card(
-    shadowColor: kMainColor,
-    margin:EdgeInsets.all(20),
-    child:Container(
-    height: 380,
-    color: Colors.white,
-    child: Row(
-    children: [
-    Expanded(
-    child:Container(
-    alignment: Alignment.topLeft,
-    child: Column(
-    children: [
-    ListTile(
-    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-    title: Text(planlist[i].plans.toString(),
-    style: TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: Colors.black),),
-    ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Image.network(imageBaseUrl+planlist[i].banner,
-            height: 100,
-            fit:BoxFit.fill
-        ),
-      ),
-    ListTile(
-    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-    title: Text(planlist[i].description.toString(),
-    style: TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w400,
-    color: Colors.black),),
-    ),
+              return(
+                  Container(
+                      child: Card(
+                          shadowColor: kMainColor,
+                          margin:EdgeInsets.all(20),
+                          child:Container(
+                              height: 380,
+                              color: Colors.white,
+                              child: Row(
+                                  children: [
+                                    Expanded(
+                                        child:Container(
+                                            alignment: Alignment.topLeft,
+                                            child: Column(
+                                                children: [
+                                                  ListTile(
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                                                    title: Text(planlist[i].plans.toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.w600,
+                                                          color: Colors.black),),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                    child: Image.network(imageBaseUrl+planlist[i].banner,
+                                                        height: 100,
+                                                        fit:BoxFit.fill
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                                                    title: Text(planlist[i].description.toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.w400,
+                                                          color: Colors.black),),
+                                                  ),
 
-    ListTile(
-    title: Text("For "+planlist[i].days.toString()+" Days @ "+"${currency}"+planlist[i].amount.toString(),
-    style: TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: Colors.black),),
-    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-    ),
+                                                  ListTile(
+                                                    title: Text("For "+planlist[i].days.toString()+" Days @ "+"${currency}"+planlist[i].amount.toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.w600,
+                                                          color: Colors.black),),
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                                                  ),
 
-      Padding(padding: EdgeInsets.all(10),
-      child : ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            primary: kMainColor,
-            padding:EdgeInsets.symmetric(
-                horizontal: 50, vertical: 20),
-            textStyle: TextStyle(
-                color: kWhiteColor, fontWeight: FontWeight.w400)),
-        onPressed: () {
-          setState(() {
-            subsid = planlist[i].planId.toString();
-          });
-          openCheckout(tagObjs[0].payment_key, double.parse(planlist[i].amount.toString()) * 100);
-        },
-        child: Text("Payment")
-    ),
-      ),
-    ]
-    )
-    )
-    )
-    ]
-    )
-    )
-    )
-    )
-    );
-    }));
+                                                  Padding(padding: EdgeInsets.all(10),
+                                                    child : ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(30.0),
+                                                            ),
+                                                            primary: kMainColor,
+                                                            padding:EdgeInsets.symmetric(
+                                                                horizontal: 50, vertical: 20),
+                                                            textStyle: TextStyle(
+                                                                color: kWhiteColor, fontWeight: FontWeight.w400)),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            subsid = planlist[i].planId.toString();
+                                                          });
+                                                          openCheckout(tagObjs[0].payment_key, double.parse(planlist[i].amount.toString()) * 100);
+                                                        },
+                                                        child: Text("Payment")
+                                                    ),
+                                                  ),
+                                                ]
+                                            )
+                                        )
+                                    )
+                                  ]
+                              )
+                          )
+                      )
+                  )
+              );
+            }));
   }
 
 

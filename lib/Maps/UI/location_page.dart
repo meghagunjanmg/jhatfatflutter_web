@@ -59,6 +59,7 @@ class SetLocationState extends State<SetLocation> {
   Completer<GoogleMapController> _controller = Completer();
 
   var isVisible = false;
+  bool button = false;
 
   var currentAddress = '';
 
@@ -76,7 +77,9 @@ class SetLocationState extends State<SetLocation> {
   void initState() {
     super.initState();
     ////_getLocation();
-
+    setState(() {
+      button = false;
+    });
     getdata();
 
   }
@@ -169,41 +172,39 @@ class SetLocationState extends State<SetLocation> {
           googleMapApiKey: apiKey);
       setState(() {
         currentAddress = data1.address;
+        button = true;
+
       });
     });
   }
 
   void getPlaces(context) async {
-    // PlacesAutocomplete.show(
-    //   context: context,
-    //   apiKey: apiKey,
-    //   mode: Mode.fullscreen,
-    //   onError: (response) {
-    //     print(response.predictions);
-    //   },
-    //   language: "en",
-    //     components: [new Component(Component.country, "in")]
-    // ).then((value) {
-    //   //displayPrediction(value);
-    // }).catchError((e) {
-    //   print(e);
-    // });
-    Map<String,String> headers = new Map();
-    headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
-    headers.putIfAbsent("origin", () => "*");
 
-    final Prediction? p = await PlacesAutocomplete.show(
+    setState(() {
+      button = false;
+    });
+
+    Map<String,String> headers = new Map();
+  headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
+  headers.putIfAbsent("origin", () => "*");
+
+  PlacesAutocomplete.show(
       context: context,
       apiKey: apiKey,
-      onError: onError,
-      mode: Mode.overlay, // or Mode.fullscreen
+      mode: Mode.fullscreen,
+        headers: headers,
       proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-      language: 'en',
-      headers: headers,
-      components: [Component(Component.country, 'in')],
-    );
+        onError: (response) {
+        print(response.predictions);
+      },
+      language: "en",
+        components: [new Component(Component.country, "in")]
+    ).then((value) {
+      displayPrediction(value!);
+    }).catchError((e) {
+      print(e);
+    });
 
-    if (p != null) displayPrediction(p);
   }
   void onError(PlacesAutocompleteResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -213,7 +214,7 @@ class SetLocationState extends State<SetLocation> {
     );
   }
 
-  Future<Null> displayPrediction(Prediction p) async {
+  Future<void> displayPrediction(Prediction p) async {
 
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
@@ -229,12 +230,12 @@ class SetLocationState extends State<SetLocation> {
     print("${p.description} - $lat/$lng");
 
     final marker = Marker(
-      markerId: MarkerId('location'),
+      markerId: const MarkerId('location'),
       position: LatLng(lat, lng),
       icon: BitmapDescriptor.defaultMarker,
     );
     setState(() {
-      markers[MarkerId('location')] = marker;
+      markers[const MarkerId('location')] = marker;
       _goToTheLake(lat, lng);
     });
 
@@ -387,6 +388,7 @@ class SetLocationState extends State<SetLocation> {
             ),
           ),
 
+          (button)?
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -404,7 +406,25 @@ class SetLocationState extends State<SetLocation> {
               style:
               TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400),
             ),
-          ),
+          )
+              :
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                primary: Colors.grey,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                textStyle:TextStyle(color: Colors.black, fontWeight: FontWeight.w400)),
+
+            onPressed: () {
+            },
+            child: Text(
+              'Continue',
+              style:
+              TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+            ),
+          )
 
         ],
       ),

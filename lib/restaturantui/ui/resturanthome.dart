@@ -74,6 +74,7 @@ class RestaurantState extends State<Restaurant> {
   bool isCategoryFetch = false;
   bool isSlideFetch = false;
   bool isFetchRestStore = false;
+  bool isFetch = false;
 
   @override
   void initState() {
@@ -113,7 +114,7 @@ class RestaurantState extends State<Restaurant> {
     hitProductUrl();
     hitCategoryUrl();
     // hitSliderUrl();
-    hitRestaurantService(lat,lng);
+    hitRestaurantService();
   }
 
   Future<void> getCartCount() async {
@@ -288,9 +289,10 @@ class RestaurantState extends State<Restaurant> {
     });
   }
 
-  void hitRestaurantService(double lat, double lng) async {
+  void hitRestaurantService() async {
     setState(() {
       isFetchRestStore = true;
+      isFetch = false;
     });
 
     var url = nearbyrest;
@@ -310,6 +312,7 @@ class RestaurantState extends State<Restaurant> {
               .toList();
           setState(() {
             isFetchRestStore = false;
+            isFetch = true;
             nearStores.clear();
             nearStoresSearch.clear();
             nearStores = tagObjs;
@@ -318,20 +321,16 @@ class RestaurantState extends State<Restaurant> {
         } else {
           setState(() {
             isFetchRestStore = false;
+            isFetch = false;
+            nearStores.clear();
+            nearStoresSearch.clear();
           });
         }
-      } else {
-        setState(() {
-          isFetchRestStore = false;
-        });
       }
     }).catchError((e) {
-      setState(() {
-        isFetchRestStore = false;
-      });
       print(e);
       Timer(Duration(seconds: 5), () {
-        // hitRestaurantService();
+        hitRestaurantService();
       });
     });
   }
@@ -342,137 +341,114 @@ class RestaurantState extends State<Restaurant> {
     double height = MediaQuery.of(context).size.height;
     return  VisibilityDetector(
         key: Key(RestaurantState.id),
-    onVisibilityChanged: (VisibilityInfo info) {
-    bool isVisible = info.visibleFraction != 0;
-    callThisMethod(isVisible);
-    },
-    child:Container(
-      color: kMainColor,
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  expandedHeight: 130,
-                  backgroundColor: Colors.white,
-                  pinned: true,
-                  floating: true,
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: innerBoxIsScrolled ? kMainTextColor : kWhiteColor,
-                      size: 24.0,
-                    ),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HomeOrderAccount(0)),
-                              (Route<dynamic> route) => false);
-                      },
-                  ),
-                  actions: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
-                      child: Stack(
-                        children: [
-                          IconButton(
-                              icon: ImageIcon(
-                                AssetImage('images/icons/ic_cart blk.png'),
-                                color: innerBoxIsScrolled
-                                    ? kMainTextColor
-                                    : kWhiteColor,
-                              ),
-                              onPressed: () {
-                                  Navigator.pushNamed(
-                                          context, PageRoutes.restviewCart)
-                                      .then((value) {
-                                    getCartCount();
-                                  });
+        onVisibilityChanged: (VisibilityInfo info) {
+          bool isVisible = info.visibleFraction != 0;
+          callThisMethod(isVisible);
+        },
+        child:Container(
+          color: kMainColor,
+          child: SafeArea(
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              body: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      expandedHeight: 130,
+                      backgroundColor: Colors.white,
+                      pinned: true,
+                      floating: true,
+                      leading: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: innerBoxIsScrolled ? kMainTextColor : kWhiteColor,
+                          size: 24.0,
+                        ),
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeOrderAccount(0)),
+                                  (Route<dynamic> route) => false);
+                        },
+                      ),
+                      actions: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6.0),
+                          child: Stack(
+                            children: [
+                              IconButton(
+                                  icon: ImageIcon(
+                                    AssetImage('images/icons/ic_cart blk.png'),
+                                    color: innerBoxIsScrolled
+                                        ? kMainTextColor
+                                        : kWhiteColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, PageRoutes.restviewCart)
+                                        .then((value) {
+                                      getCartCount();
+                                    });
 
 //                        getCurrency();
-                              }),
-                          Positioned(
-                              right: 5,
-                              top: 2,
-                              child: Visibility(
-                                visible: isCartCount,
-                                child: CircleAvatar(
-                                  minRadius: 4,
-                                  maxRadius: 8,
-                                  backgroundColor: innerBoxIsScrolled
-                                      ? kMainColor
-                                      : kWhiteColor,
-                                  child: Text(
-                                    '$cartCount',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 7,
-                                        color: innerBoxIsScrolled
-                                            ? kWhiteColor
-                                            : kMainTextColor,
-                                        fontWeight: FontWeight.w200),
-                                  ),
-                                ),
-                              ))
-                        ],
-                      ),
-                    ),
-                    // IconButton(
-                    //   icon: Icon(Icons.shopping_cart,color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,size: 24.0,),
-                    //   onPressed: () {
-                    //    hitResturantCart(context);
-                    //   },
-                    // ),
-                  ],
-                  title: InkWell(
-                    onTap: () {
-                      // _addressBottomSheet(context, width);
-                      // Navigator.of(context)
-                      //     .push(MaterialPageRoute(builder: (context) {
-                      //   return LocationPage(lat, lng);
-                      // })).then((value) {
-                      //   if (value != null) {
-                      //     print('${value.toString()}');
-                      //     BackLatLng back = value;
-                      //     getBackResult(back.lat, back.lng);
-                      //   }
-                      // }).catchError((e) {
-                      //   print(e);
-                      //   // getBackResult();
-                      // });
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Delivering To'.toUpperCase(),
-                            style: TextStyle(
-                              color: innerBoxIsScrolled
-                                  ? kMainTextColor
-                                  : kWhiteColor,
-                              fontSize: 13.0,
-                              fontFamily: 'OpenSans',
-                              fontWeight: FontWeight.w500,
-                            )),
-                        SizedBox(
-                          height: 5.0,
+                                  }),
+                              Positioned(
+                                  right: 5,
+                                  top: 2,
+                                  child: Visibility(
+                                    visible: isCartCount,
+                                    child: CircleAvatar(
+                                      minRadius: 4,
+                                      maxRadius: 8,
+                                      backgroundColor: innerBoxIsScrolled
+                                          ? kMainColor
+                                          : kWhiteColor,
+                                      child: Text(
+                                        '$cartCount',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 7,
+                                            color: innerBoxIsScrolled
+                                                ? kWhiteColor
+                                                : kMainTextColor,
+                                            fontWeight: FontWeight.w200),
+                                      ),
+                                    ),
+                                  ))
+                            ],
+                          ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        // IconButton(
+                        //   icon: Icon(Icons.shopping_cart,color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,size: 24.0,),
+                        //   onPressed: () {
+                        //    hitResturantCart(context);
+                        //   },
+                        // ),
+                      ],
+                      title: InkWell(
+                        onTap: () {
+                          // _addressBottomSheet(context, width);
+                          // Navigator.of(context)
+                          //     .push(MaterialPageRoute(builder: (context) {
+                          //   return LocationPage(lat, lng);
+                          // })).then((value) {
+                          //   if (value != null) {
+                          //     print('${value.toString()}');
+                          //     BackLatLng back = value;
+                          //     getBackResult(back.lat, back.lng);
+                          //   }
+                          // }).catchError((e) {
+                          //   print(e);
+                          //   // getBackResult();
+                          // });
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Icon(
-                              Icons.location_on,
-                              color: innerBoxIsScrolled
-                                  ? kMainTextColor
-                                  : kWhiteColor,
-                              size: 16.0,
-                            ),
-                            Text(cityName,
+                            Text('Delivering To'.toUpperCase(),
                                 style: TextStyle(
                                   color: innerBoxIsScrolled
                                       ? kMainTextColor
@@ -481,122 +457,146 @@ class RestaurantState extends State<Restaurant> {
                                   fontFamily: 'OpenSans',
                                   fontWeight: FontWeight.w500,
                                 )),
-                            // Icon(
-                            //   Icons.arrow_drop_down,
-                            //   color: innerBoxIsScrolled
-                            //       ? kMainTextColor
-                            //       : kWhiteColor,
-                            //   size: 16.0,
-                            // ),
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.location_on,
+                                  color: innerBoxIsScrolled
+                                      ? kMainTextColor
+                                      : kWhiteColor,
+                                  size: 16.0,
+                                ),
+                                Text(cityName,
+                                    style: TextStyle(
+                                      color: innerBoxIsScrolled
+                                          ? kMainTextColor
+                                          : kWhiteColor,
+                                      fontSize: 13.0,
+                                      fontFamily: 'OpenSans',
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                                // Icon(
+                                //   Icons.arrow_drop_down,
+                                //   color: innerBoxIsScrolled
+                                //       ? kMainTextColor
+                                //       : kWhiteColor,
+                                //   size: 16.0,
+                                // ),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    background:
-
-                    Container(
-                      padding: EdgeInsets.only(
-                          left: fixPadding,
-                          right: fixPadding,
-                          top: 0.0,
-                          bottom: fixPadding),
-                      alignment: Alignment.bottomCenter,
-                      decoration: BoxDecoration(
-                        color: kMainColor,
                       ),
-                      child: InkWell(
-                        onTap: () {
-                          // Navigator.push(
-                          //         context,
-                          //         PageTransition(
-                          //             type: PageTransitionType.rightToLeft,
-                          //             child: SearchRestaurantStore(
-                          //                 currencySymbol)))
-                          //     .then((value) {
-                          //   getCartCount();
-                          // });
-                        },
-                        child:
+                      flexibleSpace: FlexibleSpaceBar(
+                        background:
 
                         Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width * 0.85,
-                          height: 52,
-                          padding: EdgeInsets.only(left: 5),
+                          padding: EdgeInsets.only(
+                              left: fixPadding,
+                              right: fixPadding,
+                              top: 0.0,
+                              bottom: fixPadding),
+                          alignment: Alignment.bottomCenter,
+                          decoration: BoxDecoration(
+                            color: kMainColor,
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              // Navigator.push(
+                              //         context,
+                              //         PageTransition(
+                              //             type: PageTransitionType.rightToLeft,
+                              //             child: SearchRestaurantStore(
+                              //                 currencySymbol)))
+                              //     .then((value) {
+                              //   getCartCount();
+                              // });
+                            },
+                            child:
 
-                          child: TypeAheadField(
-                            textFieldConfiguration: TextFieldConfiguration(
-                              autofocus: false,
-                              style:
-                              DefaultTextStyle.of(context)
-                                  .style
-                                  .copyWith(fontStyle: FontStyle.italic),
-                              decoration: InputDecoration(
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                                    borderSide: BorderSide(color: Colors.black)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                                    borderSide: BorderSide(color: Colors.black)),
-                                prefixIcon: Icon(
-                                  Icons.search,
-                                  color: Colors.white,
+                            Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * 0.85,
+                              height: 52,
+                              padding: EdgeInsets.only(left: 5),
+
+                              child: TypeAheadField(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  autofocus: false,
+                                  style:
+                                  DefaultTextStyle.of(context)
+                                      .style
+                                      .copyWith(fontStyle: FontStyle.italic),
+                                  decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                        borderSide: BorderSide(color: Colors.black)),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                        borderSide: BorderSide(color: Colors.black)),
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      color: Colors.white,
+                                    ),
+                                    hintText: 'Search Restaurant...',
+                                  ),
                                 ),
-                                hintText: 'Search Restaurant...',
+                                suggestionsCallback: (pattern) async {
+                                  return await BackendService.getSuggestions(pattern,lat,lng);
+                                },
+                                itemBuilder: (context, Vendors suggestion) {
+                                  return ListTile(
+                                      title: Text('${suggestion.str1}'),
+                                      subtitle: Text('${suggestion.str2}'
+                                      )
+                                  );
+                                },
+                                hideOnError: true,
+                                onSuggestionSelected: (Vendors detail) async {
+                                  for(int i=0;i<nearStores.length;i++)
+                                  {
+                                    if(nearStores.elementAt(i).vendor_id == detail.vendorId)
+                                    {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Restaurant_Sub(
+                                                      nearStores.elementAt(i), currencySymbol)));
+                                    }
+                                  }
+                                },
                               ),
                             ),
-                            suggestionsCallback: (pattern) async {
-                              return await BackendService.getSuggestions(pattern,lat,lng);
-                            },
-                            itemBuilder: (context, Vendors suggestion) {
-                              return ListTile(
-                                  title: Text('${suggestion.str1}'),
-                                  subtitle: Text('${suggestion.str2}'
-                                  )
-                              );
-                            },
-                             hideOnError: true,
- onSuggestionSelected: (Vendors detail) async {
-                              for(int i=0;i<nearStores.length;i++)
-                              {
-                                if(nearStores.elementAt(i).vendor_id == detail.vendorId)
-                                {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              Restaurant_Sub(
-                                                  nearStores.elementAt(i), currencySymbol)));
-                                }
-                              }
-                            },
                           ),
                         ),
                       ),
+                      automaticallyImplyLeading: false,
                     ),
-                  ),
-                  automaticallyImplyLeading: false,
-                ),
-              ];
-            },
-            body: SafeArea(
-              child: Container(
-                height: height,
-                width: width,
-                decoration: BoxDecoration(
-                  borderRadius:
+                  ];
+                },
+                body: SafeArea(
+                  child:
+                  Container(
+                    height: height,
+                    width: width,
+                    decoration: BoxDecoration(
+                      borderRadius:
                       BorderRadius.vertical(top: Radius.circular(15.0)),
-                  color: kCardBackgroundColor,
-                ),
-                child: ListView(
-                  physics: BouncingScrollPhysics(),
-                  children: <Widget>[
-                    // Image Slider List Start
+                      color: kCardBackgroundColor,
+                    ),
+                    child: ListView(
+                      physics: BouncingScrollPhysics(),
+                      children: <Widget>[
+                        // Image Slider List Start
 //                     Visibility(
 //                       visible: (!isSlideFetch && listImage!=null && listImage.length>0)?true:false,
 //                       child: Column(
@@ -612,448 +612,470 @@ class RestaurantState extends State<Restaurant> {
 //                         ],
 //                       ),
 //                     ),
-                    Visibility(
-                      visible: (!isSlideFetch && listImage.length > 0)
-                          ? true
-                          : false,
-                      child: Container(
-                        width: width,
-                        height: 160.0,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 5),
-                          child: (listImage != null && listImage.length > 0)
-                              ? ListView.builder(
-                                  itemCount: listImage.length,
-                                  scrollDirection: Axis.vertical,
-                                  physics: BouncingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    // final item = listImage[index];
-                                    return InkWell(
-                                      onTap: () {},
-                                      child: Container(
-                                        width: 170.0,
-                                        margin: (index !=
-                                                (listImage.length - 1))
-                                            ? EdgeInsets.only(left: fixPadding)
-                                            : EdgeInsets.only(
-                                                left: fixPadding,
-                                                right: fixPadding),
-                                        decoration: BoxDecoration(
-                                          // image: DecorationImage(
-                                          //   image: Image.network(imageBaseUrl+listImage[index].banner_image),
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ),
-                                        child: Image.network(
-                                          '${imageBaseUrl}${listImage[index].bannerImage}',
-                                          fit: BoxFit.fill,
+
+                        (!isFetch)?
+                        Visibility(
+                            visible: true,
+                            child: Padding(
+                              padding: EdgeInsets.all(fixPadding),
+                              child: Text(
+                                'No Restaurants available in your area.',
+                                style: headingStyle,
+                              ),
+                            ))
+                            :
+                        Visibility(
+                            visible: false,
+                            child: Padding(
+                              padding: EdgeInsets.all(fixPadding),
+                              child: Text(
+                                'No Restaurants available in your area.',
+                                style: headingStyle,
+                              ),
+                            ))
+                        ,
+                        Visibility(
+                          visible: (!isSlideFetch && listImage.length > 0)
+                              ? true
+                              : false,
+                          child: Container(
+                            width: width,
+                            height: 160.0,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: (listImage != null && listImage.length > 0)
+                                  ? ListView.builder(
+                                itemCount: listImage.length,
+                                scrollDirection: Axis.vertical,
+                                physics: BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  // final item = listImage[index];
+                                  return InkWell(
+                                    onTap: () {},
+                                    child: Container(
+                                      width: 170.0,
+                                      margin: (index !=
+                                          (listImage.length - 1))
+                                          ? EdgeInsets.only(left: fixPadding)
+                                          : EdgeInsets.only(
+                                          left: fixPadding,
+                                          right: fixPadding),
+                                      decoration: BoxDecoration(
+                                        // image: DecorationImage(
+                                        //   image: Image.network(imageBaseUrl+listImage[index].banner_image),
+                                        //   fit: BoxFit.cover,
+                                        // ),
+                                        borderRadius:
+                                        BorderRadius.circular(10.0),
+                                      ),
+                                      child: Image.network(
+                                        '${imageBaseUrl}${listImage[index].bannerImage}',
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )
+                                  : ListView.builder(
+                                itemCount: 10,
+                                scrollDirection: Axis.horizontal,
+                                physics: BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  // final item = listImages[index];
+                                  return InkWell(
+                                    onTap: () {},
+                                    child: Container(
+                                      width: 170.0,
+                                      margin: (index != (10 - 1))
+                                          ? EdgeInsets.only(left: fixPadding)
+                                          : EdgeInsets.only(
+                                          left: fixPadding,
+                                          right: fixPadding),
+                                      decoration: BoxDecoration(
+                                        // image: DecorationImage(
+                                        //   image: AssetImage(imageBaseUrl+item.banner_image),
+                                        //   fit: BoxFit.cover,
+                                        // ),
+                                        borderRadius:
+                                        BorderRadius.circular(10.0),
+                                      ),
+                                      child: Shimmer(
+                                        duration: Duration(seconds: 3),
+                                        //Default value
+                                        color: Colors.white,
+                                        //Default value
+                                        enabled: true,
+                                        //Default value
+                                        direction:
+                                        ShimmerDirection.fromLTRB(),
+                                        //Default Value
+                                        child: Container(
+                                          color: kTransparentColor,
                                         ),
                                       ),
-                                    );
-                                  },
-                                )
-                              : ListView.builder(
-                                  itemCount: 10,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: BouncingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    // final item = listImages[index];
-                                    return InkWell(
-                                      onTap: () {},
-                                      child: Container(
-                                        width: 170.0,
-                                        margin: (index != (10 - 1))
-                                            ? EdgeInsets.only(left: fixPadding)
-                                            : EdgeInsets.only(
-                                                left: fixPadding,
-                                                right: fixPadding),
-                                        decoration: BoxDecoration(
-                                          // image: DecorationImage(
-                                          //   image: AssetImage(imageBaseUrl+item.banner_image),
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ),
-                                        child: Shimmer(
-                                          duration: Duration(seconds: 3),
-                                          //Default value
-                                          color: Colors.white,
-                                          //Default value
-                                          enabled: true,
-                                          //Default value
-                                          direction:
-                                              ShimmerDirection.fromLTRB(),
-                                          //Default Value
-                                          child: Container(
-                                            color: kTransparentColor,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                        ),
-                      ),
-                    ),
-                    // Categories Start
-                    Visibility(
-                      // visible: (!isCategoryFetch && categoryList!=null && categoryList.length>0)?true:false,
-                      visible: false,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(fixPadding),
-                            child: Text(
-                              'Categories',
-                              style: headingStyle,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                          CategoryList(categoryList, () {
-                            getCartCount();
-                          }),
-                          // Categories End
-                          heightSpace,
-                        ],
-                      ),
-                    ),
-                    // Products Ordered Start
-                    Visibility(
-                      visible: (!isProdcutOrderFetch &&
-                              popularItem != null &&
-                              popularItem.length > 0)
-                          ? true
-                          : false,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(fixPadding),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  'Products Ordered',
+                        ),
+                        // Categories Start
+                        Visibility(
+                          // visible: (!isCategoryFetch && categoryList!=null && categoryList.length>0)?true:false,
+                          visible: false,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(fixPadding),
+                                child: Text(
+                                  'Categories',
                                   style: headingStyle,
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        PageTransition(
-                                            type:
-                                                PageTransitionType.bottomToTop,
-                                            child: ProductsOrderedNew(
-                                                currencySymbol)));
-                                  },
-                                  child: Text('View all', style: moreStyle),
-                                ),
-                              ],
-                            ),
+                              ),
+                              CategoryList(categoryList, () {
+                                getCartCount();
+                              }),
+                              // Categories End
+                              heightSpace,
+                            ],
                           ),
-                          ProductsOrdered(currencySymbol, popularItem, () {
-                            getCartCount();
-                          }),
-                          // Products Ordered End
-                          heightSpace,
-                          heightSpace,
-                        ],
-                      ),
-                    ),
-                    // Products Ordered Start
-                    Visibility(
-                        visible: (!isFetchRestStore && nearStores.length == 0)
-                            ? false
-                            : true,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(fixPadding),
-                              child: Row(
-                                mainAxisAlignment:
+                        ),
+                        // Products Ordered Start
+                        Visibility(
+                          visible: (!isProdcutOrderFetch &&
+                              popularItem != null &&
+                              popularItem.length > 0)
+                              ? true
+                              : false,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(fixPadding),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'Products Ordered',
+                                      style: headingStyle,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            PageTransition(
+                                                type:
+                                                PageTransitionType.bottomToTop,
+                                                child: ProductsOrderedNew(
+                                                    currencySymbol)));
+                                      },
+                                      child: Text('View all', style: moreStyle),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ProductsOrdered(currencySymbol, popularItem, () {
+                                getCartCount();
+                              }),
+                              // Products Ordered End
+                              heightSpace,
+                              heightSpace,
+                            ],
+                          ),
+                        ),
+                        // Products Ordered Start
+                        Visibility(
+                            visible: (!isFetchRestStore && nearStores.length == 0)
+                                ? false
+                                : true,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(fixPadding),
+                                  child: Row(
+                                    mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    'Store',
-                                    style: headingStyle,
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.push(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        'Store',
+                                        style: headingStyle,
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
                                               context,
                                               PageTransition(
                                                   type: PageTransitionType
                                                       .bottomToTop,
                                                   child: ResturantPageList(
                                                       currencySymbol)))
-                                          .then((value) {
-                                        getCartCount();
-                                      });
-                                    },
-                                    child: Text('View all', style: moreStyle),
+                                              .then((value) {
+                                            getCartCount();
+                                          });
+                                        },
+                                        child: Text('View all', style: moreStyle),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child:
+                                ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child:
 
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 20.0, top: 20.0),
-                                    child: Text(
-                                      '${nearStores.length} Restaurant found',
-                                      style: Theme
-                                          .of(context)
-                                          .textTheme
-                                          .headline6!
-                                          .copyWith(color: kHintColor, fontSize: 18),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  (nearStores != null && nearStores.length > 0)
-                                      ? Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 10),
-                                    child: ListView.separated(
-                                        shrinkWrap: true,
-                                        primary: false,
-                                        scrollDirection: Axis.vertical,
-                                        itemCount: nearStores.length,
-                                        itemBuilder: (context, index) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              // hitNavigator(context, nearStores[index]);
-                                              if((nearStores[index].online_status == "on" || nearStores[index].online_status == "On" || nearStores[index].online_status == "ON")){
-                                                hitNavigator(context, nearStores[index]);
-                                              }else{
-                                                Toast.show('Restaurant are closed now!', duration: Toast.lengthShort, gravity:  Toast.bottom);
-                                              }
-                                            },
-                                            behavior: HitTestBehavior.opaque,
-                                            child: Material(
-                                              elevation: 2,
-                                              shadowColor: white_color,
-                                              clipBehavior: Clip.hardEdge,
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: Stack(
-                                                children: [
-                                                  Container(
-                                                    width: MediaQuery
-                                                        .of(context)
-                                                        .size
-                                                        .width,
-                                                    color: white_color,
-                                                    padding: EdgeInsets.only(
-                                                        left: 20.0, top: 15, bottom: 15),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Image.network(
-                                                          imageBaseUrl +
-                                                              nearStores[index].vendor_logo,
-                                                          width: 93.3,
-                                                          height: 93.3,
-                                                        ),
-                                                        SizedBox(width: 13.3),
-                                                        Column(
-                                                          crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 20.0, top: 20.0),
+                                        child: Text(
+                                          '${nearStores.length} Restaurant found',
+                                          style: Theme
+                                              .of(context)
+                                              .textTheme
+                                              .headline6!
+                                              .copyWith(color: kHintColor, fontSize: 18),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      (nearStores != null && nearStores.length > 0)
+                                          ? Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: ListView.separated(
+                                            shrinkWrap: true,
+                                            primary: false,
+                                            scrollDirection: Axis.vertical,
+                                            itemCount: nearStores.length,
+                                            itemBuilder: (context, index) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  // hitNavigator(context, nearStores[index]);
+                                                  if((nearStores[index].online_status == "on" || nearStores[index].online_status == "On" || nearStores[index].online_status == "ON")){
+                                                    hitNavigator(context, nearStores[index]);
+                                                  }else{
+                                                    Toast.show('Restaurant are closed now!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+                                                  }
+                                                },
+                                                behavior: HitTestBehavior.opaque,
+                                                child: Material(
+                                                  elevation: 2,
+                                                  shadowColor: white_color,
+                                                  clipBehavior: Clip.hardEdge,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Stack(
+                                                    children: [
+                                                      Container(
+                                                        width: MediaQuery
+                                                            .of(context)
+                                                            .size
+                                                            .width,
+                                                        color: white_color,
+                                                        padding: EdgeInsets.only(
+                                                            left: 20.0, top: 15, bottom: 15),
+                                                        child: Row(
                                                           children: <Widget>[
-                                                            Text(nearStores[index].vendor_name,
-                                                                style: Theme
-                                                                    .of(context)
-                                                                    .textTheme
-                                                                    .subtitle2!
-                                                                    .copyWith(
-                                                                    color: kMainTextColor,
-                                                                    fontSize: 18)),
-                                                            SizedBox(height: 8.0),
-                                                            Row(
-                                                              children: <Widget>[
-                                                                Icon(
-                                                                  Icons.location_on,
-                                                                  color: kIconColor,
-                                                                  size: 15,
-                                                                ),
-                                                                SizedBox(width: 10.0),
-                                                                Text(
-                                                                    '${double.parse(
-                                                                        '${nearStores[index].distance}')
-                                                                        .toStringAsFixed(2)} km ',
-                                                                    style: Theme
-                                                                        .of(context)
-                                                                        .textTheme
-                                                                        .caption!
-                                                                        .copyWith(
-                                                                        color:
-                                                                        kLightTextColor,
-                                                                        fontSize: 13.0)),
-                                                                Text('|',
-                                                                    style: Theme
-                                                                        .of(context)
-                                                                        .textTheme
-                                                                        .caption!
-                                                                        .copyWith(
-                                                                        color: kMainColor,
-                                                                        fontSize: 13.0)),
-                                                                Text(
-                                                                    '${nearStores[index].vendor_loc}',
-                                                                    style: Theme
-                                                                        .of(context)
-                                                                        .textTheme
-                                                                        .caption!
-                                                                        .copyWith(
-                                                                        color:
-                                                                        kLightTextColor,
-                                                                        fontSize: 13.0)),
-                                                              ],
+                                                            Image.network(
+                                                              imageBaseUrl +
+                                                                  nearStores[index].vendor_logo,
+                                                              width: 93.3,
+                                                              height: 93.3,
                                                             ),
-                                                            SizedBox(height: 6),
-                                                            Row(
+                                                            SizedBox(width: 13.3),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                              CrossAxisAlignment.start,
                                                               children: <Widget>[
-                                                                Icon(
-                                                                  Icons.access_time,
-                                                                  color: kIconColor,
-                                                                  size: 15,
-                                                                ),
-                                                                SizedBox(width: 10.0),
-                                                                Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), lat, lng)}',
-                                                                    style: Theme.of(context)
+                                                                Text(nearStores[index].vendor_name,
+                                                                    style: Theme
+                                                                        .of(context)
                                                                         .textTheme
-                                                                        .caption!
+                                                                        .subtitle2!
                                                                         .copyWith(
-                                                                        color:
-                                                                        kLightTextColor,
-                                                                        fontSize: 13.0)),
+                                                                        color: kMainTextColor,
+                                                                        fontSize: 18)),
+                                                                SizedBox(height: 8.0),
+                                                                Row(
+                                                                  children: <Widget>[
+                                                                    Icon(
+                                                                      Icons.location_on,
+                                                                      color: kIconColor,
+                                                                      size: 15,
+                                                                    ),
+                                                                    SizedBox(width: 10.0),
+                                                                    Text(
+                                                                        '${double.parse(
+                                                                            '${nearStores[index].distance}')
+                                                                            .toStringAsFixed(2)} km ',
+                                                                        style: Theme
+                                                                            .of(context)
+                                                                            .textTheme
+                                                                            .caption!
+                                                                            .copyWith(
+                                                                            color:
+                                                                            kLightTextColor,
+                                                                            fontSize: 13.0)),
+                                                                    Text('|',
+                                                                        style: Theme
+                                                                            .of(context)
+                                                                            .textTheme
+                                                                            .caption!
+                                                                            .copyWith(
+                                                                            color: kMainColor,
+                                                                            fontSize: 13.0)),
+                                                                    Text(
+                                                                        '${nearStores[index].vendor_loc}',
+                                                                        style: Theme
+                                                                            .of(context)
+                                                                            .textTheme
+                                                                            .caption!
+                                                                            .copyWith(
+                                                                            color:
+                                                                            kLightTextColor,
+                                                                            fontSize: 13.0)),
+                                                                  ],
+                                                                ),
+                                                                SizedBox(height: 6),
+                                                                Row(
+                                                                  children: <Widget>[
+                                                                    Icon(
+                                                                      Icons.access_time,
+                                                                      color: kIconColor,
+                                                                      size: 15,
+                                                                    ),
+                                                                    SizedBox(width: 10.0),
+                                                                    Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), lat, lng)}',
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .caption!
+                                                                            .copyWith(
+                                                                            color:
+                                                                            kLightTextColor,
+                                                                            fontSize: 13.0)),
+                                                                  ],
+                                                                ),
                                                               ],
                                                             ),
                                                           ],
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    bottom: 20,
-                                                    child: Visibility(
-                                                      visible: (nearStores[index].online_status == "off" || nearStores[index].online_status == "Off" || nearStores[index].online_status == "OFF")?true:false,
-                                                      child: Container(
-                                                        height: 40,
-                                                        width: MediaQuery.of(context).size.width-10,
-                                                        alignment: Alignment.center,
-                                                        color: kCardBackgroundColor,
-                                                        child: Text('Store Closed Now',style: TextStyle(
-                                                            color: red_color
-                                                        ),),
                                                       ),
-                                                    ),
+                                                      Positioned(
+                                                        bottom: 20,
+                                                        child: Visibility(
+                                                          visible: (nearStores[index].online_status == "off" || nearStores[index].online_status == "Off" || nearStores[index].online_status == "OFF")?true:false,
+                                                          child: Container(
+                                                            height: 40,
+                                                            width: MediaQuery.of(context).size.width-10,
+                                                            alignment: Alignment.center,
+                                                            color: kCardBackgroundColor,
+                                                            child: Text('Store Closed Now',style: TextStyle(
+                                                                color: red_color
+                                                            ),),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        separatorBuilder: (context, index) {
-                                          return SizedBox(
-                                            height: 10,
-                                          );
-                                        }),
-                                  )
-                                      : Container(
-                                    height: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .height / 2,
-                                    width: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .width,
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        isFetchRestStore ? CircularProgressIndicator() : Container(
-                                          width: 0.5,),
-                                        isFetchRestStore ? SizedBox(
-                                          width: 10,
-                                        ) : Container(width: 0.5,),
-                                        Text(
-                                          (!isFetchRestStore)
-                                              ? 'No Store Found at your location'
-                                              : 'Fetching Stores',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600,
-                                              color: kMainTextColor),
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                                ),
+                                              );
+                                            },
+                                            separatorBuilder: (context, index) {
+                                              return SizedBox(
+                                                height: 10,
+                                              );
+                                            }),
+                                      )
+                                          : Container(
+                                        height: MediaQuery
+                                            .of(context)
+                                            .size
+                                            .height / 2,
+                                        width: MediaQuery
+                                            .of(context)
+                                            .size
+                                            .width,
+                                        alignment: Alignment.center,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            isFetchRestStore ? CircularProgressIndicator() : Container(
+                                              width: 0.5,),
+                                            isFetchRestStore ? SizedBox(
+                                              width: 10,
+                                            ) : Container(width: 0.5,),
+                                            Text(
+                                              (!isFetchRestStore)
+                                                  ? 'No Store Found at your location'
+                                                  : 'Fetching Stores',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: kMainTextColor),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
 
-                              ),
-                            ),
-                            heightSpace,
-                          ],
-                        )),
-                    // FavouriteRestaurantsList(currencySymbol,nearStores,nearStoresSearch,() {
-                    //   getCartCount();
-                    //   print("value rest up");
-                    // }),
-                    // Products Ordered End
+                                  ),
+                                ),
+                                heightSpace,
+                              ],
+                            )),
+                        // FavouriteRestaurantsList(currencySymbol,nearStores,nearStoresSearch,() {
+                        //   getCartCount();
+                        //   print("value rest up");
+                        // }),
+                        // Products Ordered End
 
-                    // Hot Sale Start
-                    Visibility(
-                      visible: (!isProdcutOrderFetch &&
+                        // Hot Sale Start
+                        Visibility(
+                          visible: (!isProdcutOrderFetch &&
                               popularItem != null &&
                               popularItem.length > 0)
-                          ? true
-                          : false,
-                      child: Column(
-                        children: [
-                          heightSpace,
-                          Padding(
-                            padding: EdgeInsets.all(fixPadding),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  'Hot Sale',
-                                  style: headingStyle,
+                              ? true
+                              : false,
+                          child: Column(
+                            children: [
+                              heightSpace,
+                              Padding(
+                                padding: EdgeInsets.all(fixPadding),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'Hot Sale',
+                                      style: headingStyle,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        // Navigator.push(context, PageTransition(type: PageTransitionType.downToUp, child: MoreList()));
+                                      },
+                                      child: Text('View all', style: moreStyle),
+                                    ),
+                                  ],
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    // Navigator.push(context, PageTransition(type: PageTransitionType.downToUp, child: MoreList()));
-                                  },
-                                  child: Text('View all', style: moreStyle),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        HotSale(currencySymbol, popularItem, () {
+                          getCartCount();
+                        }),
+                        // Hot Sale End
+                        heightSpace,
+                      ],
                     ),
-                    HotSale(currencySymbol, popularItem, () {
-                      getCartCount();
-                    }),
-                    // Hot Sale End
-                    heightSpace,
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    )
+        )
     );
   }
 

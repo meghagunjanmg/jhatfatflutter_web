@@ -22,7 +22,7 @@ class OrderMapRestPage extends StatelessWidget {
   final dynamic user_id;
 
   OrderMapRestPage(
-  { this.instruction, this.pageTitle, this.ongoingOrders, this.currency,this.user_id});
+      { this.instruction, this.pageTitle, this.ongoingOrders, this.currency,this.user_id});
 
   @override
   Widget build(BuildContext context) {
@@ -100,61 +100,61 @@ class _OrderMapRestState extends State<OrderMapRest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(52.0),
-          child: AppBar(
-            titleSpacing: 0.0,
-            title: Text(
-              'Order #${widget.ongoingOrders.cart_id}',
-              style: TextStyle(
-                  fontSize: 18, color: black_color, fontWeight: FontWeight.w400),
-            ),
-            actions: [
-              Visibility(
-                visible: (widget.ongoingOrders.order_status == 'Pending' ||
-                    widget.ongoingOrders.order_status == 'Confirmed')
-                    ? true
-                    : false,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                  child:
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) {
-                        return CancelRestProduct(widget.ongoingOrders.cart_id);
-                      })).then((value) {
-                        if (value) {
-                          setState(() {
-                            widget.ongoingOrders.order_status = "Cancelled";
-                          });
-                        }
-                      });
-                    },
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                          color: kMainColor, fontWeight: FontWeight.w400),
-                    ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(52.0),
+        child: AppBar(
+          titleSpacing: 0.0,
+          title: Text(
+            'Order #${widget.ongoingOrders.cart_id}',
+            style: TextStyle(
+                fontSize: 18, color: black_color, fontWeight: FontWeight.w400),
+          ),
+          actions: [
+            Visibility(
+              visible: (widget.ongoingOrders.order_status == 'Pending' ||
+                  widget.ongoingOrders.order_status == 'Confirmed')
+                  ? true
+                  : false,
+              child: Padding(
+                padding: EdgeInsets.only(right: 10, top: 10, bottom: 10),
+                child:
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return CancelRestProduct(widget.ongoingOrders.cart_id);
+                    })).then((value) {
+                      if (value) {
+                        setState(() {
+                          widget.ongoingOrders.order_status = "Cancelled";
+                        });
+                      }
+                    });
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                        color: kMainColor, fontWeight: FontWeight.w400),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
+      ),
       body:
       StreamBuilder(
         stream: FirebaseFirestore.instance.collection('location').snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (_added) {
-              mymap(snapshot);
-              _originLatitude = snapshot.data!.docs.singleWhere(
-                      (element) =>
-                  element.id == user_id.toString())['latitude'];
-              _originLongitude = snapshot.data!.docs.singleWhere(
-                      (element) =>
-                  element.id == user_id.toString())['longitude'];
-              getDirections();
+            mymap(snapshot);
+            _originLatitude = snapshot.data!.docs.singleWhere(
+                    (element) =>
+                element.id == user_id.toString())['latitude'];
+            _originLongitude = snapshot.data!.docs.singleWhere(
+                    (element) =>
+                element.id == user_id.toString())['longitude'];
+            getDirections();
           }
 
           else if (!snapshot.hasData) {
@@ -356,25 +356,21 @@ class _OrderMapRestState extends State<OrderMapRest> {
               Expanded(
                 child: Stack(
                   children: <Widget>[
-                    GoogleMap(
-                      mapType: MapType.normal,
-                      markers: Set<Marker>.of(markers.values),
-                      polylines: Set<Polyline>.of(polylines.values),
-                      initialCameraPosition: CameraPosition(
-                          target: LatLng(snapshot.data!.docs.singleWhere(
-                                  (element) =>
-                              element.id == user_id.toString())['latitude'],
-                              snapshot.data!.docs.singleWhere(
-                                      (element) =>
-                                  element.id == user_id.toString())['longitude']),
-                          zoom: 14),
-                      onMapCreated: (GoogleMapController controller) async {
-                        setState(() {
-                          _controller = controller;
-                          _added = true;
-                        });
-                        getDirections();
-                      },
+                    Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Image.asset("images/map.png",
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
+                              color: Color.fromRGBO(255, 255, 255, 0.5),
+                              colorBlendMode: BlendMode.modulate,
+                              alignment: Alignment.center,
+                              fit: BoxFit.fill),
+                          Text("Waiting for order to be picked...",
+                            style: TextStyle(fontSize: 32),),
+                        ]
                     ),
 
                     Positioned(
@@ -566,60 +562,60 @@ class _OrderMapRestState extends State<OrderMapRest> {
 //      },
 //    );
 //  }
-        _addMarker(LatLng position, String id, BitmapDescriptor descriptor) {
-      MarkerId markerId = MarkerId(id);
-      Marker marker =
-      Marker(markerId: markerId, icon: descriptor, position: position);
-      markers[markerId] = marker;
-    }
-
-    void mymap(AsyncSnapshot<QuerySnapshot> snapshot) async {
-      await _controller!
-          .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-          target: LatLng(
-            snapshot.data!.docs.singleWhere(
-                    (element) =>
-                element.id == user_id.toString())['latitude'],
-            snapshot.data!.docs.singleWhere(
-                    (element) =>
-                element.id == user_id.toString())['longitude'],
-          ),
-          zoom: 14)));
-      _addMarker(LatLng(_originLatitude,_originLongitude), "source", await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(90,90)), 'assets/delivery.png'));
-      _addMarker(LatLng(_destLatitude, _destLongitude), "dest", BitmapDescriptor.defaultMarkerWithHue(90));
-    }
-
-
-    getDirections() async {
-      List<LatLng> polylineCoordinates = [];
-
-      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-       apiKey,
-        PointLatLng(_originLatitude, _originLongitude),
-        PointLatLng(_destLatitude, _destLongitude),
-        travelMode: TravelMode.driving,
-      );
-
-      if (result.points.isNotEmpty) {
-        result.points.forEach((PointLatLng point) {
-          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        });
-      } else {
-        print(result.errorMessage);
-      }
-      addPolyLine(polylineCoordinates);
-    }
-
-    addPolyLine(List<LatLng> polylineCoordinates) {
-      PolylineId id = PolylineId("poly");
-      Polyline polyline = Polyline(
-        polylineId: id,
-        color: kMainColor,
-        points: polylineCoordinates,
-        width: 5,
-      );
-      polylines[id] = polyline;
-      setState(() {});
-    }
-
+  _addMarker(LatLng position, String id, BitmapDescriptor descriptor) {
+    MarkerId markerId = MarkerId(id);
+    Marker marker =
+    Marker(markerId: markerId, icon: descriptor, position: position);
+    markers[markerId] = marker;
   }
+
+  void mymap(AsyncSnapshot<QuerySnapshot> snapshot) async {
+    await _controller!
+        .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: LatLng(
+          snapshot.data!.docs.singleWhere(
+                  (element) =>
+              element.id == user_id.toString())['latitude'],
+          snapshot.data!.docs.singleWhere(
+                  (element) =>
+              element.id == user_id.toString())['longitude'],
+        ),
+        zoom: 14)));
+    _addMarker(LatLng(_originLatitude,_originLongitude), "source", await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(90,90)), 'assets/delivery.png'));
+    _addMarker(LatLng(_destLatitude, _destLongitude), "dest", BitmapDescriptor.defaultMarkerWithHue(90));
+  }
+
+
+  getDirections() async {
+    List<LatLng> polylineCoordinates = [];
+
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      apiKey,
+      PointLatLng(_originLatitude, _originLongitude),
+      PointLatLng(_destLatitude, _destLongitude),
+      travelMode: TravelMode.driving,
+    );
+
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+    } else {
+      print(result.errorMessage);
+    }
+    addPolyLine(polylineCoordinates);
+  }
+
+  addPolyLine(List<LatLng> polylineCoordinates) {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: kMainColor,
+      points: polylineCoordinates,
+      width: 5,
+    );
+    polylines[id] = polyline;
+    setState(() {});
+  }
+
+}

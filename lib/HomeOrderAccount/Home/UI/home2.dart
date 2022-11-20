@@ -71,6 +71,7 @@ class _HomeState extends State<Home> {
   late List<NearStores> rest_nearStores = [];
   String ClosedImage = '';
   List<BannerDetails> ClosedBannerImage = [];
+  String subsenddate = '';
 
   String pickImage = '';
   String subsImage = '';
@@ -118,7 +119,8 @@ class _HomeState extends State<Home> {
 
   static String id="";
 
-  bool subscription = false;
+  bool subscriptionbanner = true;
+  bool subscriptionStore = false;
 
   @override
   void initState() {
@@ -387,13 +389,32 @@ class _HomeState extends State<Home> {
                                   )
                               );
                             },
-                            child: Text(
-                              admins!.topMessage.toString(),
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .bodyText1,
+                            child:  Align(
+                              alignment: Alignment.center,
+                              child:Container(
+                                width: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width * 0.85,
+                                height: 60,
+                                alignment: Alignment(0.05, -0.5),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(11.0),
+                                  image: DecorationImage(
+                                    image: AssetImage("assets/back.png"),
+                                    fit : BoxFit.fill,
+                                  ),
+                                ),
+                                child:   Text(
+                                  admins!.topMessage.toString(),
+                                  style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w900),
+                                ),
+                                //padding: <-- Using to shift text position a little bit for your requirement
+                              ),
+
                             ),
+
                           ),
                         ],
                       ),
@@ -513,7 +534,6 @@ class _HomeState extends State<Home> {
                           rowMainAxisAlignment: MainAxisAlignment.center,
                           squareCells: true,
                           desiredItemWidth: 120,
-                          shrinkWrap: true,
                           minSpacing: 2, children:
                         (nearStores != null && nearStores.length > 0)
                             ? nearStores.map((e) {
@@ -593,7 +613,7 @@ class _HomeState extends State<Home> {
                       ),
                     ]),
 
-                    ( !subscription )?
+                    ( !subscriptionbanner )?
                     ResponsiveGridList(
                         rowMainAxisAlignment: MainAxisAlignment.center,
                         desiredItemWidth: MediaQuery
@@ -637,8 +657,10 @@ class _HomeState extends State<Home> {
                           },
                         ),
                       ),
-                    ])
-                        :
+                    ]):
+                        Container(),
+
+                    (subscriptionStore)?
                     Padding(
                         padding: EdgeInsets.only(top: 5, bottom: 2),
                         child:
@@ -650,6 +672,17 @@ class _HomeState extends State<Home> {
                                   child:
                                   Column(
                                       children:[
+                                        (subsenddate.isNotEmpty)?
+                                        Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child:Text("Your Subscription ends on "+subsenddate,style: TextStyle(fontSize: 18,color: kMainColor,fontWeight: FontWeight.bold),),
+                                            )):
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 8.0, left: 24.0,right: 24.0),
+                                          child:Text(""),
+                                        ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 8.0, left: 24.0,right: 24.0),
                                           child:
@@ -709,14 +742,18 @@ class _HomeState extends State<Home> {
                                       ]
                                   )
                               ),
-                            ])),
+                            ]))
+                        :
+                    Container(),
+
+
                     Visibility(
                       visible: (!isFetch && listImage.length == 0) ? false : true,
                       child: Padding(
                         padding: EdgeInsets.only(top: 10, bottom: 5),
                         child: CarouselSlider(
                             options: CarouselOptions(
-                              height: 200.0,
+                              height: 400.0,
                               autoPlay: true,
                               initialPage: 0,
                               viewportFraction: 0.9,
@@ -744,7 +781,7 @@ class _HomeState extends State<Home> {
                                         BorderRadius.circular(20.0),
                                         clipBehavior: Clip.hardEdge,
                                         child: Container(
-                                          height: 200,
+                                          height: 400,
                                           width: MediaQuery
                                               .of(context)
                                               .size
@@ -1348,17 +1385,41 @@ class _HomeState extends State<Home> {
     var value = await http.post(myUri , body: {
       'user_phone': prefs.getString('user_phone')});
     var jsonData = jsonDecode(value.body.toString());
-    print("Substore "+jsonData.toString());
     if (jsonData['status'] == "1") {
       setState(() {
-        subscription = true;
+        subscriptionbanner = false;
+        subscriptionStore = true;
         callSubStore();
       });
     }
-    else {
+    else if(jsonData['status'] == "2") {
       setState(() {
-        subscription = false;
+        subscriptionbanner = false;
+        subscriptionStore = false;
+        subsenddate = '';
+        ///callSubStore();
       });
+    }
+    else{
+      setState(() {
+        subscriptionbanner = true;
+        subscriptionStore = false;
+        subsenddate = '';
+        ///callSubStore();
+      });
+    }
+
+    if(jsonData['enddate']!=null || jsonData['enddate'].toString().isNotEmpty){
+      setState(() {
+        subsenddate=jsonData['enddate'].toString();
+      });
+    }
+
+    if(jsonData['allowmultishop']!=null || jsonData['allowmultishop'].toString().isNotEmpty){
+      prefs.setString("allowmultishop", jsonData['allowmultishop'].toString());
+    }
+    else{
+      prefs.setString("allowmultishop", "0");
     }
   }
   void callSubStore() async {

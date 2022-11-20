@@ -53,14 +53,15 @@ class OtpVerify extends StatefulWidget {
 class _OtpVerifyState extends State<OtpVerify> {
   final TextEditingController _controller = TextEditingController();
   ConfirmationResult? confirmationResult;
+
   late FirebaseMessaging messaging;
   bool isDialogShowing = false;
   dynamic token = 'token';
   var showDialogBox = false;
   var verificaitonPin = "";
-  String phoneNo='';
-  String smsOTP="";
-  String verificationId='';
+  late String phoneNo;
+  late String smsOTP="";
+  String verificationId="";
   String errorMessage = '';
   String contact = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -85,7 +86,7 @@ class _OtpVerifyState extends State<OtpVerify> {
     _controller.dispose();
     super.dispose();
   }
-  
+
   void getd() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     contact = pref.getString("user_phone")!;
@@ -94,7 +95,6 @@ class _OtpVerifyState extends State<OtpVerify> {
 
     generateOtp('+91$contact');
   }
-
   @override
   Widget build(BuildContext context) {
 //    MobileNumberArg mobileNumberArg = ModalRoute.of(context).settings.arguments;
@@ -168,9 +168,9 @@ class _OtpVerifyState extends State<OtpVerify> {
                                 .roundedPinBoxDecoration,
                             pinTextStyle: TextStyle(fontSize: 22.0),
                             pinTextAnimatedSwitcherTransition:
-                                ProvidedPinBoxTextAnimation.scalingTransition,
+                            ProvidedPinBoxTextAnimation.scalingTransition,
                             pinTextAnimatedSwitcherDuration:
-                                Duration(milliseconds: 300),
+                            Duration(milliseconds: 300),
                             highlightAnimationBeginColor: Colors.black,
                             highlightAnimationEndColor: Colors.white12,
                             keyboardType: TextInputType.number,
@@ -183,19 +183,19 @@ class _OtpVerifyState extends State<OtpVerify> {
                               textDirection: TextDirection.ltr,
                               textAlign: TextAlign.center,
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
+                              TextStyle(color: Colors.black, fontSize: 16),
                             ),
                           ),
                           SizedBox(height: 10.0),
-                      InkWell(
-                        onTap: () {
-                          generateOtp('+91$contact');
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Text("Resend Code"),
-                        ),
-                      ),
+                          InkWell(
+                            onTap: () {
+                              generateOtp('+91$contact');
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: Text("Resend Code"),
+                            ),
+                          ),
                           const SizedBox(height: 10.0),
 
                           Visibility(
@@ -223,12 +223,10 @@ class _OtpVerifyState extends State<OtpVerify> {
                       showDialogBox = true;
                     });
                   }
+                  /////hitService("123456", context);
 
-
-                  //// hitService("123456", context);
-
-                   verifyOtp();
-                  },
+                  verifyOtp();
+                },
                 child: Container(
                   alignment: Alignment.center,
                   height: 52,
@@ -262,37 +260,38 @@ class _OtpVerifyState extends State<OtpVerify> {
         'phone': prefs.getString('user_phone'),
         'otp': verificaitonPin,
         'device_id': '${token}'
-      }).then((response) async {
+      }).then((response) {
         print('Response Body: *-*- ${response.body}');
         if (response.statusCode == 200) {
           print('Response Body: *-*- ${response.body}');
           var jsonData = jsonDecode(response.body);
           if (jsonData['status'] == 1) {
             var userId = int.parse('${jsonData['data']['user_id']}');
-            await prefs.setInt("user_id", userId);
-            await prefs.setString("user_name", jsonData['data']['user_name']);
-            await prefs.setString("user_email", jsonData['data']['user_email']);
-            await prefs.setString("user_image", jsonData['data']['user_image']);
-            await prefs.setString("user_phone", jsonData['data']['user_phone']);
-            await prefs.setString("user_password", jsonData['data']['user_password']);
-            await prefs.setString("id_proof", (jsonData['data']['id_proof']));
+            prefs.setInt("user_id", userId);
+            prefs.setString("user_name", jsonData['data']['user_name']);
+            prefs.setString("user_email", jsonData['data']['user_email']);
+            prefs.setString("user_image", jsonData['data']['user_image']);
+            prefs.setString("user_phone", jsonData['data']['user_phone']);
+            prefs.setString("user_password", jsonData['data']['user_password']);
+            prefs.setString("id_proof", (jsonData['data']['id_proof']));
 
-            await prefs.setString(
+            prefs.setString(
                 "wallet_credits", jsonData['data']['wallet_credits'].toString());
-            await  prefs.setString("first_recharge_coupon",
+            prefs.setString("first_recharge_coupon",
                 jsonData['data']['first_recharge_coupon'].toString());
-            await prefs.setBool("phoneverifed", true);
-            await prefs.setBool("islogin", true);
-            await prefs.setString("refferal_code", jsonData['data']['referral_code'].toString());
+            prefs.setBool("phoneverifed", true);
+            prefs.setBool("islogin", true);
+            prefs.setString("refferal_code", jsonData['data']['referral_code'].toString());
             if (jsonData['currency'] != null) {
               CurrencyData currencyData =
-                  CurrencyData.fromJson(jsonData['currency']);
-              await prefs.setString("curency", '${currencyData.currency_sign}');
+              CurrencyData.fromJson(jsonData['currency']);
+              print('${currencyData.toString()}');
+              prefs.setString("curency", '${currencyData.currency_sign}');
             }
-           ///// widget.onVerificationDone();
+            ///// widget.onVerificationDone();
 
-            await prefs.setBool("phoneverifed", true);
-            await prefs.setBool("islogin", true);
+            prefs.setBool("phoneverifed", true);
+            prefs.setBool("islogin", true);
             widget.onVerificationDone();
 
           } else {
@@ -316,7 +315,7 @@ class _OtpVerifyState extends State<OtpVerify> {
     } else {
       messaging.getToken().then((value) {
         token = value;
-         hitService(verificaitonPin, context);
+        hitService(verificaitonPin, context);
       });
     }
   }
@@ -372,8 +371,7 @@ class _OtpVerifyState extends State<OtpVerify> {
       print(e);
       handleError(e as FirebaseAuthException);
     }
-  ///  await _auth.signInWithPhoneNumber(contact);
-
+    ///  await _auth.signInWithPhoneNumber(contact);
 
     // try {
     //   final AuthCredential credential = PhoneAuthProvider.credential(
@@ -394,11 +392,11 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   //Method for handle the errors
   void handleError(FirebaseAuthException error) {
-     FocusScope.of(context).requestFocus(FocusNode());
-        setState(() {
-          errorMessage = 'Invalid Code';
-        });
-        showAlertDialog(context, 'Invalid Code');
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      errorMessage = 'Invalid Code';
+    });
+    showAlertDialog(context, 'Invalid Code');
   }
 
   //Basic alert dialogue for alert errors and confirmations

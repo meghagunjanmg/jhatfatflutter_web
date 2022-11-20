@@ -385,7 +385,8 @@ class _SubscribeStore extends State<SubscribeStore> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Navigator.push(context, MaterialPageRoute
       (builder: (context) =>
-    new AppCategory(substores.vendorName.toString(),  substores.vendorId,
+    new AppCategory(
+        substores.vendorName.toString(),  substores.vendorId,
         substores.distance)));
 
   }

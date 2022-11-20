@@ -98,15 +98,17 @@ class OrderPageState extends State<OrderPage> {
                     onGoingOrders[i].cart_id) {
                   print("IF " + onGoingOrders[i].data[j].order_cart_id + " " +
                       onGoingOrders[i].cart_id);
-                  vendor = vendor +","+ onGoingOrders[i].data[j].vendor_name;
+                  if( !vendor.contains(onGoingOrders[i].data[j].vendor_name)) {
+                    vendor = vendor +"\n"+ onGoingOrders[i].data[j].vendor_name;
+                  }
                 }
               }
-
               VendorName.add(vendor);
               vendor = '';
               print("NAME " + i.toString() + " " + vendor);
             }
           }
+          VendorName.toSet().toList();
         }
         if (countFetch == 4) {
           setState(() {
@@ -115,7 +117,7 @@ class OrderPageState extends State<OrderPage> {
         }
       }
     })
-      .catchError((e) {
+        .catchError((e) {
       if (countFetch == 4) {
         setState(() {
           isFetch = false;
@@ -135,7 +137,7 @@ class OrderPageState extends State<OrderPage> {
       VendorName.clear();
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
-     userId = preferences.getInt('user_id');
+    userId = preferences.getInt('user_id');
     var url = cancelOrders;
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {'user_id': '$userId'}).then((value) {
@@ -171,7 +173,9 @@ class OrderPageState extends State<OrderPage> {
                     onGoingOrders[i].cart_id) {
                   print("IF " + onGoingOrders[i].data[j].order_cart_id + " " +
                       onGoingOrders[i].cart_id);
-                  vendor = vendor +","+ onGoingOrders[i].data[j].vendor_name;
+                  if( !vendor.contains(onGoingOrders[i].data[j].vendor_name)) {
+                    vendor = vendor +"\n"+ onGoingOrders[i].data[j].vendor_name;
+                  }
                 }
               }
 
@@ -208,7 +212,7 @@ class OrderPageState extends State<OrderPage> {
       VendorName.clear();
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
-     userId = preferences.getInt('user_id');
+    userId = preferences.getInt('user_id');
     var url = completeOrders;
     Uri myUri = Uri.parse(url);
 
@@ -247,7 +251,9 @@ class OrderPageState extends State<OrderPage> {
                     onGoingOrders[i].cart_id) {
                   print("IF " + onGoingOrders[i].data[j].order_cart_id + " " +
                       onGoingOrders[i].cart_id);
-                  vendor = vendor +","+ onGoingOrders[i].data[j].vendor_name;
+                  if( !vendor.contains(onGoingOrders[i].data[j].vendor_name)) {
+                    vendor = vendor +"\n"+ onGoingOrders[i].data[j].vendor_name;
+                  }
                 }
               }
 
@@ -255,6 +261,7 @@ class OrderPageState extends State<OrderPage> {
               vendor = '';
               print("NAME " + i.toString() + " " + vendor);
             }
+
           }
         }
       }
@@ -525,7 +532,7 @@ class OrderPageState extends State<OrderPage> {
       onPharmaGoingOrders = onGoingOrderss;
     });
     SharedPreferences preferences = await SharedPreferences.getInstance();
-     userId = preferences.getInt('user_id');
+    userId = preferences.getInt('user_id');
     var url = pharmacy_user_completed_orders;
     Uri myUri = Uri.parse(url);
 
@@ -724,12 +731,6 @@ class OrderPageState extends State<OrderPage> {
     getOnParcelGointOrders();
   }
 
-  bool showMyDialog(BuildContext context) {
-    bool result = false;
-
-    return result;
-  }
-
   void getCancelledHistory() async {
     setState(() {
       isFetch = true;
@@ -805,7 +806,7 @@ class OrderPageState extends State<OrderPage> {
                             '${tabDesign[index]}',
                             textAlign: TextAlign.center,
                             style:
-                                TextStyle(color: kMainTextColor, fontSize: 15),
+                            TextStyle(color: kMainTextColor, fontSize: 15),
                           ),
                           Positioned(
                             bottom: 0.0,
@@ -826,27 +827,26 @@ class OrderPageState extends State<OrderPage> {
               color: Colors.transparent,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height - 157,
-              alignment: Alignment.center,
               child: SingleChildScrollView(
                 primary: true,
                 child: Column(
                   children: [
                     Visibility(
                         visible: ((onParcelGoingOrders != null &&
-                                    onParcelGoingOrders.length > 0) ||
-                                (onRestGoingOrders != null &&
-                                    onRestGoingOrders.length > 0) ||
-                                (onGoingOrders != null &&
-                                    onGoingOrders.length > 0) ||
-                                (onPharmaGoingOrders != null &&
-                                    onPharmaGoingOrders.length > 0))
+                            onParcelGoingOrders.length > 0) ||
+                            (onRestGoingOrders != null &&
+                                onRestGoingOrders.length > 0) ||
+                            (onGoingOrders != null &&
+                                onGoingOrders.length > 0) ||
+                            (onPharmaGoingOrders != null &&
+                                onPharmaGoingOrders.length > 0))
                             ? true
                             : false,
                         child: Column(
                           children: [
                             Visibility(
                                 visible: (onGoingOrders != null &&
-                                        onGoingOrders.length > 0)
+                                    onGoingOrders.length > 0)
                                     ? true
                                     : false,
                                 child: ListView.builder(
@@ -858,47 +858,28 @@ class OrderPageState extends State<OrderPage> {
                                           if (onGoingOrders[t].order_status ==
                                               'Cancelled') {
                                           } else {
-                                            showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return new AlertDialog(
-                                                    content: Text(
-                                                      'For Live Tracking use mobile application.',
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    OrderMapPage(
+                                                      pageTitle:
+                                                      VendorName[t],
+                                                      ongoingOrders:
+                                                      onGoingOrders[t],
+                                                      currency: currency,
+                                                      user_id:onGoingOrders[t].cart_id.toString(),
                                                     ),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        child: const Text('OK'),
-                                                        onPressed: () {
-                                                          Navigator.of(context).pop(true);
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  OrderMapPage(
-                                                                    pageTitle:
-                                                                    VendorName[t],
-                                                                    ongoingOrders:
-                                                                    onGoingOrders[t],
-                                                                    currency: currency,
-                                                                    user_id:onGoingOrders[t].cart_id.toString(),
-                                                                  ),
-                                                            ),
-                                                          ).then((value) {
-                                                            if (khit == 0) {
-                                                              getAllThreeData();
-                                                            } else if (khit == 1) {
-                                                              getCancelledHistory();
-                                                            } else if (khit == 2) {
-                                                              getCompletedHistory();
-                                                            }
-                                                          });
-                                                        },
-                                                      ),
-                                                    ],
-                                                  );
-                                                }
-                                            );
-
+                                              ),
+                                            ).then((value) {
+                                              if (khit == 0) {
+                                                getAllThreeData();
+                                              } else if (khit == 1) {
+                                                getCancelledHistory();
+                                              } else if (khit == 2) {
+                                                getCompletedHistory();
+                                              }
+                                            });
                                           }
                                         },
                                         behavior: HitTestBehavior.opaque,
@@ -909,8 +890,8 @@ class OrderPageState extends State<OrderPage> {
                                                 children: <Widget>[
                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.only(
-                                                            left: 16.3),
+                                                    const EdgeInsets.only(
+                                                        left: 16.3),
                                                     child: Image.asset(
                                                       'images/maincategory/vegetables_fruitsact.png',
                                                       height: 42.3,
@@ -922,56 +903,56 @@ class OrderPageState extends State<OrderPage> {
                                                       title: Text(
                                                         'Order Id - #${onGoingOrders[t].cart_id}',
                                                         style:
-                                                            orderMapAppBarTextStyle
-                                                                .copyWith(
-                                                                    letterSpacing:
-                                                                        0.07),
+                                                        orderMapAppBarTextStyle
+                                                            .copyWith(
+                                                            letterSpacing:
+                                                            0.07),
                                                       ),
                                                       subtitle: Text(
                                                         (onGoingOrders[t]
-                                                                        .delivery_date !=
-                                                                    null &&
-                                                                onGoingOrders[t]
-                                                                        .time_slot !=
-                                                                    null)
+                                                            .delivery_date !=
+                                                            null &&
+                                                            onGoingOrders[t]
+                                                                .time_slot !=
+                                                                null)
                                                             ? '${onGoingOrders[t].delivery_date} | ${onGoingOrders[t].time_slot}'
                                                             : '',
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .headline6!
                                                             .copyWith(
-                                                                fontSize: 11.7,
-                                                                letterSpacing:
-                                                                    0.06,
-                                                                color: Color(
-                                                                    0xffc1c1c1)),
+                                                            fontSize: 11.7,
+                                                            letterSpacing:
+                                                            0.06,
+                                                            color: Color(
+                                                                0xffc1c1c1)),
                                                       ),
                                                       trailing: Column(
                                                         mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                         children: <Widget>[
                                                           Text(
                                                             '${onGoingOrders[t].order_status}',
                                                             style: orderMapAppBarTextStyle
                                                                 .copyWith(
-                                                                    color:
-                                                                        kMainColor),
+                                                                color:
+                                                                kMainColor),
                                                           ),
                                                           SizedBox(height: 7.0),
                                                           Text(
                                                             '${onGoingOrders[t].data.length} items | $currency ${onGoingOrders[t].price}',
                                                             style: Theme.of(
-                                                                    context)
+                                                                context)
                                                                 .textTheme
                                                                 .headline6!
                                                                 .copyWith(
-                                                                    fontSize:
-                                                                        11.7,
-                                                                    letterSpacing:
-                                                                        0.06,
-                                                                    color: Color(
-                                                                        0xffc1c1c1)),
+                                                                fontSize:
+                                                                11.7,
+                                                                letterSpacing:
+                                                                0.06,
+                                                                color: Color(
+                                                                    0xffc1c1c1)),
                                                           )
                                                         ],
                                                       ),
@@ -999,14 +980,15 @@ class OrderPageState extends State<OrderPage> {
                                                     ),
                                                   ),
                                                   Text(
-                                      VendorName[t],
+                                                    VendorName[t]
+                                                    ,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .caption!
                                                         .copyWith(
-                                                            fontSize: 10.0,
-                                                            letterSpacing:
-                                                                0.05),
+                                                        fontSize: 10.0,
+                                                        letterSpacing:
+                                                        0.05),
                                                   ),
                                                 ],
                                               ),
@@ -1032,24 +1014,24 @@ class OrderPageState extends State<OrderPage> {
                                                           .textTheme
                                                           .caption!
                                                           .copyWith(
-                                                              fontSize: 10.0,
-                                                              letterSpacing:
-                                                                  0.05),
+                                                          fontSize: 10.0,
+                                                          letterSpacing:
+                                                          0.05),
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                               (onGoingOrders.length - 1 == t)
                                                   ? Divider(
-                                                      color:
-                                                          kCardBackgroundColor,
-                                                      thickness: 0,
-                                                    )
+                                                color:
+                                                kCardBackgroundColor,
+                                                thickness: 0,
+                                              )
                                                   : Divider(
-                                                      color:
-                                                          kCardBackgroundColor,
-                                                      thickness: 13.3,
-                                                    ),
+                                                color:
+                                                kCardBackgroundColor,
+                                                thickness: 13.3,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -1058,7 +1040,7 @@ class OrderPageState extends State<OrderPage> {
                                     itemCount: onGoingOrders.length)),
                             Visibility(
                               visible: (onRestGoingOrders != null &&
-                                      onRestGoingOrders.length > 0)
+                                  onRestGoingOrders.length > 0)
                                   ? true
                                   : false,
                               child: Column(
@@ -1074,58 +1056,31 @@ class OrderPageState extends State<OrderPage> {
                                         return GestureDetector(
                                           onTap: () {
                                             if (onRestGoingOrders[t]
-                                                    .order_status ==
+                                                .order_status ==
                                                 'Cancelled') {
                                             } else {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (
-                                                      BuildContext context) {
-                                                    return new AlertDialog(
-                                                      content: Text(
-                                                        'For Live Tracking use mobile application.',
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OrderMapRestPage(
+                                                        pageTitle:
+                                                        '${onRestGoingOrders[t].vendor_name}',
+                                                        ongoingOrders:
+                                                        onRestGoingOrders[t],
+                                                        currency: currency,
+                                                        user_id:onGoingOrders[t].cart_id.toString(),
                                                       ),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          child: const Text(
-                                                              'OK'),
-                                                          onPressed: () {
-                                                            Navigator.of(
-                                                                context).pop(
-                                                                true);
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (
-                                                                    context) =>
-                                                                    OrderMapRestPage(
-                                                                      pageTitle:
-                                                                      '${onRestGoingOrders[t]
-                                                                          .vendor_name}',
-                                                                      ongoingOrders:
-                                                                      onRestGoingOrders[t],
-                                                                      currency: currency,
-                                                                      user_id: onGoingOrders[t]
-                                                                          .cart_id
-                                                                          .toString(),
-                                                                    ),
-                                                              ),
-                                                            ).then((value) {
-                                                              if (khit == 0) {
-                                                                getAllThreeData();
-                                                              } else
-                                                              if (khit == 1) {
-                                                                getCancelledHistory();
-                                                              } else
-                                                              if (khit == 2) {
-                                                                getCompletedHistory();
-                                                              }
-                                                            });
-                                                          },
-                                                        ),
-                                                      ],
-                                                    );
-                                                  });
+                                                ),
+                                              ).then((value) {
+                                                if (khit == 0) {
+                                                  getAllThreeData();
+                                                } else if (khit == 1) {
+                                                  getCancelledHistory();
+                                                } else if (khit == 2) {
+                                                  getCompletedHistory();
+                                                }
+                                              });
                                             }
                                           },
                                           behavior: HitTestBehavior.opaque,
@@ -1136,8 +1091,8 @@ class OrderPageState extends State<OrderPage> {
                                                   children: <Widget>[
                                                     Padding(
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                              left: 16.3),
+                                                      const EdgeInsets.only(
+                                                          left: 16.3),
                                                       child: Image.asset(
                                                         'images/maincategory/vegetables_fruitsact.png',
                                                         height: 42.3,
@@ -1150,58 +1105,58 @@ class OrderPageState extends State<OrderPage> {
                                                           'Order Id - #${onRestGoingOrders[t].cart_id}',
                                                           style: orderMapAppBarTextStyle
                                                               .copyWith(
-                                                                  letterSpacing:
-                                                                      0.07),
+                                                              letterSpacing:
+                                                              0.07),
                                                         ),
                                                         subtitle: Text(
                                                           (onRestGoingOrders[t]
-                                                                          .delivery_date !=
-                                                                      null &&
-                                                                  onRestGoingOrders[
-                                                                              t]
-                                                                          .time_slot !=
-                                                                      null)
+                                                              .delivery_date !=
+                                                              null &&
+                                                              onRestGoingOrders[
+                                                              t]
+                                                                  .time_slot !=
+                                                                  null)
                                                               ? '${onRestGoingOrders[t].delivery_date} | ${onRestGoingOrders[t].time_slot}'
                                                               : '',
                                                           style: Theme.of(
-                                                                  context)
+                                                              context)
                                                               .textTheme
                                                               .headline6!
                                                               .copyWith(
-                                                                  fontSize:
-                                                                      11.7,
-                                                                  letterSpacing:
-                                                                      0.06,
-                                                                  color: Color(
-                                                                      0xffc1c1c1)),
+                                                              fontSize:
+                                                              11.7,
+                                                              letterSpacing:
+                                                              0.06,
+                                                              color: Color(
+                                                                  0xffc1c1c1)),
                                                         ),
                                                         trailing: Column(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                           children: <Widget>[
                                                             Text(
                                                               '${onRestGoingOrders[t].order_status}',
                                                               style: orderMapAppBarTextStyle
                                                                   .copyWith(
-                                                                      color:
-                                                                          kMainColor),
+                                                                  color:
+                                                                  kMainColor),
                                                             ),
                                                             SizedBox(
                                                                 height: 7.0),
                                                             Text(
                                                               '${onRestGoingOrders[t].data.length} items | $currency ${onRestGoingOrders[t].remaining_amount}',
                                                               style: Theme.of(
-                                                                      context)
+                                                                  context)
                                                                   .textTheme
                                                                   .headline6!
                                                                   .copyWith(
-                                                                      fontSize:
-                                                                          11.7,
-                                                                      letterSpacing:
-                                                                          0.06,
-                                                                      color: Color(
-                                                                          0xffc1c1c1)),
+                                                                  fontSize:
+                                                                  11.7,
+                                                                  letterSpacing:
+                                                                  0.06,
+                                                                  color: Color(
+                                                                      0xffc1c1c1)),
                                                             )
                                                           ],
                                                         ),
@@ -1234,9 +1189,9 @@ class OrderPageState extends State<OrderPage> {
                                                           .textTheme
                                                           .caption!
                                                           .copyWith(
-                                                              fontSize: 10.0,
-                                                              letterSpacing:
-                                                                  0.05),
+                                                          fontSize: 10.0,
+                                                          letterSpacing:
+                                                          0.05),
                                                     ),
                                                   ],
                                                 ),
@@ -1262,25 +1217,25 @@ class OrderPageState extends State<OrderPage> {
                                                             .textTheme
                                                             .caption!
                                                             .copyWith(
-                                                                fontSize: 10.0,
-                                                                letterSpacing:
-                                                                    0.05),
+                                                            fontSize: 10.0,
+                                                            letterSpacing:
+                                                            0.05),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                                 (onRestGoingOrders.length - 1 ==
-                                                        t)
+                                                    t)
                                                     ? Divider(
-                                                        color:
-                                                            kCardBackgroundColor,
-                                                        thickness: 0.0,
-                                                      )
+                                                  color:
+                                                  kCardBackgroundColor,
+                                                  thickness: 0.0,
+                                                )
                                                     : Divider(
-                                                        color:
-                                                            kCardBackgroundColor,
-                                                        thickness: 13.3,
-                                                      ),
+                                                  color:
+                                                  kCardBackgroundColor,
+                                                  thickness: 13.3,
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -1292,7 +1247,7 @@ class OrderPageState extends State<OrderPage> {
                             ),
                             Visibility(
                               visible: (onPharmaGoingOrders != null &&
-                                      onPharmaGoingOrders.length > 0)
+                                  onPharmaGoingOrders.length > 0)
                                   ? true
                                   : false,
                               child: Column(
@@ -1308,7 +1263,7 @@ class OrderPageState extends State<OrderPage> {
                                         return GestureDetector(
                                           onTap: () {
                                             if (onPharmaGoingOrders[t]
-                                                    .order_status ==
+                                                .order_status ==
                                                 'Cancelled') {
                                             } else {
                                               Navigator.push(
@@ -1316,12 +1271,12 @@ class OrderPageState extends State<OrderPage> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       OrderMapPharmaPage(
-                                                    pageTitle:
+                                                        pageTitle:
                                                         '${onPharmaGoingOrders[t].vendor_name}',
-                                                    ongoingOrders:
+                                                        ongoingOrders:
                                                         onPharmaGoingOrders[t],
-                                                    currency: currency,
-                                                  ),
+                                                        currency: currency,
+                                                      ),
                                                 ),
                                               ).then((value) {
                                                 if (khit == 0) {
@@ -1342,8 +1297,8 @@ class OrderPageState extends State<OrderPage> {
                                                   children: <Widget>[
                                                     Padding(
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                              left: 16.3),
+                                                      const EdgeInsets.only(
+                                                          left: 16.3),
                                                       child: Image.asset(
                                                         'images/maincategory/vegetables_fruitsact.png',
                                                         height: 42.3,
@@ -1356,59 +1311,59 @@ class OrderPageState extends State<OrderPage> {
                                                           'Order Id - #${onPharmaGoingOrders[t].cart_id}',
                                                           style: orderMapAppBarTextStyle
                                                               .copyWith(
-                                                                  letterSpacing:
-                                                                      0.07),
+                                                              letterSpacing:
+                                                              0.07),
                                                         ),
                                                         subtitle: Text(
                                                           (onPharmaGoingOrders[
-                                                                              t]
-                                                                          .delivery_date !=
-                                                                      null &&
-                                                                  onPharmaGoingOrders[
-                                                                              t]
-                                                                          .time_slot !=
-                                                                      null)
+                                                          t]
+                                                              .delivery_date !=
+                                                              null &&
+                                                              onPharmaGoingOrders[
+                                                              t]
+                                                                  .time_slot !=
+                                                                  null)
                                                               ? '${onPharmaGoingOrders[t].delivery_date} | ${onPharmaGoingOrders[t].time_slot}'
                                                               : '',
                                                           style: Theme.of(
-                                                                  context)
+                                                              context)
                                                               .textTheme
                                                               .headline6!
                                                               .copyWith(
-                                                                  fontSize:
-                                                                      11.7,
-                                                                  letterSpacing:
-                                                                      0.06,
-                                                                  color: Color(
-                                                                      0xffc1c1c1)),
+                                                              fontSize:
+                                                              11.7,
+                                                              letterSpacing:
+                                                              0.06,
+                                                              color: Color(
+                                                                  0xffc1c1c1)),
                                                         ),
                                                         trailing: Column(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                           children: <Widget>[
                                                             Text(
                                                               '${onPharmaGoingOrders[t].order_status}',
                                                               style: orderMapAppBarTextStyle
                                                                   .copyWith(
-                                                                      color:
-                                                                          kMainColor),
+                                                                  color:
+                                                                  kMainColor),
                                                             ),
                                                             SizedBox(
                                                                 height: 7.0),
                                                             Text(
                                                               '${onPharmaGoingOrders[t].data.length} items | $currency ${onPharmaGoingOrders[t].remaining_amount}',
                                                               style: Theme.of(
-                                                                      context)
+                                                                  context)
                                                                   .textTheme
                                                                   .headline6!
                                                                   .copyWith(
-                                                                      fontSize:
-                                                                          11.7,
-                                                                      letterSpacing:
-                                                                          0.06,
-                                                                      color: Color(
-                                                                          0xffc1c1c1)),
+                                                                  fontSize:
+                                                                  11.7,
+                                                                  letterSpacing:
+                                                                  0.06,
+                                                                  color: Color(
+                                                                      0xffc1c1c1)),
                                                             )
                                                           ],
                                                         ),
@@ -1441,9 +1396,9 @@ class OrderPageState extends State<OrderPage> {
                                                           .textTheme
                                                           .caption!
                                                           .copyWith(
-                                                              fontSize: 10.0,
-                                                              letterSpacing:
-                                                                  0.05),
+                                                          fontSize: 10.0,
+                                                          letterSpacing:
+                                                          0.05),
                                                     ),
                                                   ],
                                                 ),
@@ -1469,26 +1424,26 @@ class OrderPageState extends State<OrderPage> {
                                                             .textTheme
                                                             .caption!
                                                             .copyWith(
-                                                                fontSize: 10.0,
-                                                                letterSpacing:
-                                                                    0.05),
+                                                            fontSize: 10.0,
+                                                            letterSpacing:
+                                                            0.05),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                                 (onPharmaGoingOrders.length -
-                                                            1 ==
-                                                        t)
+                                                    1 ==
+                                                    t)
                                                     ? Divider(
-                                                        color:
-                                                            kCardBackgroundColor,
-                                                        thickness: 0.0,
-                                                      )
+                                                  color:
+                                                  kCardBackgroundColor,
+                                                  thickness: 0.0,
+                                                )
                                                     : Divider(
-                                                        color:
-                                                            kCardBackgroundColor,
-                                                        thickness: 13.3,
-                                                      ),
+                                                  color:
+                                                  kCardBackgroundColor,
+                                                  thickness: 13.3,
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -1500,7 +1455,7 @@ class OrderPageState extends State<OrderPage> {
                             ),
                             Visibility(
                               visible: (onParcelGoingOrders != null &&
-                                      onParcelGoingOrders.length > 0)
+                                  onParcelGoingOrders.length > 0)
                                   ? true
                                   : false,
                               child: Column(
@@ -1516,53 +1471,31 @@ class OrderPageState extends State<OrderPage> {
                                         return GestureDetector(
                                           onTap: () {
                                             if (onParcelGoingOrders[t]
-                                                    .orderStatus ==
+                                                .orderStatus ==
                                                 'Cancelled') {
-                                            }
-                                            else{
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (
-                                                      BuildContext context) {
-                                                    return new AlertDialog(
-                                                      content: Text(
-                                                        'For Live Tracking use mobile application.',
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OrderMapParcelPage (
+                                                          pageTitle:
+                                                          '${onParcelGoingOrders[t].vendorName}',
+                                                          ongoingOrders:
+                                                          onParcelGoingOrders[t],
+                                                          currency: currency,
+                                                          user_id: onParcelGoingOrders[t].cartId.toString()
                                                       ),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          child: const Text(
-                                                              'OK'),
-                                                          onPressed: () {
-                                                            Navigator.of(
-                                                                context).pop(
-                                                                true);
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) =>
-                                                                    OrderMapParcelPage (
-                                                                        pageTitle:
-                                                                        '${onParcelGoingOrders[t].vendorName}',
-                                                                        ongoingOrders:
-                                                                        onParcelGoingOrders[t],
-                                                                        currency: currency,
-                                                                        user_id: onParcelGoingOrders[t].cartId.toString()
-                                                                    ),
-                                                              ),
-                                                            ).then((value) {
-                                                              if (khit == 0) {
-                                                                getAllThreeData();
-                                                              } else if (khit == 1) {
-                                                                getCancelledHistory();
-                                                              } else if (khit == 2) {
-                                                                getCompletedHistory();
-                                                              }
-                                                            });
-                                                          },
-                                                        ),
-                                                      ],
-                                                    );
-                                                  });
+                                                ),
+                                              ).then((value) {
+                                                if (khit == 0) {
+                                                  getAllThreeData();
+                                                } else if (khit == 1) {
+                                                  getCancelledHistory();
+                                                } else if (khit == 2) {
+                                                  getCompletedHistory();
+                                                }
+                                              });
                                             }
                                           },
                                           behavior: HitTestBehavior.opaque,
@@ -1573,8 +1506,8 @@ class OrderPageState extends State<OrderPage> {
                                                   children: <Widget>[
                                                     Padding(
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                              left: 16.3),
+                                                      const EdgeInsets.only(
+                                                          left: 16.3),
                                                       child: Image.asset(
                                                         'images/maincategory/vegetables_fruitsact.png',
                                                         height: 42.3,
@@ -1587,59 +1520,59 @@ class OrderPageState extends State<OrderPage> {
                                                           'Order Id - #${onParcelGoingOrders[t].cartId}',
                                                           style: orderMapAppBarTextStyle
                                                               .copyWith(
-                                                                  letterSpacing:
-                                                                      0.07),
+                                                              letterSpacing:
+                                                              0.07),
                                                         ),
                                                         subtitle: Text(
                                                           (onParcelGoingOrders[
-                                                                              t]
-                                                                          .pickupDate !=
-                                                                      null &&
-                                                                  onParcelGoingOrders[
-                                                                              t]
-                                                                          .pickupTime !=
-                                                                      null)
+                                                          t]
+                                                              .pickupDate !=
+                                                              null &&
+                                                              onParcelGoingOrders[
+                                                              t]
+                                                                  .pickupTime !=
+                                                                  null)
                                                               ? '${onParcelGoingOrders[t].pickupDate} | ${onParcelGoingOrders[t].pickupTime}'
                                                               : '',
                                                           style: Theme.of(
-                                                                  context)
+                                                              context)
                                                               .textTheme
                                                               .headline6!
                                                               .copyWith(
-                                                                  fontSize:
-                                                                      11.7,
-                                                                  letterSpacing:
-                                                                      0.06,
-                                                                  color: Color(
-                                                                      0xffc1c1c1)),
+                                                              fontSize:
+                                                              11.7,
+                                                              letterSpacing:
+                                                              0.06,
+                                                              color: Color(
+                                                                  0xffc1c1c1)),
                                                         ),
                                                         trailing: Column(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                           children: <Widget>[
                                                             Text(
                                                               '${onParcelGoingOrders[t].orderStatus}',
                                                               style: orderMapAppBarTextStyle
                                                                   .copyWith(
-                                                                      color:
-                                                                          kMainColor),
+                                                                  color:
+                                                                  kMainColor),
                                                             ),
                                                             SizedBox(
                                                                 height: 5.0),
                                                             Text(
                                                               '1 items | ${currency} ${(double.parse('${onParcelGoingOrders[t].distance}') > 1) ? double.parse('${onParcelGoingOrders[t].charges}') * double.parse('${onParcelGoingOrders[t].distance}') : double.parse('${onParcelGoingOrders[t].charges}')}\n\n',
                                                               style: Theme.of(
-                                                                      context)
+                                                                  context)
                                                                   .textTheme
                                                                   .headline6!
                                                                   .copyWith(
-                                                                      fontSize:
-                                                                          11.7,
-                                                                      letterSpacing:
-                                                                          0.06,
-                                                                      color: Color(
-                                                                          0xffc1c1c1)),
+                                                                  fontSize:
+                                                                  11.7,
+                                                                  letterSpacing:
+                                                                  0.06,
+                                                                  color: Color(
+                                                                      0xffc1c1c1)),
                                                             )
                                                           ],
                                                         ),
@@ -1672,9 +1605,9 @@ class OrderPageState extends State<OrderPage> {
                                                           .textTheme
                                                           .caption!
                                                           .copyWith(
-                                                              fontSize: 10.0,
-                                                              letterSpacing:
-                                                                  0.05),
+                                                          fontSize: 10.0,
+                                                          letterSpacing:
+                                                          0.05),
                                                     ),
                                                   ],
                                                 ),
@@ -1700,26 +1633,26 @@ class OrderPageState extends State<OrderPage> {
                                                             .textTheme
                                                             .caption!
                                                             .copyWith(
-                                                                fontSize: 10.0,
-                                                                letterSpacing:
-                                                                    0.05),
+                                                            fontSize: 10.0,
+                                                            letterSpacing:
+                                                            0.05),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                                 (onParcelGoingOrders.length -
-                                                            1 ==
-                                                        t)
+                                                    1 ==
+                                                    t)
                                                     ? Divider(
-                                                        color:
-                                                            kCardBackgroundColor,
-                                                        thickness: 0.0,
-                                                      )
+                                                  color:
+                                                  kCardBackgroundColor,
+                                                  thickness: 0.0,
+                                                )
                                                     : Divider(
-                                                        color:
-                                                            kCardBackgroundColor,
-                                                        thickness: 13.3,
-                                                      ),
+                                                  color:
+                                                  kCardBackgroundColor,
+                                                  thickness: 13.3,
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -1733,102 +1666,102 @@ class OrderPageState extends State<OrderPage> {
                         )),
                     Visibility(
                       visible: ((onRestGoingOrders != null &&
-                                  onRestGoingOrders.length == 0) &&
-                              (onGoingOrders != null &&
-                                  onGoingOrders.length == 0) &&
-                              (onPharmaGoingOrders != null &&
-                                  onPharmaGoingOrders.length == 0) &&
-                              (onParcelGoingOrders != null &&
-                                  onParcelGoingOrders.length == 0))
+                          onRestGoingOrders.length == 0) &&
+                          (onGoingOrders != null &&
+                              onGoingOrders.length == 0) &&
+                          (onPharmaGoingOrders != null &&
+                              onPharmaGoingOrders.length == 0) &&
+                          (onParcelGoingOrders != null &&
+                              onParcelGoingOrders.length == 0))
                           ? true
                           : false,
                       child: (!isFetch)
                           ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'No Order found',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 25,
-                                    color: kMainTextColor,
-                                  ),
-                                ),
-                                Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 20.0,
-                                        top: 10.0,
-                                        bottom: 50,
-                                        right: 20.0),
-                                    child: Text(
-                                      'Looks like you have not made your order yet.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: 18,
-                                        color: kHintColor,
-                                      ),
-                                    )),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: kMainColor,
-                                      foregroundColor : kMainColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
-                                      ),
-                                      primary: Colors.purple,
-                                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                                      textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
-
-                                  onPressed: () {
-                                    // clearCart();
-                                    Navigator.pushAndRemoveUntil(context,
-                                        MaterialPageRoute(builder: (context) {
-                                      return HomeOrderAccount(0);
-                                    }), (Route<dynamic> route) => false);
-                                  },
-                                  child: Text(
-                                    'Shop Now',
-                                    style: TextStyle(
-                                        color: kWhiteColor,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-
-                                )
-                              ],
-                            )
-                          : Container(
-                              width: MediaQuery.of(context).size.width,
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  isFetch
-                                      ? CircularProgressIndicator()
-                                      : Container(
-                                          width: 0.5,
-                                        ),
-                                  isFetch
-                                      ? SizedBox(
-                                          width: 10,
-                                        )
-                                      : Container(
-                                          width: 0.5,
-                                        ),
-                                  Text(
-                                    (!isFetch)
-                                        ? 'No Store Found at your location'
-                                        : 'Fetching orders',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: kMainTextColor),
-                                  )
-                                ],
-                              ),
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'No Order found',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                              fontSize: 25,
+                              color: kMainTextColor,
                             ),
+                          ),
+                          Padding(
+                              padding: EdgeInsets.only(
+                                  left: 20.0,
+                                  top: 10.0,
+                                  bottom: 50,
+                                  right: 20.0),
+                              child: Text(
+                                'Looks like you have not made your order yet.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 18,
+                                  color: kHintColor,
+                                ),
+                              )),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kMainColor,
+                                foregroundColor : kMainColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                                primary: Colors.purple,
+                                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                                textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
+
+                            onPressed: () {
+                              // clearCart();
+                              Navigator.pushAndRemoveUntil(context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return HomeOrderAccount(0);
+                                  }), (Route<dynamic> route) => false);
+                            },
+                            child: Text(
+                              'Shop Now',
+                              style: TextStyle(
+                                  color: kWhiteColor,
+                                  fontWeight: FontWeight.w400),
+                            ),
+
+                          )
+                        ],
+                      )
+                          : Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            isFetch
+                                ? CircularProgressIndicator()
+                                : Container(
+                              width: 0.5,
+                            ),
+                            isFetch
+                                ? SizedBox(
+                              width: 10,
+                            )
+                                : Container(
+                              width: 0.5,
+                            ),
+                            Text(
+                              (!isFetch)
+                                  ? 'No Store Found at your location'
+                                  : 'Fetching orders',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: kMainTextColor),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

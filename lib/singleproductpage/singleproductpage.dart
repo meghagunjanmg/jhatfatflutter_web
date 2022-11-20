@@ -347,10 +347,20 @@ class SingleProductState extends State<SingleProductPage> {
                                               height: 8.0,
                                             ),
                                             Text(
-                                                '${widget.currency} ${widget.productVarintList[index].price}',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .caption),
+                                                (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
+                                                    <=
+                                                    widget.productVarintList[index].price ||
+                                                    widget.productVarintList[index].strick_price==null )
+                                                    ? ''
+                                                    :'${widget.currency}  ${widget.productVarintList[index].strick_price}',
+
+                                                style: TextStyle(decoration: TextDecoration.lineThrough)),
+
+                                            Text(
+                                              '${widget.currency} ${widget.productVarintList[index].price}',
+                                              //style: TextStyle(decoration: TextDecoration.lineThrough)
+                                            ),
+
                                             SizedBox(
                                               height: 20.0,
                                             ),
@@ -650,27 +660,29 @@ class SingleProductState extends State<SingleProductPage> {
     print("SIZE:* " +key.toString());
     print("SIZE:** " +values.toString());
     values;
-    if(values <=3){
-      var key = await store.record(varient_id).add(db, <String, Object?>{
-        'product_name': product_name.toString(),
-        'storename':store_name.toString(),
-        'vendor':vendorid.toString(),
-        "price":(price * itemCount),
-        "unit":unit.toString(),
-        "quantity":quantity,
-        "itemCount":itemCount,
-        "varient_image": varient_image.toString(),
-        "is_id": is_id,
-        "is_pres": is_pres,
-        "isBasket": isbasket,
-        "addedBasket": 0,
-        "varient_id": varient_id,
-      });
-    }
-    else{
-      showMyDialog2(context);
-    }
 
+    if(prefs.getString("allowmultishop").toString()!="1") {
+      if (values <= 3) {
+        var key = await store.record(varient_id).add(db, <String, Object?>{
+          'product_name': product_name.toString(),
+          'storename': store_name.toString(),
+          'vendor': vendorid.toString(),
+          "price": (price * itemCount),
+          "unit": unit.toString(),
+          "quantity": quantity,
+          "itemCount": itemCount,
+          "varient_image": varient_image.toString(),
+          "is_id": is_id,
+          "is_pres": is_pres,
+          "isBasket": isbasket,
+          "addedBasket": 0,
+          "varient_id": varient_id,
+        });
+      }
+      else {
+        showMyDialog2(context);
+      }
+    }
     var value = await store.record(varient_id).get(db);
     Map map2 = Map.from(value!);
     print(map2);

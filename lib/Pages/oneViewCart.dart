@@ -1652,7 +1652,7 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void createCart(BuildContext context) async {
-   if(iduploaded!=null) uploadid(context);
+    if(iduploaded!=null) uploadid(context);
 
     if (cartListI.length > 0) {
       if (radioList.length > 0) {
@@ -1665,12 +1665,12 @@ class _oneViewCartState extends State<oneViewCart> {
           String? ui_type = pref.getString("ui_type");
 
           List<OrderArrayGrocery> orderArray = [];
-           for (CartItem item in cartListI) {
-             orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
-                 int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
-           }
+          for (CartItem item in cartListI) {
+            orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
+                int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
+          }
 
-           print(orderArray.toString()+" "+dateTimeSt.toString()+" "+radioList[idd1]+" "+presuploaded.toString());
+          print(orderArray.toString()+" "+dateTimeSt.toString()+" "+radioList[idd1]+" "+presuploaded.toString());
 
           Uri myUri = Uri.parse(url);
           http.post(myUri, body: {
@@ -1690,6 +1690,10 @@ class _oneViewCartState extends State<oneViewCart> {
                 //     duration: Toast.LENGTH_SHORT);
                 CartDetail details = CartDetail.fromJson(jsonData['data']);
                 getVendorPayment2(vendorId!, details, orderArray.toString());
+
+
+                iduploaded = null;
+                presuploaded = null;
               } else {
                 // Toast.show(jsonData['message'], context,
                 //     duration: Toast.LENGTH_SHORT);

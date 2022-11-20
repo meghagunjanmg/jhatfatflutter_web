@@ -63,18 +63,6 @@ class _ItemsPageState extends State<ItemsPage>
       '',
       '',
       '',
-    ),
-    SubCategoryList(
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    ),
-    SubCategoryList(
-      '',
-      '',
       '',
       '',
       '',
@@ -87,8 +75,16 @@ class _ItemsPageState extends State<ItemsPage>
       '',
       '',
       '',
+      '',
+      '',
+      '',
+      '',
     ),
     SubCategoryList(
+      '',
+      '',
+      '',
+      '',
       '',
       '',
       '',
@@ -690,17 +686,34 @@ class _ItemsPageState extends State<ItemsPage>
                 SizedBox(
                 height: 8.0,
                 ),
-                Text(
-                '$currency ${(productVarientList[index]
-                    .data.length > 0)
-                ? productVarientList[index]
-                    .data[productVarientList[index]
-                    .selectPos].price
-                    : 0}',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .caption),
+                  Text(
+                      (productVarientList[index]
+                          .data.length < 0||productVarientList[index]
+                          .data[productVarientList[index]
+                          .selectPos].strick_price
+                          <=
+                          productVarientList[index]
+                              .data[productVarientList[index]
+                              .selectPos].price ||
+                          productVarientList[index]
+                              .data[productVarientList[index]
+                              .selectPos].strick_price==null )
+                          ? ''
+                          :'$currency  ${productVarientList[index]
+                          .data[productVarientList[index]
+                          .selectPos].strick_price}',
+
+                      style: TextStyle(decoration: TextDecoration.lineThrough)),
+
+                  Text(
+                    '$currency ${(productVarientList[index]
+                        .data.length > 0)
+                        ? productVarientList[index]
+                        .data[productVarientList[index]
+                        .selectPos].price
+                        : 0}',
+                    //style: TextStyle(decoration: TextDecoration.lineThrough)
+                  ),
                 SizedBox(
                 height: 20.0,
                 ),
@@ -1392,7 +1405,7 @@ class _ItemsPageState extends State<ItemsPage>
             List<Tab> tabss = <Tab>[];
             for (SubCategoryList tagd in tagObjs) {
               tabss.add(Tab(
-                text: tagd.subcat_name,
+                text: tagd.subcatName,
               ));
             }
             subCategoryListApp.clear();
@@ -1405,13 +1418,13 @@ class _ItemsPageState extends State<ItemsPage>
                 setState(() {
                   productVarientList = [];
                   hitTabSeriveList(
-                      subCategoryListApp[tabController.index].subcat_id);
+                      subCategoryListApp[tabController.index].subcatId);
                 });
               }
             });
             setState(() {
               productVarientList = [];
-              hitTabSeriveList(subCategoryListApp[0].subcat_id);
+              hitTabSeriveList(subCategoryListApp[0].subcatId);
             });
           });
         }

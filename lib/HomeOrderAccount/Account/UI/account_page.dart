@@ -75,12 +75,20 @@ class _AccountState extends State<Account> {
         ),
         AddressTile(),
         BuildListTile(
+            image: 'images/account/ic_orders.png',
+            text: 'Orders',
+            onTap: () async {
+              Navigator.pushNamed(context, PageRoutes.orderPage);
+            }
+        ),
+
+        BuildListTile(
             image: 'images/account/ic_menu_wallet.png',
             text: 'Wallet',
-    onTap: () async {
-    Navigator.pushNamed(context, PageRoutes.wallet);
-    }
-    ),
+            onTap: () async {
+              Navigator.pushNamed(context, PageRoutes.wallet);
+            }
+        ),
         BuildListTile(
             image: 'images/account/reward.png',
             text: 'Rewards',
@@ -93,13 +101,6 @@ class _AccountState extends State<Account> {
             text: 'Notification',
             onTap: () async {
               Navigator.pushNamed(context, PageRoutes.offers);
-            }
-        ),
-        BuildListTile(
-            image: 'images/account/ic_orders.png',
-            text: 'Orders',
-            onTap: () async {
-              Navigator.pushNamed(context, PageRoutes.orderPage);
             }
         ),
 
@@ -123,14 +124,14 @@ class _AccountState extends State<Account> {
                 arguments: number);}
         ),
         BuildListTile(
-          image: 'images/account/ic_menu_aboutact.png',
-          text: 'About us',
+            image: 'images/account/ic_menu_aboutact.png',
+            text: 'About us',
             onTap: () async {
               Navigator.pushNamed(context, PageRoutes.aboutUsPage);
             }        ),
         BuildListTile(
-          image: 'images/account/ic_menu_aboutact.png',
-          text: 'Settings',
+            image: 'images/account/ic_menu_aboutact.png',
+            text: 'Settings',
             onTap: () async {
               Navigator.pushNamed(context, PageRoutes.settings);
             }        ),
@@ -148,11 +149,11 @@ class AddressTile extends StatelessWidget {
         text: 'Saved Addresses',
 
         onTap: () async {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return SavedAddressesPage("");
-      }));
-      return null;
-    });
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return SavedAddressesPage("");
+          }));
+          return null;
+        });
   }
 }
 
@@ -179,12 +180,12 @@ class LogoutTile extends StatelessWidget {
                       child: Text('Yes'),
                       onPressed: () async {
                         SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
+                        await SharedPreferences.getInstance();
                         prefs.clear();
                         Navigator.pushAndRemoveUntil(context,
                             MaterialPageRoute(builder: (context) {
-                          return LoginNavigator();
-                        }), (Route<dynamic> route) => false);
+                              return LoginNavigator();
+                            }), (Route<dynamic> route) => false);
                       })
                 ],
               );

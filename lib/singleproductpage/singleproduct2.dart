@@ -321,10 +321,20 @@ class SingleProductState2 extends State<SingleProductPage_2> {
                                               height: 8.0,
                                             ),
                                             Text(
-                                                '${widget.currencyda} ${widget.productVarintList[index].price}',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .caption),
+                                                (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
+                                                    <=
+                                                    widget.productVarintList[index].price ||
+                                                    widget.productVarintList[index].strick_price==null )
+                                                    ? ''
+                                                    :'$widget.currencyda  ${widget.productVarintList[index].strick_price}',
+
+                                                style: TextStyle(decoration: TextDecoration.lineThrough)),
+
+                                            Text(
+                                              '${widget.currencyda} ${widget.productVarintList[index].price}',
+                                              //style: TextStyle(decoration: TextDecoration.lineThrough)
+                                            ),
+
                                             SizedBox(
                                               height: 20.0,
                                             ),
