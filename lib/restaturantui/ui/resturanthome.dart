@@ -76,6 +76,8 @@ class RestaurantState extends State<Restaurant> {
   bool isFetchRestStore = false;
   bool isFetch = false;
 
+  String nodata='';
+
   @override
   void initState() {
     super.initState();
@@ -317,6 +319,8 @@ class RestaurantState extends State<Restaurant> {
             nearStoresSearch.clear();
             nearStores = tagObjs;
             nearStoresSearch = List.from(nearStores);
+            nodata='';
+
           });
         } else {
           setState(() {
@@ -324,6 +328,8 @@ class RestaurantState extends State<Restaurant> {
             isFetch = false;
             nearStores.clear();
             nearStoresSearch.clear();
+            nodata="No Restaurants available in your area.";
+
           });
         }
       }

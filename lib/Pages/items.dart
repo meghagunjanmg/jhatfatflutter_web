@@ -1243,26 +1243,31 @@ class _ItemsPageState extends State<ItemsPage>
     print("SIZE:* " +key.toString());
     print("SIZE:** " +values.toString());
     values;
-    if(values <=3){
-      var key = await store.record(varient_id).add(db, <String, Object?>{
-        'product_name': product_name.toString(),
-        'storename':storename.toString(),
-        'vendor':vendor.toString(),
-        "price":(price * itemCount),
-        "unit":unit.toString(),
-        "quantity":quantity,
-        "itemCount":itemCount,
-        "varient_image": varient_image.toString(),
-        "is_id": is_id,
-        "is_pres": is_pres,
-        "isBasket": isBasket,
-        "addedBasket": 0,
-        "varient_id": varient_id,
-      });
-    }
-    else{
-      showMyDialog2(context);
-      setList(productVarientList);
+    bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
+
+    if(prefs.getString("allowmultishop").toString()!="1") {
+      if (values <= 3) {
+        var key = await store.record(varient_id).add(db, <String, Object?>{
+          'product_name': product_name.toString(),
+          'storename': storename.toString(),
+          'vendor': vendor_id.toString(),
+          "price": (price * itemCount),
+          "unit": unit.toString(),
+          "quantity": quantity,
+          "itemCount": itemCount,
+          "varient_image": varient_image.toString(),
+          "is_id": is_id,
+          "is_pres": is_pres,
+          "isBasket": isBasket,
+          "addedBasket": 0,
+          "varient_id": varient_id,
+        });
+      }
+      else {
+        showMyDialog2(context);
+        setList(productVarientList);
+
+      }
     }
 
       var value = await store.record(varient_id).get(db);
@@ -1288,7 +1293,6 @@ class _ItemsPageState extends State<ItemsPage>
          });
          print("SAME VAR " + key.toString());
        }
-
        if(itemCount==0){
          await store.record(varient_id).delete(db);
        }
@@ -1401,17 +1405,50 @@ class _ItemsPageState extends State<ItemsPage>
           List<SubCategoryList> tagObjs = tagObjsJson
               .map((tagJson) => SubCategoryList.fromJson(tagJson))
               .toList();
+          List<Tab> tabss = <Tab>[];
+          List<SubCategoryList> toRemove = [];
+
+          setState(() {
+            for (SubCategoryList tagd in tagObjs) {
+                tabss.add(Tab(
+                  text: tagd.subcatName,
+                ));
+                toRemove.add(tagd);
+            }
+            setState(() {
+              subCategoryListApp.clear();
+              tabs.clear();
+              subCategoryListApp = toRemove;
+              tabs = tabss;
+              tabController = TabController(length: tabs.length, vsync: this);
+            });
+            setState(() {
+              productVarientList = [];
+              hitTabSeriveList(subCategoryListApp[0].subcatId);
+            });
+
+            tabController.addListener(() {
+              if (!tabController.indexIsChanging) {
+                setState(() {
+                  productVarientList = [];
+                  hitTabSeriveList(
+                      subCategoryListApp[tabController.index].subcatId);
+                });
+              }
+            });
+          });
+        }
+        else{
           setState(() {
             List<Tab> tabss = <Tab>[];
-            for (SubCategoryList tagd in tagObjs) {
-              tabss.add(Tab(
-                text: tagd.subcatName,
-              ));
-            }
+            tabss.add(Tab(
+              text: category_name,
+            ));
             subCategoryListApp.clear();
             tabs.clear();
-            subCategoryListApp = tagObjs;
+            subCategoryListApp = [];
             tabs = tabss;
+
             tabController = TabController(length: tabs.length, vsync: this);
             tabController.addListener(() {
               if (!tabController.indexIsChanging) {
@@ -1424,9 +1461,10 @@ class _ItemsPageState extends State<ItemsPage>
             });
             setState(() {
               productVarientList = [];
-              hitTabSeriveList(subCategoryListApp[0].subcatId);
+              ///hitTabSeriveList(subCategoryListApp[0].subcat_id);
             });
           });
+
         }
       }
     } on Exception catch (_) {
@@ -1435,6 +1473,7 @@ class _ItemsPageState extends State<ItemsPage>
       });
     }
   }
+
 
   void hitTabSeriveList(subCatId) async {
     setState(() {

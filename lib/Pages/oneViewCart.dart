@@ -1511,6 +1511,10 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void createResCart(BuildContext context) async {
+
+    iduploaded = null;
+    presuploaded = null;
+
     if (cartListII.length > 0) {
       if (totalAmount > 0.0 && addressDelivery != null) {
         var url = returant_order;

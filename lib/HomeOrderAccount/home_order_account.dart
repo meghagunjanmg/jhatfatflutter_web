@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:circular_bottom_navigation/circular_bottom_navigation.dart';
 import 'package:circular_bottom_navigation/tab_item.dart';
@@ -69,13 +70,13 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
   void getData() async {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
-      cityName = pref.getString("addr").toString();
-      lat = double.parse(pref.getString("lat").toString());
-      lng = double.parse(pref.getString("lng").toString());
+      cityName = pref.getString("addr")!;
+      lat = double.parse(pref.getString("lat")!);
+      lng = double.parse(pref.getString("lng")!);
 
-      await pref.setString("lat", lat.toString());
-      await pref.setString("lng", lng.toString());
-      await pref.setString("addr", cityName.toString());
+      pref.setString("lat", lat.toString());
+      pref.setString("lng", lng.toString());
+      pref.setString("addr", cityName.toString());
 
       print("HOME_ORDER" + lat.toString() + lng.toString());
     } catch (e) {
@@ -90,7 +91,7 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
     } else if (status.isDenied) {
       _requestPermission();
     } else if (status.isPermanentlyDenied) {
-     // openAppSettings();
+      //openAppSettings();
     }
   }
 
@@ -101,10 +102,10 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
 
     var client = http.Client();
     Uri myUri = Uri.parse(currencyUrl);
-    client.get(myUri).then((value) async {
+    client.get(myUri).then((value) {
       var jsonData = jsonDecode(value.body);
       if (value.statusCode == 200 && jsonData['status'] == "1") {
-        await   preferences.setString(
+        preferences.setString(
             'curency', '${jsonData['data'][0]['currency_sign']}');
       }
     }).catchError((e) {
@@ -114,19 +115,19 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
 
   List<TabItem> tabItems = List.of([
     new TabItem(Icons.home, "Home", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-     new TabItem(Icons.restaurant, "Resturant", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-   ///  new TabItem(Icons.reorder, "Order", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-     new TabItem(Icons.pin_drop, "Pick & Drop", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-     new TabItem(Icons.shopping_cart, "Cart", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.bold,fontSize: 10)),
+    new TabItem(Icons.restaurant, "Resturant", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+    ///  new TabItem(Icons.reorder, "Order", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+    new TabItem(Icons.pin_drop, "Pick & Drop", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+    new TabItem(Icons.shopping_cart, "Cart", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.bold,fontSize: 10)),
   ]);
 
   final List<Widget> _children = [
-     HomePage2(),
-     Restaurant("Urbanby Resturant"),
-     ///OrderPage(),
-     ParcelLocation(),
+    HomePage2(),
+    Restaurant("Urbanby Resturant"),
+    ///OrderPage(),
+    ParcelLocation(),
 
-        oneViewCart(),
+    oneViewCart(),
     // ViewCart(),
 
   ];
@@ -140,13 +141,28 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
   @override
   Widget build(BuildContext context) {
     return
-     Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _children,
-      ),
-      bottomNavigationBar: bottomNav(context),
-    );
+      WillPopScope(
+          onWillPop: () async {
+            if(_currentIndex!=0) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => HomeOrderAccount(0)),
+                    (Route<dynamic> route) => false,
+              );
+            }else{
+              exit(0);
+            }
+            return true;
+          },
+
+          child:
+          Scaffold(
+            body: IndexedStack(
+              index: _currentIndex,
+              children: _children,
+            ),
+            bottomNavigationBar: bottomNav(context),
+          ));
   }
 
   Widget bottomNav(BuildContext context) {

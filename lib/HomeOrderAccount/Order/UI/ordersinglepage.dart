@@ -39,6 +39,7 @@ class SingleOrderPageState extends State<SingleOrderPage> {
           ),
         ),
       ),
+
       body: SingleChildScrollView(
         primary: true,
         child: Container(
@@ -50,90 +51,90 @@ class SingleOrderPageState extends State<SingleOrderPage> {
               ),
               (ongoingOrders.data != null && ongoingOrders.data.length > 0)
                   ? ListView.separated(
-                      shrinkWrap: true,
-                      primary: false,
-                      itemBuilder: (context, t) {
-                        return Material(
-                          borderRadius: BorderRadius.circular(10),
-                          elevation: 3,
-                          clipBehavior: Clip.hardEdge,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: kWhiteColor),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Image.network(
-                                  imageBaseUrl +
-                                      ongoingOrders.data[t].varient_image,
-                                  height: 90,
-                                  width: 90,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Container(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                  shrinkWrap: true,
+                  primary: false,
+                  itemBuilder: (context, t) {
+                    return Material(
+                      borderRadius: BorderRadius.circular(10),
+                      elevation: 3,
+                      clipBehavior: Clip.hardEdge,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: kWhiteColor),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.network(
+                              imageBaseUrl +
+                                  ongoingOrders.data[t].varient_image,
+                              height: 90,
+                              width: 90,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Container(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${ongoingOrders.data[t].product_name}',
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: kMainTextColor),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
                                     children: [
                                       Text(
-                                        '${ongoingOrders.data[t].product_name}',
+                                        'Rs. ${ongoingOrders.data[t].price}',
                                         textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: kMainTextColor),
                                       ),
                                       SizedBox(
-                                        height: 5,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Rs. ${ongoingOrders.data[t].price}',
-                                            textAlign: TextAlign.start,
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            'Rs. ${ongoingOrders.data[t].total_mrp}',
-                                            style: TextStyle(
-                                                decoration:
-                                                    TextDecoration.lineThrough),
-                                          )
-                                        ],
+                                        width: 10,
                                       ),
                                       Text(
-                                        '${ongoingOrders.data[t].quantity} ${ongoingOrders.data[t].unit}',
-                                        textAlign: TextAlign.start,
+                                        'Rs. ${ongoingOrders.data[t].total_mrp}',
                                         style: TextStyle(
-                                            fontSize: 16,
-                                            color: kMainTextColor),
-                                      ),
+                                            decoration:
+                                            TextDecoration.lineThrough),
+                                      )
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Text(
+                                    '${ongoingOrders.data[t].quantity} ${ongoingOrders.data[t].unit}',
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: kMainTextColor),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, t2) {
-                        return Container(
-                          height: 5,
-                          margin: EdgeInsets.symmetric(horizontal: 10),
-                        );
-                      },
-                      itemCount: ongoingOrders.data.length)
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, t2) {
+                    return Container(
+                      height: 5,
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                    );
+                  },
+                  itemCount: ongoingOrders.data.length)
                   : Container(
-                      child: Text('No Items asscociated with this order'),
-                    ),
+                child: Text('No Items asscociated with this order'),
+              ),
               SizedBox(
                 height: 30,
               ),

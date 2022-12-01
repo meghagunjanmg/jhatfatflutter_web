@@ -44,9 +44,8 @@ class LoginNavigator extends StatelessWidget {
             case LoginRoutes.verification:
               builder = (BuildContext _) => VerificationPage(
                     () {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(PageRoutes.homeOrderAccountPage, (Route<dynamic> route) => false);
-
+                      Navigator.popAndPushNamed(
+                          context, PageRoutes.homeOrderAccountPage);
                 },
               );
 

@@ -344,18 +344,20 @@ class _HomeState extends State<Home> {
                   children: <Widget>[
                     (admins!.surge==1)
                         ?
-                    Padding(
-                        padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                        child:
-                        Text(
-                          admins!.surgeMsg.toString(),
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 16,color: Colors.blue),
-                        )
-
-                    )
-                        :
+                Padding(
+                  padding: EdgeInsets.only(top: 8.0, left: 24.0),
+                  child:
+                  Wrap(
+                      children:<Widget>[
+                  Text(
+                  admins!.surgeMsg.toString(),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 16,color: Colors.blue),
+                )
+              ]
+            )
+                )  :
                     Padding(
                         padding: EdgeInsets.only(top: 8.0, left: 24.0),
                         child: Text(
@@ -389,32 +391,32 @@ class _HomeState extends State<Home> {
                                   )
                               );
                             },
-                            child:  Align(
-                              alignment: Alignment.center,
-                              child:Container(
-                                width: MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width * 0.85,
-                                height: 60,
-                                alignment: Alignment(0.05, -0.5),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(11.0),
-                                  image: DecorationImage(
-                                    image: AssetImage("assets/back.png"),
-                                    fit : BoxFit.fill,
+                            child:
+                            Container(
+                              child:
+                              Stack(
+                                children: <Widget>[
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: Image.asset(
+                                      'assets/backgg.png',
+                                      fit: BoxFit.fitWidth,
+                                      width: MediaQuery.of(context).size.width * 0.85 ,
+                                    ),
                                   ),
-                                ),
-                                child:   Text(
-                                  admins!.topMessage.toString(),
-                                  style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w900),
-                                ),
-                                //padding: <-- Using to shift text position a little bit for your requirement
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    width: MediaQuery.of(context).size.width * 0.70,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      admins!.topMessage.toString(),
+                                      maxLines: 2,
+                                      style:  orderMapAppBarTextStyle
+                                          .copyWith(color: Colors.white,fontWeight: FontWeight.w900,fontSize: 15,fontFamily: 'OpenSans'),
+                                    ),)
+                                ],
                               ),
-
-                            ),
-
+                          ),
                           ),
                         ],
                       ),
@@ -1240,6 +1242,7 @@ class _HomeState extends State<Home> {
         lng = double.parse(pref.getString("lng")!);
       });
       print("HOME_ORDER_HOME"+lat.toString()+lng.toString());
+      calladminsetting();
     } catch (e) {
       print(e);
     }
@@ -1248,10 +1251,6 @@ class _HomeState extends State<Home> {
     {
       _getLocation(context);
     }
-
-
-    calladminsetting();
-
   }
 
   void hitbannerVendor(BannerDetails detail) async {
@@ -1470,21 +1469,6 @@ class _HomeState extends State<Home> {
                 (Route<dynamic> route) => false);
       }
     }
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value) {
-      print(value);
-    });
-
-
-    getCurrency();
-    Topbanner();
-    hitService(lat.toString(), lng.toString());
-    hitBannerUrl();
-    pickbanner();
-    hitRestaurantService();
-    location.changeSettings(
-        interval: 300, accuracy: loc.LocationAccuracy.high);
-    location.enableBackgroundMode(enable: true);
 
   }
 }
