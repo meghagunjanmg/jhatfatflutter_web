@@ -191,22 +191,21 @@ class OrderPlaced extends StatelessWidget {
               String vendor = '';
 
               for (int i = 0; i < orders.length; i++) {
-                print("MAIN " + orders[i].cart_id + " " +
-                    orders[i].vendor_name);
                 for (int j = 0; j < orders[i].data.length; j++) {
-                  print("DATA " + orders[i].data[j].order_cart_id + " " +
-                      orders[i].data[j].vendor_name);
                   if (orders[i].data[j].order_cart_id ==
                       orders[i].cart_id) {
-                    print("IF " + orders[i].data[j].order_cart_id + " " +
-                        orders[i].cart_id);
-                    if (!vendor.contains(orders[i].data[j].vendor_name)) {
+                    if( !vendor.contains(orders[i].data[j].vendor_name)) {
                       vendor =
                           vendor + "\n" + orders[i].data[j].vendor_name;
                     }
                   }
                 }
+                VendorName.add(vendor);
+                vendor = '';
+                print("NAME " + i.toString() + " " + vendor);
               }
+              VendorName.toSet().toList();
+
               Navigator.pushAndRemoveUntil(context,
                   MaterialPageRoute(builder: (context) {
                     return  OrderMapPage(
@@ -248,4 +247,3 @@ class OrderPlaced extends StatelessWidget {
     }
   }
 }
-
