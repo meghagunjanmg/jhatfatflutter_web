@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:location/location.dart' as loc;
-import 'package:dio/dio.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -71,12 +70,12 @@ class _HomeState extends State<Home> {
   late List<NearStores> rest_nearStores = [];
   String ClosedImage = '';
   List<BannerDetails> ClosedBannerImage = [];
-  String subsenddate = '';
 
   String pickImage = '';
   String subsImage = '';
   String bigImage = '';
   String TopImage = '';
+  String subsenddate = '';
   var lat = 30.3253;
   var lng = 78.0413;
   List<BannerDetails> listImage = [];
@@ -104,10 +103,11 @@ class _HomeState extends State<Home> {
   List<NearStores> nearStores1 = [];
   List<NearStores> nearStoresSearch1 = [];
   List<NearStores> nearStoresShimmer1 = [
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+
   ];
   List<String> listImages1 = ['', '', '', '', ''];
   double userLat = 0.0;
@@ -200,33 +200,18 @@ class _HomeState extends State<Home> {
         //double lng = position.longitude;
         //double lng = 77.027535;
 
+        List<Placemark> placemarks = await placemarkFromCoordinates(lats, lngs);
+        setState(() {
+          cityName = (placemarks
+              .elementAt(0)
+              .subLocality
+              .toString()) + " ( " + (placemarks
+              .elementAt(0)
+              .locality
+              .toString()) + " )".toUpperCase();
 
-        Dio dio = Dio();  //initilize dio package
-        String apiurl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lats,$lngs&key=$apiKey";
-
-        Response response = await dio.get(apiurl); //send get request to API URL
-        print("BackLATLONG" + response.data.toString());
-
-        if(response.statusCode == 200){ //if connection is successful
-          Map data = response.data; //get response data
-          if(data["status"] == "OK"){ //if status is "OK" returned from REST API
-            if(data["results"].length > 0){ //if there is atleast one address
-              Map firstresult = data["results"][0]; //select the first address
-              print("BackLATLONG" + firstresult.toString());
-
-              setState(() {
-                cityName = firstresult["formatted_address"]; //get the address
-              });
-
-              await  prefs.setString("addr", cityName.toString());
-
-            }
-          }else{
-            print(data["error_message"]);
-          }
-        }else{
-          print("error while fetching geoconding data");
-        }
+          prefs.setString("addr", cityName.toString());
+        });
 
         calladminsetting();
 
@@ -342,22 +327,19 @@ class _HomeState extends State<Home> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
+
                     (admins!.surge==1)
                         ?
-                Padding(
-                  padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                  child:
-                  Wrap(
-                      children:<Widget>[
-                  Text(
-                  admins!.surgeMsg.toString(),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16,color: Colors.blue),
-                )
-              ]
-            )
-                )  :
+                    Wrap(
+                        children:<Widget>[
+                          Text(
+                            admins!.surgeMsg.toString(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.visible,
+                            style: TextStyle(fontSize: 16,color: Colors.blue),
+                          )]
+                    )
+                        :
                     Padding(
                         padding: EdgeInsets.only(top: 8.0, left: 24.0),
                         child: Text(
@@ -367,58 +349,70 @@ class _HomeState extends State<Home> {
                           style: TextStyle(fontSize: 12),
                         )
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                      child: Row(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: ()async {
 
-                              await showDialog(
-                                  context: context,
-                                  builder: (_) => Dialog(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: white_color,
-                                        borderRadius:
-                                        BorderRadius.circular(20.0),
+                    Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: 60,
+                      alignment: Alignment.center,
+                      child:
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 24.0),
+                        child:
+                        Row(
+                          children: <Widget>[
+
+                            GestureDetector(
+                              onTap: ()async {
+
+                                await showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: white_color,
+                                          borderRadius:
+                                          BorderRadius.circular(20.0),
+                                        ),
+                                        child: Image.network(
+                                          TopImage,
+                                          fit: BoxFit.fill,
+                                        ),
                                       ),
-                                      child: Image.network(
-                                        TopImage,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  )
-                              );
-                            },
-                            child:
-                            Container(
+                                    )
+                                );
+                              },
                               child:
-                              Stack(
-                                children: <Widget>[
-                                  Container(
-                                    alignment: Alignment.center,
-                                    child: Image.asset(
-                                      'assets/backgg.png',
-                                      fit: BoxFit.fitWidth,
-                                      width: MediaQuery.of(context).size.width * 0.85 ,
+                              Container(
+                                child:
+                                Stack(
+                                  children: <Widget>[
+                                    Container(
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        'assets/backgg.png',
+                                        fit: BoxFit.fitWidth,
+                                        width: MediaQuery.of(context).size.width * 0.85 ,
+                                      ),
                                     ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    width: MediaQuery.of(context).size.width * 0.70,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      admins!.topMessage.toString(),
-                                      maxLines: 2,
-                                      style:  orderMapAppBarTextStyle
-                                          .copyWith(color: Colors.white,fontWeight: FontWeight.w900,fontSize: 15,fontFamily: 'OpenSans'),
-                                    ),)
-                                ],
+                                    Container(
+                                      padding: EdgeInsets.all(5),
+                                      width: MediaQuery.of(context).size.width * 0.70,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        admins!.topMessage.toString(),
+                                        maxLines: 2,
+                                        style:  orderMapAppBarTextStyle
+                                            .copyWith(color: Colors.white,fontWeight: FontWeight.w900,fontSize: 15,fontFamily: 'OpenSans'),
+                                      ),)
+                                  ],
+                                ),
                               ),
-                          ),
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -530,14 +524,17 @@ class _HomeState extends State<Home> {
                     // ),
 
                     Padding(
-                        padding: EdgeInsets.all(20),
-                        child:
-                        ResponsiveGridList(
-                          rowMainAxisAlignment: MainAxisAlignment.center,
-                          squareCells: true,
-                          desiredItemWidth: 120,
-                          minSpacing: 2, children:
-                        (nearStores != null && nearStores.length > 0)
+                      padding: EdgeInsets.all(20),
+                      child: GridView.count(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 0,
+                        mainAxisSpacing: 0,
+                        childAspectRatio: 100 / 90,
+                        controller: ScrollController(keepScrollOffset: false),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        // childAspectRatio: itemWidth/(itemHeight),
+                        children: (nearStores != null && nearStores.length > 0)
                             ? nearStores.map((e) {
                           return ReusableCard(
                             cardChild: CardContent(
@@ -549,6 +546,7 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         }).toList()
+
                             : nearStoresShimmer.map((e) {
                           return ReusableCard(
                               cardChild: Shimmer(
@@ -566,102 +564,94 @@ class _HomeState extends State<Home> {
                               ),
                               onPress: () {});
                         }).toList(),
-                        )
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 2, bottom: 2),
+                      child: Builder(
+                        builder: (context) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute
+                                (builder: (context) =>
+                              new AppCategory(pickBannerImage[0].vendorName,
+                                  pickBannerImage[0].vendorId, "22")));
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 10),
+                              child: Material(
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                                clipBehavior: Clip.hardEdge,
+                                child: Container(
+                                  height: 100,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width *
+                                      0.90,
+//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                                  decoration: BoxDecoration(
+                                    color: white_color,
+                                    borderRadius:
+                                    BorderRadius.circular(20.0),
+                                  ),
+                                  child: Image.network(
+                                    pickImage,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+
+                      ),
                     ),
 
-                    ResponsiveGridList(
-                        rowMainAxisAlignment: MainAxisAlignment.center,
-                        desiredItemWidth: MediaQuery
-                            .of(context)
-                            .size
-                            .width - 200,
-                        shrinkWrap: true,
-                        minSpacing: 2, children:[
-                      Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Builder(
-                          builder: (context) {
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute
-                                  (builder: (context) =>
-                                new AppCategory(pickBannerImage[0].vendorName,
-                                    pickBannerImage[0].vendorId, "22")));
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(20),
-                                child: Material(
-                                  borderRadius:
-                                  BorderRadius.circular(20.0),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Container(
+                    (subscriptionbanner)?
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 2),
+                      child: Builder(
+                        builder: (context) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(context, PageRoutes.subscription);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 10),
+                              child: Material(
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                                clipBehavior: Clip.hardEdge,
+                                child: Container(
+                                  height: 100,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width *
+                                      0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: white_color,
-                                      borderRadius:
-                                      BorderRadius.circular(20.0),
-                                    ),
-                                    child: Image.network(
-                                      pickImage,
-                                      fit: BoxFit.fill,
-                                      height: 150,
-                                    ),
+                                  decoration: BoxDecoration(
+                                    color: white_color,
+                                    borderRadius:
+                                    BorderRadius.circular(20.0),
+                                  ),
+                                  child: Image.network(
+                                    subsImage,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
+
                       ),
-                    ]),
-
-                    ( !subscriptionbanner )?
-                    ResponsiveGridList(
-                        rowMainAxisAlignment: MainAxisAlignment.center,
-                        desiredItemWidth: MediaQuery
-                            .of(context)
-                            .size
-                            .width  - 200,
-                        shrinkWrap: true,
-                        minSpacing: 2, children:[
-                      Padding(
-                        padding: EdgeInsets.only(top: 2, bottom: 2),
-                        child: Builder(
-                          builder: (context) {
-                            return InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(context, PageRoutes.subscription);
-
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 10),
-                                child: Material(
-                                  borderRadius:
-                                  BorderRadius.circular(20.0),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Container(
-//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: white_color,
-                                      borderRadius:
-                                      BorderRadius.circular(20.0),
-                                    ),
-                                    child: Image.network(
-                                      subsImage,
-                                      fit: BoxFit.fill,
-                                      height: 150,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ]):
-                        Container(),
-
+                    )        :
+                    Container(),
                     (subscriptionStore)?
                     Padding(
                         padding: EdgeInsets.only(top: 5, bottom: 2),
@@ -748,14 +738,13 @@ class _HomeState extends State<Home> {
                         :
                     Container(),
 
-
                     Visibility(
                       visible: (!isFetch && listImage.length == 0) ? false : true,
                       child: Padding(
                         padding: EdgeInsets.only(top: 10, bottom: 5),
                         child: CarouselSlider(
                             options: CarouselOptions(
-                              height: 400.0,
+                              height: 200.0,
                               autoPlay: true,
                               initialPage: 0,
                               viewportFraction: 0.9,
@@ -783,11 +772,12 @@ class _HomeState extends State<Home> {
                                         BorderRadius.circular(20.0),
                                         clipBehavior: Clip.hardEdge,
                                         child: Container(
-                                          height: 400,
+                                          height: 200,
                                           width: MediaQuery
                                               .of(context)
                                               .size
-                                              .width - 200,
+                                              .width *
+                                              0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                                           decoration: BoxDecoration(
                                             color: white_color,
@@ -839,7 +829,7 @@ class _HomeState extends State<Home> {
 
 
                     Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.only(top: 2, bottom: 2),
                       child: Builder(
                         builder: (context) {
                           return InkWell(
@@ -898,34 +888,22 @@ class _HomeState extends State<Home> {
     // prefs.setString("lat", latss.toStringAsFixed(8));
     // prefs.setString("lng", lngss.toStringAsFixed(8));
 
+    print("LATLONG" + lat.toString() + lng.toString());
+    List<Placemark> placemarks = await placemarkFromCoordinates(lats, lngs);
 
-    Dio dio = Dio();  //initilize dio package
-    String apiurl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lats,$lngs&key=$apiKey";
+    print("LATLONG" + placemarks.toString());
 
-    Response response = await dio.get(apiurl); //send get request to API URL
-    print("BackLATLONG" + response.data.toString());
+    setState(() {
+      cityName = (placemarks
+          .elementAt(0)
+          .subLocality
+          .toString()) + " ( " + (placemarks
+          .elementAt(0)
+          .locality
+          .toString()) + " )".toUpperCase();
+      prefs.setString("addr", cityName.toString());
 
-    if(response.statusCode == 200){ //if connection is successful
-      Map data = response.data; //get response data
-      if(data["status"] == "OK"){ //if status is "OK" returned from REST API
-        if(data["results"].length > 0){ //if there is atleast one address
-          Map firstresult = data["results"][0]; //select the first address
-          print("BackLATLONG" + firstresult.toString());
-
-          setState(() {
-            cityName = firstresult["formatted_address"]; //get the address
-          });
-
-          await  prefs.setString("addr", cityName.toString());
-
-        }
-      }else{
-        print(data["error_message"]);
-      }
-    }else{
-      print("error while fetching geoconding data");
-    }
-
+    });
     calladminsetting();
 
   }
@@ -1234,15 +1212,15 @@ class _HomeState extends State<Home> {
 
   void getData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-
     try {
       setState(() {
         cityName = pref.getString("addr")!;
         lat = double.parse(pref.getString("lat")!);
         lng = double.parse(pref.getString("lng")!);
       });
-      print("HOME_ORDER_HOME"+lat.toString()+lng.toString());
       calladminsetting();
+
+      print("HOME_ORDER_HOME"+lat.toString()+lng.toString());
     } catch (e) {
       print(e);
     }
@@ -1251,6 +1229,8 @@ class _HomeState extends State<Home> {
     {
       _getLocation(context);
     }
+
+
   }
 
   void hitbannerVendor(BannerDetails detail) async {
@@ -1423,8 +1403,16 @@ class _HomeState extends State<Home> {
   }
   void callSubStore() async {
     var url = subsstore;
+    Map<String, String> queryParams = {
+      'lat':  lat.toString(),
+      'lng':  lng.toString()
+    };
     Uri myUri = Uri.parse(url);
-    var value = await http.get(myUri);
+    final finalUri = myUri.replace(queryParameters: queryParams); //USE THIS
+
+    print("SUBSTORE: "+finalUri.toString());
+
+    var value = await http.get(finalUri);
     var jsonData = jsonDecode(value.body.toString());
     if (jsonData['status'] == "1") {
       var tagObjsJson = jsonDecode(value.body)['data'] as List;
@@ -1446,7 +1434,7 @@ class _HomeState extends State<Home> {
     if (jsonData['status'] == "1") {
       admins = Adminsetting.fromJson(jsonData['data']);
       print("ADMIN RES: " + admins!.cityadminId.toString());
-      if(admins!.status==1) {
+      if (admins!.status == 1) {
         FirebaseMessaging messaging = FirebaseMessaging.instance;
         messaging.getToken().then((value) {
           print(value);
@@ -1457,9 +1445,9 @@ class _HomeState extends State<Home> {
         hitBannerUrl();
         pickbanner();
         hitRestaurantService();
-        location.changeSettings(
-            interval: 300, accuracy: loc.LocationAccuracy.high);
-        location.enableBackgroundMode(enable: true);
+        // location.changeSettings(
+        //     interval: 300, accuracy: loc.LocationAccuracy.high);
+        // location.enableBackgroundMode(enable: true);
       }
       else {
         Navigator.pushAndRemoveUntil(
@@ -1469,7 +1457,6 @@ class _HomeState extends State<Home> {
                 (Route<dynamic> route) => false);
       }
     }
-
   }
 }
 

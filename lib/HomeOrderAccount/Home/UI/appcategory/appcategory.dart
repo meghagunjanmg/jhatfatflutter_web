@@ -176,178 +176,181 @@ class AppCategoryState extends State<AppCategory> {
           preferredSize: Size.fromHeight(isSearchOpen ? 60 : 112.0),
           child: isSearchOpen
               ? Padding(
-                  padding: EdgeInsets.only(top: 5.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 52,
-                        padding: EdgeInsets.only(left: 5),
-                        decoration: BoxDecoration(
-                          color: scaffoldBgColor,
-                          // borderRadius: BorderRadius.circular(50)
-                        ),
-                        child: TextFormField(
-                          controller: searchController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: kHintColor,
-                            ),
-                            hintText: 'Search category...',
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isSearchOpen = !isSearchOpen;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.close,
-                                color: kHintColor,
-                              ),
-                            ),
-                          ),
-                          cursorColor: kMainColor,
-                          autofocus: false,
-                          onChanged: (value) {
-                            setState(() {
-                              categoryLists = categoryListsSearch
-                                  .where((element) => element.category_name
-                                      .toString()
-                                      .toLowerCase()
-                                      .contains(value.toLowerCase()))
-                                  .toList();
-                            });
-                          },
-                        ),
-                      )
-                    ],
+            padding: EdgeInsets.only(top: 5.0),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 52,
+                  padding: EdgeInsets.only(left: 5),
+                  decoration: BoxDecoration(
+                    color: scaffoldBgColor,
+                    // borderRadius: BorderRadius.circular(50)
                   ),
-                )
-              : CustomAppBar(
-                  titleWidget: Text(
-                    pageTitle,
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 2.0),
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.search,
-                            color: kHintColor,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isSearchOpen = !isSearchOpen;
-                            });
-                          }),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
-                      child: Stack(
-                        children: [
-                          IconButton(
-                              icon: ImageIcon(
-                                AssetImage('images/icons/ic_cart blk.png'),
-                              ),
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, PageRoutes.viewCart)
-                                    .then((value) {
-                                  getCartCount();
-                                });
-                              }),
-                          Positioned(
-                              right: 5,
-                              top: 2,
-                              child: Visibility(
-                                visible: isCartCount,
-                                child: CircleAvatar(
-                                  minRadius: 4,
-                                  maxRadius: 8,
-                                  backgroundColor: kMainColor,
-                                  child: Text(
-                                    '$cartCount',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 7,
-                                        color: kWhiteColor,
-                                        fontWeight: FontWeight.w200),
-                                  ),
-                                ),
-                              ))
-                        ],
+                  child: TextFormField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: kHintColor,
                       ),
-                    ),                  ],
-                  bottom: PreferredSize(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DealProducts(
-                                      pageTitle,
-                                      '',
-                                      '',
-                                      widget.distance,
-                                      widget.vendor_id))).then((value) {
-                            getCartCount();
+                      hintText: 'Search category...',
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isSearchOpen = !isSearchOpen;
                           });
                         },
-                        behavior: HitTestBehavior.opaque,
-                        child: Card(
-                          color: kMainColor,
-                          elevation: 0.1,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 52,
-                            color: kMainColor,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Deal/Offer Zone',
-                                  style: TextStyle(color: kWhiteColor),
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: kWhiteColor,
-                                      size: 24,
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
+                        icon: Icon(
+                          Icons.close,
+                          color: kHintColor,
                         ),
                       ),
-                      preferredSize:
-                          Size(MediaQuery.of(context).size.width, 52)),
+                    ),
+                    cursorColor: kMainColor,
+                    autofocus: false,
+                    onChanged: (value) {
+                      setState(() {
+                        categoryLists = categoryListsSearch
+                            .where((element) => element.category_name
+                            .toString()
+                            .toLowerCase()
+                            .contains(value.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
+          )
+              : CustomAppBar(
+            titleWidget: Text(
+              pageTitle,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 2.0),
+                child: IconButton(
+                    icon: Icon(
+                      Icons.search,
+                      color: kHintColor,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isSearchOpen = !isSearchOpen;
+                      });
+                    }),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 6.0),
+                child: Stack(
+                  children: [
+                    IconButton(
+                        icon: ImageIcon(
+                          AssetImage('images/icons/ic_cart blk.png'),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(
+                              context, PageRoutes.viewCart)
+                              .then((value) {
+                            getCartCount();
+                          });
+                        }),
+                    Positioned(
+                        right: 5,
+                        top: 2,
+                        child: Visibility(
+                          visible: isCartCount,
+                          child: CircleAvatar(
+                            minRadius: 4,
+                            maxRadius: 8,
+                            backgroundColor: kMainColor,
+                            child: Text(
+                              '$cartCount',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 7,
+                                  color: kWhiteColor,
+                                  fontWeight: FontWeight.w200),
+                            ),
+                          ),
+                        ))
+                  ],
                 ),
+              ),                  ],
+            bottom:
+            PreferredSize(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DealProducts(
+                                pageTitle,
+                                '',
+                                '',
+                                widget.distance,
+                                widget.vendor_id))).then((value) {
+                      getCartCount();
+                    });
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Card(
+                    color: kMainColor,
+                    elevation: 0.1,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 52,
+                      color: kMainColor,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Deal/Offer Zone',
+                            style: TextStyle(color: kWhiteColor),
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: kWhiteColor,
+                                size: 24,
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                preferredSize:
+                Size(MediaQuery.of(context).size.width, 52)),
+          ),
         ),
-        body: Container(
+        body:
+        Container(
           height:
-              MediaQuery.of(context).size.height - (isSearchOpen ? 83 : 135),
+          MediaQuery.of(context).size.height - (isSearchOpen ? 83 : 135),
           width: MediaQuery.of(context).size.width,
           child: SingleChildScrollView(
             primary: true,
             child: Column(
               children: [
+
                 Visibility(
                   visible: (!isFetch && listImage.length == 0) ? false : true,
                   child: Padding(
                     padding: EdgeInsets.only(top: 10, bottom: 5),
                     child: CarouselSlider(
                         options: CarouselOptions(
-                          height: 250.0,
+                          height: 170.0,
                           autoPlay: true,
                           initialPage: 0,
                           viewportFraction: 0.9,
@@ -355,195 +358,195 @@ class AppCategoryState extends State<AppCategory> {
                           reverse: false,
                           autoPlayInterval: Duration(seconds: 3),
                           autoPlayAnimationDuration:
-                              Duration(milliseconds: 800),
+                          Duration(milliseconds: 800),
                           autoPlayCurve: Curves.fastOutSlowIn,
                           scrollDirection: Axis.horizontal,
                         ),
                         items: (listImage != null && listImage.length > 0)
                             ? listImage.map((e) {
-                                return Builder(
-                                  builder: (context) {
-                                    return InkWell(
-                                      onTap: () {},
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 5, vertical: 10),
-                                        child: Material(
-                                          elevation: 5,
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                          clipBehavior: Clip.hardEdge,
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.90,
+                          return Builder(
+                            builder: (context) {
+                              return InkWell(
+                                onTap: () {},
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 10),
+                                  child: Material(
+                                    elevation: 5,
+                                    borderRadius:
+                                    BorderRadius.circular(20.0),
+                                    clipBehavior: Clip.hardEdge,
+                                    child: Container(
+                                      width: MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                                            decoration: BoxDecoration(
-                                              color: white_color,
-                                              borderRadius:
-                                                  BorderRadius.circular(20.0),
-                                            ),
-                                            child: Image.network(
-                                              imageBaseUrl + e.banner_image,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                        ),
+                                      decoration: BoxDecoration(
+                                        color: white_color,
+                                        borderRadius:
+                                        BorderRadius.circular(20.0),
                                       ),
-                                    );
-                                  },
-                                );
-                              }).toList()
-                            : listImages.map((e) {
-                                return Builder(builder: (context) {
-                                  return Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.90,
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 5.0),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: Shimmer(
-                                      duration: Duration(seconds: 3),
-                                      //Default value
-                                      color: Colors.white,
-                                      //Default value
-                                      enabled: true,
-                                      //Default value
-                                      direction: ShimmerDirection.fromLTRB(),
-                                      //Default Value
-                                      child: Container(
-                                        color: kTransparentColor,
+                                      child: Image.network(
+                                        imageBaseUrl + e.banner_image,
+                                        fit: BoxFit.fill,
                                       ),
                                     ),
-                                  );
-                                });
-                              }).toList()),
-                  ),
-                ),
-                (isSearchOpen ||
-                        categoryLists != null && categoryLists.length > 0)
-                    ? Padding(
-                        padding: EdgeInsets.only(top: 10, left: 5, right: 5),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 2.0,
-                          mainAxisSpacing: 2.0,
-                          controller: ScrollController(keepScrollOffset: false),
-                          shrinkWrap: true,
-                          primary: false,
-                          scrollDirection: Axis.vertical,
-                          children: categoryLists.map((e) {
-                            return GestureDetector(
-                              onTap: () {
-                                hitNavigator(
-                                    context,
-                                    pageTitle,
-                                    vendor_id,
-                                    e.category_name,
-                                    e.category_id,
-                                    widget.distance);
-                              },
-                              behavior: HitTestBehavior.opaque,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 3, horizontal: 3),
-                                color: kCardBackgroundColor,
-                                alignment: Alignment.center,
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      color: kWhiteColor),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 10, bottom: 10.0),
-                                        child: Image.network(
-                                          '${imageBaseUrl}${e.category_image}',
-                                          height: 100,
-                                          width: 120,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          e.category_name,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: black_color,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 16),
-                                        ),
-                                      ),
-                                    ],
                                   ),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList()
+                            : listImages.map((e) {
+                          return Builder(builder: (context) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width *
+                                  0.90,
+                              margin:
+                              EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: Shimmer(
+                                duration: Duration(seconds: 3),
+                                //Default value
+                                color: Colors.white,
+                                //Default value
+                                enabled: true,
+                                //Default value
+                                direction: ShimmerDirection.fromLTRB(),
+                                //Default Value
+                                child: Container(
+                                  color: kTransparentColor,
                                 ),
                               ),
                             );
-                          }).toList(),
-                        ),
-                      )
-                    : (isNoCategoryTrue != true)
-                        ? Padding(
-                            padding: EdgeInsets.only(
-                                left: 10, right: 10, top: 20, bottom: 30),
-                            child: GridView.count(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 2.0,
-                              mainAxisSpacing: 2.0,
-                              controller:
-                                  ScrollController(keepScrollOffset: false),
-                              shrinkWrap: true,
-                              primary: false,
-                              scrollDirection: Axis.vertical,
-                              children: categoryListsDemo.map((e) {
-                                return Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 3, horizontal: 3),
-                                  color: kCardBackgroundColor,
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        color: kWhiteColor),
-                                    child: Container(
-                                      color: white_color,
-                                      height: 120,
-                                      child: Shimmer(
-                                        duration: Duration(seconds: 3),
-                                        color: Colors.black38,
-                                        enabled: true,
-                                        direction: ShimmerDirection.fromLTRB(),
-                                        child: Container(
-                                          height: 120,
-                                          color: kTransparentColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ))
-                        : Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height - 120,
+                          });
+                        }).toList()),
+                  ),
+                ),
+                (isSearchOpen ||
+                    categoryLists != null && categoryLists.length > 0)
+                    ? Padding(
+                  padding: EdgeInsets.only(top: 10, left: 5, right: 5),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 2.0,
+                    mainAxisSpacing: 2.0,
+                    controller: ScrollController(keepScrollOffset: false),
+                    shrinkWrap: true,
+                    primary: false,
+                    scrollDirection: Axis.vertical,
+                    children: categoryLists.map((e) {
+                      return GestureDetector(
+                        onTap: () {
+                          hitNavigator(
+                              context,
+                              pageTitle,
+                              vendor_id,
+                              e.category_name,
+                              e.category_id,
+                              widget.distance);
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 3),
+                          color: kCardBackgroundColor,
+                          alignment: Alignment.center,
+                          child: Container(
                             alignment: Alignment.center,
-                            child: Text(
-                              'No category found for this store ${widget.pageTitle}',
-                              style: TextStyle(
-                                  color: kMainColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 18),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: kWhiteColor),
+                            child: Column(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 10, bottom: 10.0),
+                                  child: Image.network(
+                                    '${imageBaseUrl}${e.category_image}',
+                                    height: 100,
+                                    width: 120,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    e.category_name,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: black_color,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                )
+                    : (isNoCategoryTrue != true)
+                    ? Padding(
+                    padding: EdgeInsets.only(
+                        left: 10, right: 10, top: 20, bottom: 30),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 2.0,
+                      mainAxisSpacing: 2.0,
+                      controller:
+                      ScrollController(keepScrollOffset: false),
+                      shrinkWrap: true,
+                      primary: false,
+                      scrollDirection: Axis.vertical,
+                      children: categoryListsDemo.map((e) {
+                        return Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 3),
+                          color: kCardBackgroundColor,
+                          alignment: Alignment.center,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.circular(5.0),
+                                color: kWhiteColor),
+                            child: Container(
+                              color: white_color,
+                              height: 120,
+                              child: Shimmer(
+                                duration: Duration(seconds: 3),
+                                color: Colors.black38,
+                                enabled: true,
+                                direction: ShimmerDirection.fromLTRB(),
+                                child: Container(
+                                  height: 120,
+                                  color: kTransparentColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ))
+                    : Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height - 120,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'No category found for this store ${widget.pageTitle}',
+                    style: TextStyle(
+                        color: kMainColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 18),
+                  ),
+                ),
               ],
             ),
           ),

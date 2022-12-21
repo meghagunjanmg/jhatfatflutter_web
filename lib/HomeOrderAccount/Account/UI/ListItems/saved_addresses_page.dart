@@ -229,452 +229,437 @@ class _SavedAddressesState extends State<SavedAddresses> {
           child:
           Column(
               children: [
-      Stack(
-      children: [
-        Stack(
-          children: <Widget>[
-
-            ((showAddressList != null && showAddressList.length > 0) ||
-                (addressDelivery != null && addressDelivery.length > 0))
-                ? Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height-200,
-              child:  Column(
+                Stack(
                   children: [
-                    Visibility(
-                      visible: (addressDelivery != null &&
-                          addressDelivery.length > 0)
-                          ? true
-                          : false,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          primary: false,
-                          itemCount: addressDelivery.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: <Widget>[
-                                Divider(
-                                  height: 6.0,
-                                  color: kCardBackgroundColor,
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10.0, horizontal: 6.0),
-                                  color: Colors.white,
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor:
-                                        kCardBackgroundColor,
-                                        child: ImageIcon(
-                                          AssetImage(
-                                              'images/address/ic_homeblk.png'),
-                                          color: kMainColor,
-                                          size: 28,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: 8.0, bottom: 8.0),
-                                              child: Text(
-                                                '${addressDelivery[index].address}',
-                                                style: listTitleTextStyle,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Column(
-                                          children: [
-                                            IconButton(
-                                                icon: Icon(Icons.edit),
-                                                iconSize: 24.0,
-                                                onPressed: () {
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder:
-                                                              (context) {
-                                                            return EditAddresspage(
-                                                              addressDelivery[
-                                                              index]
-                                                                  .lat,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .lng,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .pincode,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .houseno,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .address,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .state,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .addressId,
-                                                              widget.vendorId,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .cityId,
-                                                              addressDelivery[
-                                                              index]
-                                                                  .areaId,
-                                                              (addressDelivery[
-                                                              index]
-                                                                  .type!=null)?addressDelivery[
-                                                              index]
-                                                                  .type:'Other',);
-                                                          })).then((value) {
-                                                    if (widget.vendorId != null &&
-                                                        widget.vendorId.toString().length > 0 &&
-                                                        widget.vendorId != "") {
-                                                      getVendorAddress(context);
-                                                    } else {
-                                                      setState(() {
-                                                        isFetchAdd = true;
-                                                      });
-                                                      getAddress(context);
-                                                    }
-                                                  });
-                                                }),
-                                            Radio(
-                                                value: index,
-                                                groupValue: idd1,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    idd1 = index;
-                                                    showDialogBox = true;
-                                                  });
-                                                  selectAddressd(
-                                                      addressDelivery[index]
-                                                          .addressId,
-                                                      widget.vendorId);
-                                                }),
-                                            IconButton(
-                                                icon: Icon(Icons.delete),
-                                                iconSize: 24.0,
-                                                onPressed: () {
-                                                  setState(() {
-                                                    showDialogBox = true;
-                                                    deleteAddress(
-                                                        addressDelivery[index].addressId,
-                                                        context);
-                                                  });
-                                                }),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
-                    ),
-                    Visibility(
-                      visible: (showAddressList != null &&
-                          showAddressList.length > 0)
-                          ? true
-                          : false,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          primary: false,
-                          itemCount: showAddressList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: <Widget>[
-                                Divider(
-                                  height: 6.0,
-                                  color: kCardBackgroundColor,
-                                ),
+                    Stack(
+                      children: <Widget>[
 
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10.0, horizontal: 6.0),
-                                  color: Colors.white,
-                                  child: Stack(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: 30,
-                                            backgroundColor:
-                                            kCardBackgroundColor,
-                                            child: ImageIcon(
-                                              AssetImage(
-                                                  'images/address/ic_homeblk.png'),
-                                              color: kMainColor,
-                                              size: 28,
-                                            ),
+                        ((showAddressList != null && showAddressList.length > 0) ||
+                            (addressDelivery != null && addressDelivery.length > 0))
+                            ? Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height-200,
+                          child:  Column(
+                            children: [
+                              Visibility(
+                                visible: (addressDelivery != null &&
+                                    addressDelivery.length > 0)
+                                    ? true
+                                    : false,
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    primary: false,
+                                    itemCount: addressDelivery.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return Column(
+                                        children: <Widget>[
+                                          Divider(
+                                            height: 6.0,
+                                            color: kCardBackgroundColor,
                                           ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10.0, horizontal: 6.0),
+                                            color: Colors.white,
+                                            child: Row(
                                               children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: 8.0, bottom: 8.0),
-                                                  child: Text(
-                                                    '${showAddressList[index].address}',
-                                                    style: listTitleTextStyle,
+                                                CircleAvatar(
+                                                  radius: 30,
+                                                  backgroundColor:
+                                                  kCardBackgroundColor,
+                                                  child: ImageIcon(
+                                                    AssetImage(
+                                                        'images/address/ic_homeblk.png'),
+                                                    color: kMainColor,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding: EdgeInsets.only(
+                                                            left: 8.0, bottom: 8.0),
+                                                        child: Text(
+                                                          '${addressDelivery[index].address}',
+                                                          style: listTitleTextStyle,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  child: Column(
+                                                    children: [
+                                                      IconButton(
+                                                          icon: Icon(Icons.edit),
+                                                          iconSize: 24.0,
+                                                          onPressed: () {
+                                                            Navigator.of(context).push(
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) {
+                                                                      return EditAddresspage(
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .lat,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .lng,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .pincode,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .houseno,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .address,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .state,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .addressId,
+                                                                        widget.vendorId,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .cityId,
+                                                                        addressDelivery[
+                                                                        index]
+                                                                            .areaId,
+                                                                        (addressDelivery[
+                                                                        index]
+                                                                            .type!=null)?addressDelivery[
+                                                                        index]
+                                                                            .type:'Other',);
+                                                                    })).then((value) {
+                                                              if (widget.vendorId != null &&
+                                                                  widget.vendorId.toString().length > 0 &&
+                                                                  widget.vendorId != "") {
+                                                                getVendorAddress(context);
+                                                              } else {
+                                                                setState(() {
+                                                                  isFetchAdd = true;
+                                                                });
+                                                                getAddress(context);
+                                                              }
+                                                            });
+                                                          }),
+                                                      Radio(
+                                                          value: index,
+                                                          groupValue: idd1,
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              idd1 = index;
+                                                              showDialogBox = true;
+                                                            });
+                                                            selectAddressd(
+                                                                addressDelivery[index]
+                                                                    .addressId,
+                                                                widget.vendorId);
+                                                          }),
+                                                      IconButton(
+                                                          icon: Icon(Icons.delete),
+                                                          iconSize: 24.0,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              showDialogBox = true;
+                                                              deleteAddress(
+                                                                  addressDelivery[index].addressId,
+                                                                  context);
+                                                            });
+                                                          }),
+                                                    ],
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
+                                        ],
+                                      );
+                                    }),
+                              ),
+                              Visibility(
+                                visible: (showAddressList != null &&
+                                    showAddressList.length > 0)
+                                    ? true
+                                    : false,
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    primary: false,
+                                    itemCount: showAddressList.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return Column(
+                                        children: <Widget>[
+                                          Divider(
+                                            height: 6.0,
+                                            color: kCardBackgroundColor,
+                                          ),
+
                                           Container(
-                                            child: Column(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10.0, horizontal: 6.0),
+                                            color: Colors.white,
+                                            child: Stack(
                                               children: [
-                                                Visibility(
-                                                  visible: (widget.vendorId !=
-                                                      null &&
-                                                      widget.vendorId
-                                                          .toString()
-                                                          .length >
-                                                          0 &&
-                                                      widget.vendorId != "")
-                                                      ? true
-                                                      : false,
-                                                  child: IconButton(
-                                                      icon: Icon(Icons.edit),
-                                                      iconSize: 24.0,
-                                                      onPressed: () {
-                                                        Navigator.of(context).push(
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) {
-                                                                  return EditAddresspage(
-                                                                      showAddressList[
-                                                                      index]
-                                                                          .lat,
-                                                                      showAddressList[
-                                                                      index]
-                                                                          .lng,
-                                                                      showAddressList[
-                                                                      index]
-                                                                          .pincode,
-                                                                      showAddressList[
-                                                                      index]
-                                                                          .houseno,
-                                                                      showAddressList[
-                                                                      index].street,
-                                                                      showAddressList[
-                                                                      index]
-                                                                          .state,
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 30,
+                                                      backgroundColor:
+                                                      kCardBackgroundColor,
+                                                      child: ImageIcon(
+                                                        AssetImage(
+                                                            'images/address/ic_homeblk.png'),
+                                                        color: kMainColor,
+                                                        size: 28,
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          Padding(
+                                                            padding: EdgeInsets.only(
+                                                                left: 8.0, bottom: 8.0),
+                                                            child: Text(
+                                                              '${showAddressList[index].address}',
+                                                              style: listTitleTextStyle,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      child: Column(
+                                                        children: [
+                                                          Visibility(
+                                                            visible: (widget.vendorId !=
+                                                                null &&
+                                                                widget.vendorId
+                                                                    .toString()
+                                                                    .length >
+                                                                    0 &&
+                                                                widget.vendorId != "")
+                                                                ? true
+                                                                : false,
+                                                            child: IconButton(
+                                                                icon: Icon(Icons.edit),
+                                                                iconSize: 24.0,
+                                                                onPressed: () {
+                                                                  Navigator.of(context).push(
+                                                                      MaterialPageRoute(
+                                                                          builder:
+                                                                              (context) {
+                                                                            return EditAddresspage(
+                                                                                showAddressList[
+                                                                                index]
+                                                                                    .lat,
+                                                                                showAddressList[
+                                                                                index]
+                                                                                    .lng,
+                                                                                showAddressList[
+                                                                                index]
+                                                                                    .pincode,
+                                                                                showAddressList[
+                                                                                index]
+                                                                                    .houseno,
+                                                                                showAddressList[
+                                                                                index].street,
+                                                                                showAddressList[
+                                                                                index]
+                                                                                    .state,
+                                                                                showAddressList[
+                                                                                index]
+                                                                                    .address_id,
+                                                                                widget.vendorId,
+                                                                                showAddressList[
+                                                                                index].city_id,
+                                                                                showAddressList[
+                                                                                index].area_id,
+                                                                                (showAddressList[
+                                                                                index].type!=null)?showAddressList[
+                                                                                index].type:'Other');
+                                                                          })).then((value) {
+                                                                    if (widget.vendorId != null &&
+                                                                        widget.vendorId.toString().length > 0 &&
+                                                                        widget.vendorId != "") {
+                                                                      getVendorAddress(context);
+                                                                    } else {
+                                                                      setState(() {
+                                                                        isFetchAdd = true;
+                                                                      });
+                                                                      getAddress(context);
+                                                                    }
+                                                                  });
+                                                                }),
+                                                          ),
+                                                          Radio(
+                                                              value: index,
+                                                              groupValue: idd,
+                                                              onChanged: (value) {
+
+                                                                setState(() {
+                                                                  idd = index;
+                                                                  showDialogBox = true;
+                                                                });
+                                                                selectAddressd(
+                                                                    showAddressList[index]
+                                                                        .address_id,
+                                                                    widget.vendorId);
+                                                              }),
+                                                          IconButton(
+                                                              icon: Icon(Icons.delete),
+                                                              iconSize: 24.0,
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  showDialogBox = true;
+                                                                  deleteAddress(
                                                                       showAddressList[
                                                                       index]
                                                                           .address_id,
-                                                                      widget.vendorId,
-                                                                      showAddressList[
-                                                                      index].city_id,
-                                                                      showAddressList[
-                                                                      index].area_id,
-                                                                      (showAddressList[
-                                                                      index].type!=null)?showAddressList[
-                                                                      index].type:'Other');
-                                                                })).then((value) {
-                                                          if (widget.vendorId != null &&
-                                                              widget.vendorId.toString().length > 0 &&
-                                                              widget.vendorId != "") {
-                                                            getVendorAddress(context);
-                                                          } else {
-                                                            setState(() {
-                                                              isFetchAdd = true;
-                                                            });
-                                                            getAddress(context);
-                                                          }
-                                                        });
-                                                      }),
+                                                                      context);
+                                                                });
+                                                              }),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Radio(
-                                                    value: index,
-                                                    groupValue: idd,
-                                                    onChanged: (value) {
-                                                      if(addressDelivery!=null && addressDelivery.length>0){
 
-                                                      }else{
-                                                        setState(() {
-                                                          idd = index;
-                                                          showDialogBox = true;
-                                                        });
-                                                        selectAddressd(
-                                                            showAddressList[index]
-                                                                .address_id,
-                                                            widget.vendorId);
-                                                      }
-                                                    }),
-                                                IconButton(
-                                                    icon: Icon(Icons.delete),
-                                                    iconSize: 24.0,
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        showDialogBox = true;
-                                                        deleteAddress(
-                                                            showAddressList[
-                                                            index]
-                                                                .address_id,
-                                                            context);
-                                                      });
-                                                    }),
                                               ],
                                             ),
                                           ),
                                         ],
-                                      ),
-                                      Positioned(
-                                        top: 50,
-                                        child: Visibility(
-                                          visible:(addressDelivery != null && addressDelivery.length > 0)?true:false,
-                                          child: Container(
-                                            padding:EdgeInsets.symmetric(vertical: 10),
-                                            width: MediaQuery.of(context).size.width,
-                                            alignment: Alignment.center,
-                                            color:kCardBackgroundColor,
-                                            child: Text('We are not delivery this address',style: TextStyle(fontSize: 13),),
-                                          ),
+                                      );
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ): Container(
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              (isVendor_list || isFetchAdd)
+                                  ? CircularProgressIndicator()
+                                  : Container(
+                                width: 0.5,
+                              ),
+                              (isVendor_list || isFetchAdd)
+                                  ? SizedBox(
+                                width: 10,
+                              )
+                                  : Container(
+                                width: 0.5,
+                              ),
+                              Text(
+                                (isVendor_list || isFetchAdd)
+                                    ? 'Fetching address'
+                                    : 'No address found',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: kMainTextColor),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Positioned.fill(
+                        child: Visibility(
+                          visible: showDialogBox,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height,
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                height: 120,
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                child: Material(
+                                  elevation: 5,
+                                  borderRadius: BorderRadius.circular(20),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Container(
+                                    color: white_color,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        CircularProgressIndicator(),
+                                        SizedBox(
+                                          width: 20,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          'Loading please wait!....',
+                                          style: TextStyle(
+                                              color: kMainTextColor,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 20),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ],
-                            );
-                          }),
-                    ),
+                              ),
+                            ),
+                          ),
+                        )),
                   ],
                 ),
-            ): Container(
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  (isVendor_list || isFetchAdd)
-                      ? CircularProgressIndicator()
-                      : Container(
-                    width: 0.5,
-                  ),
-                  (isVendor_list || isFetchAdd)
-                      ? SizedBox(
-                    width: 10,
-                  )
-                      : Container(
-                    width: 0.5,
-                  ),
-                  Text(
-                    (isVendor_list || isFetchAdd)
-                        ? 'Fetching address'
-                        : 'No address found',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: kMainTextColor),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-        Positioned.fill(
-            child: Visibility(
-              visible: showDialogBox,
-              child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    height: 120,
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: Material(
-                      elevation: 5,
-                      borderRadius: BorderRadius.circular(20),
-                      clipBehavior: Clip.hardEdge,
-                      child: Container(
-                        color: white_color,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            CircularProgressIndicator(),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Text(
-                              'Loading please wait!....',
-                              style: TextStyle(
-                                  color: kMainTextColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 20),
-                            )
-                          ],
+
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Visibility(
+                    visible: (widget.vendorId != null &&
+                        widget.vendorId.toString().length > 0 &&
+                        widget.vendorId != "")
+                        ? true
+                        : false,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
                         ),
+                        primary: kMainColor,
+                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                       ),
+
+                      onPressed: () {
+//                  Navigator.pushNamed(context, PageRoutes.locationPage);
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return AddAddressPage(widget.vendorId);
+                        })).then((value) {
+                          if (widget.vendorId != null &&
+                              widget.vendorId.toString().length > 0 &&
+                              widget.vendorId != "") {
+                            getVendorAddress(context);
+                          } else {
+                            setState(() {
+                              isFetchAdd = true;
+                            });
+                            getAddress(context);
+                          }
+                        });
+                      }, child: Text("Add New",style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20),
+                    ),
+
                     ),
                   ),
-                ),
-              ),
-            )),
-      ],
-      ),
-
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Visibility(
-              visible: (widget.vendorId != null &&
-                  widget.vendorId.toString().length > 0 &&
-                  widget.vendorId != "")
-                  ? true
-                  : false,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  primary: kMainColor,
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                ),
-
-                onPressed: () {
-//                  Navigator.pushNamed(context, PageRoutes.locationPage);
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) {
-                    return AddAddressPage(widget.vendorId);
-                  })).then((value) {
-                    if (widget.vendorId != null &&
-                        widget.vendorId.toString().length > 0 &&
-                        widget.vendorId != "") {
-                      getVendorAddress(context);
-                    } else {
-                      setState(() {
-                        isFetchAdd = true;
-                      });
-                      getAddress(context);
-                    }
-                  });
-                }, child: Text("Add New",style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 20),
-              ),
-
-              ),
-            ),
-          )
-])
+                )
+              ])
       );
   }
 
@@ -720,9 +705,9 @@ class _SavedAddressesState extends State<SavedAddresses> {
       if (value.statusCode == 200) {
         var jsonData = jsonDecode(value.body);
         if (jsonData['status'] == "1") {
-         // Toast.show(jsonData['message'],  duration: Toast.lengthShort, gravity:  Toast.bottom);
+          // Toast.show(jsonData['message'],  duration: Toast.lengthShort, gravity:  Toast.bottom);
         } else {
-        //  Toast.show(jsonData['message'],  duration: Toast.lengthShort, gravity:  Toast.bottom);
+          //  Toast.show(jsonData['message'],  duration: Toast.lengthShort, gravity:  Toast.bottom);
         }
         setState(() {
           showDialogBox = false;

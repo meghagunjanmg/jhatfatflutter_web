@@ -36,10 +36,11 @@ class StoresPageState extends State<StoresPage> {
   List<NearStores> nearStores = [];
   List<NearStores> nearStoresSearch = [];
   List<NearStores> nearStoresShimmer = [
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+
   ];
   List<String> listImages = ['', '', '', '', ''];
   bool isFetch = true;
@@ -150,10 +151,10 @@ class StoresPageState extends State<StoresPage> {
                           AssetImage('images/icons/ic_cart blk.png'),
                         ),
                         onPressed: () {
-                            Navigator.pushNamed(context, PageRoutes.viewCart)
-                                .then((value) {
-                              getCartCount();
-                            });
+                          Navigator.pushNamed(context, PageRoutes.viewCart)
+                              .then((value) {
+                            getCartCount();
+                          });
 
                         }),
                     Positioned(
@@ -203,15 +204,15 @@ class StoresPageState extends State<StoresPage> {
                     onChanged: (value) {
                       nearStores = nearStoresSearch
                           .where((element) => element.vendor_name
-                              .toString()
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
+                          .toString()
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
                           .toList();
                     },
                   ),
                 ),
                 preferredSize:
-                    Size(MediaQuery.of(context).size.width * 0.85, 52)),
+                Size(MediaQuery.of(context).size.width * 0.85, 52)),
           ),
         ),
         body: Container(
@@ -236,212 +237,243 @@ class StoresPageState extends State<StoresPage> {
                 ),
                 (nearStores != null && nearStores.length > 0)
                     ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: ListView.separated(
-                            shrinkWrap: true,
-                            primary: false,
-                            scrollDirection: Axis.vertical,
-                            itemCount: nearStores.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  if ((nearStores[index].online_status ==
-                                          "on" ||
-                                      nearStores[index].online_status == "On" ||
-                                      nearStores[index].online_status ==
-                                          "ON")) {
-                                    hitNavigator(
-                                        context,
-                                        nearStores[index].vendor_name,
-                                        nearStores[index].vendor_id,
-                                        nearStores[index].distance);
-                                  } else {
-                                    Toast.show('Store are closed now!', duration: Toast.lengthShort, gravity:  Toast.bottom);
-                                  }
-                                },
-                                behavior: HitTestBehavior.opaque,
-                                child: Material(
-                                  elevation: 2,
-                                  shadowColor: white_color,
-                                  clipBehavior: Clip.hardEdge,
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        color: white_color,
-                                        padding: EdgeInsets.only(
-                                            left: 20.0, top: 15, bottom: 15),
-                                        child: Row(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: ListView.separated(
+                      shrinkWrap: true,
+                      primary: false,
+                      scrollDirection: Axis.vertical,
+                      itemCount: nearStores.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            if ((nearStores[index].online_status ==
+                                "off" ||
+                                nearStores[index].online_status == "Off" ||
+                                nearStores[index].online_status ==
+                                    "OFF")) {
+                            }
+                            else if(nearStores[index].inrange == 0){
+                            }
+                            else {
+                              hitNavigator(
+                                  context,
+                                  nearStores[index].vendor_name,
+                                  nearStores[index].vendor_id,
+                                  nearStores[index].distance);
+                            }
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Material(
+                            elevation: 2,
+                            shadowColor: white_color,
+                            clipBehavior: Clip.hardEdge,
+                            borderRadius: BorderRadius.circular(10),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width:
+                                  MediaQuery.of(context).size.width,
+                                  color: white_color,
+                                  padding: EdgeInsets.only(
+                                      left: 20.0, top: 15, bottom: 15),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Image.network(
+                                        imageBaseUrl +
+                                            nearStores[index].vendor_logo,
+                                        width: 93.3,
+                                        height: 93.3,
+                                      ),
+                                      SizedBox(width: 13.3),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                           children: <Widget>[
-                                            Image.network(
-                                              imageBaseUrl +
-                                                  nearStores[index].vendor_logo,
-                                              width: 93.3,
-                                              height: 93.3,
-                                            ),
-                                            SizedBox(width: 13.3),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Text(
-                                                      nearStores[index]
-                                                          .vendor_name,
-                                                      style: Theme.of(context)
+                                            Text(
+                                                nearStores[index]
+                                                    .vendor_name,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle2!
+                                                    .copyWith(
+                                                    color:
+                                                    kMainTextColor,
+                                                    fontSize: 18)),
+                                            SizedBox(height: 8.0),
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(
+                                                  Icons.location_on,
+                                                  color: kIconColor,
+                                                  size: 15,
+                                                ),
+                                                SizedBox(width: 10.0),
+                                                Text(
+                                                    '${double.parse('${nearStores[index].distance}').toStringAsFixed(2)} km ',
+                                                    style: Theme.of(
+                                                        context)
+                                                        .textTheme
+                                                        .caption!
+                                                        .copyWith(
+                                                        color:
+                                                        kLightTextColor,
+                                                        fontSize:
+                                                        13.0)),
+                                                Text('| ',
+                                                    style: Theme.of(
+                                                        context)
+                                                        .textTheme
+                                                        .caption!
+                                                        .copyWith(
+                                                        color:
+                                                        kMainColor,
+                                                        fontSize:
+                                                        13.0)),
+                                                Expanded(
+                                                  child: Text(
+                                                      '${nearStores[index].vendor_loc}',
+                                                      maxLines: 2,
+                                                      style: Theme.of(
+                                                          context)
                                                           .textTheme
-                                                          .subtitle2!
+                                                          .caption!
                                                           .copyWith(
-                                                              color:
-                                                                  kMainTextColor,
-                                                              fontSize: 18)),
-                                                  SizedBox(height: 8.0),
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Icon(
-                                                        Icons.location_on,
-                                                        color: kIconColor,
-                                                        size: 15,
-                                                      ),
-                                                      SizedBox(width: 10.0),
-                                                      Text(
-                                                          '${double.parse('${nearStores[index].distance}').toStringAsFixed(2)} km ',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .caption!
-                                                              .copyWith(
-                                                                  color:
-                                                                      kLightTextColor,
-                                                                  fontSize:
-                                                                      13.0)),
-                                                      Text('| ',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .caption!
-                                                              .copyWith(
-                                                                  color:
-                                                                      kMainColor,
-                                                                  fontSize:
-                                                                      13.0)),
-                                                      Expanded(
-                                                        child: Text(
-                                                            '${nearStores[index].vendor_loc}',
-                                                            maxLines: 2,
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .textTheme
-                                                                .caption!
-                                                                .copyWith(
-                                                                    color:
-                                                                        kLightTextColor,
-                                                                    fontSize:
-                                                                        13.0)),
-                                                      ),
-                                                    ],
+                                                          color:
+                                                          kLightTextColor,
+                                                          fontSize:
+                                                          13.0)),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 6),
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(
+                                                  Icons.access_time,
+                                                  color: kIconColor,
+                                                  size: 15,
+                                                ),
+                                                SizedBox(width: 10.0),
+                                                Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), userLat, userLng)}',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .caption!
+                                                        .copyWith(
+                                                        color:
+                                                        kLightTextColor,
+                                                        fontSize: 13.0)),
+                                              ],
+                                            ),
+
+                                            Container(
+                                              margin: EdgeInsets.all(8),
+                                              child: Visibility(
+                                                visible: (nearStores[index]
+                                                    .online_status ==
+                                                    "off" ||
+                                                    nearStores[index]
+                                                        .online_status ==
+                                                        "Off" ||
+                                                    nearStores[index]
+                                                        .online_status ==
+                                                        "OFF")
+                                                    ? true
+                                                    : false,
+                                                child: Container(
+                                                  margin: EdgeInsets.all(8),
+                                                  height: 20,
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                      10,
+                                                  alignment: Alignment.center,
+                                                  color: kCardBackgroundColor,
+                                                  child: Text(
+                                                    'Store Closed Now',
+                                                    style: TextStyle(
+                                                        color: red_color,
+                                                        fontSize: 15),
                                                   ),
-                                                  SizedBox(height: 6),
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Icon(
-                                                        Icons.access_time,
-                                                        color: kIconColor,
-                                                        size: 15,
-                                                      ),
-                                                      SizedBox(width: 10.0),
-                                                      Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), userLat, userLng)}',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .caption!
-                                                              .copyWith(
-                                                              color:
-                                                              kLightTextColor,
-                                                              fontSize: 13.0)),
-                                                    ],
-                                                  ),
-                                                ],
+                                                ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 20,
-                                        child: Visibility(
-                                          visible: (nearStores[index]
-                                                          .online_status ==
-                                                      "off" ||
-                                                  nearStores[index]
-                                                          .online_status ==
-                                                      "Off" ||
-                                                  nearStores[index]
-                                                          .online_status ==
-                                                      "OFF")
-                                              ? true
-                                              : false,
-                                          child: Container(
-                                            height: 40,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                10,
-                                            alignment: Alignment.center,
-                                            color: kCardBackgroundColor,
-                                            child: Text(
-                                              'Store Closed Now',
-                                              style: TextStyle(
-                                                  color: red_color,
-                                                  fontSize: 15),
+                                            Container(
+                                              margin: EdgeInsets.all(8),
+                                              child: Visibility(
+                                                visible: (nearStores[index]
+                                                    .inrange == 0)
+                                                    ? true
+                                                    : false,
+                                                child: Container(
+                                                  margin: EdgeInsets.all(8),
+                                                  height: 20,
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                      10,
+                                                  alignment: Alignment.center,
+                                                  color: kCardBackgroundColor,
+                                                  child: Text(
+                                                    'Store Out of Delivery Range',
+                                                    style: TextStyle(
+                                                        color: red_color,
+                                                        fontSize: 15),
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              );
-                            },
-                            separatorBuilder: (context, index) {
-                              return SizedBox(
-                                height: 10,
-                              );
-                            }),
-                      )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(
+                          height: 10,
+                        );
+                      }),
+                )
                     : Container(
-                        height: MediaQuery.of(context).size.height / 2,
-                        width: MediaQuery.of(context).size.width,
-                        alignment: Alignment.center,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            isFetchStore
-                                ? CircularProgressIndicator()
-                                : Container(
-                                    width: 0.5,
-                                  ),
-                            isFetchStore
-                                ? SizedBox(
-                                    width: 10,
-                                  )
-                                : Container(
-                                    width: 0.5,
-                                  ),
-                            Text(
-                              (!isFetchStore)
-                                  ? 'No Store Found at your location'
-                                  : 'Fetching Stores',
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: kMainTextColor),
-                            )
-                          ],
-                        ),
+                  height: MediaQuery.of(context).size.height / 2,
+                  width: MediaQuery.of(context).size.width,
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      isFetchStore
+                          ? CircularProgressIndicator()
+                          : Container(
+                        width: 0.5,
+                      ),
+                      isFetchStore
+                          ? SizedBox(
+                        width: 10,
                       )
+                          : Container(
+                        width: 0.5,
+                      ),
+                      Text(
+                        (!isFetchStore)
+                            ? 'No Store Found at your location'
+                            : 'Fetching Stores',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: kMainTextColor),
+                      )
+                    ],
+                  ),
+                )
               ],
             ),
           ),

@@ -346,20 +346,22 @@ class SingleProductState extends State<SingleProductPage> {
                                             SizedBox(
                                               height: 8.0,
                                             ),
-                                            Text(
-                                                (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
-                                                    <=
-                                                    widget.productVarintList[index].price ||
-                                                    widget.productVarintList[index].strick_price==null )
-                                                    ? ''
-                                                    :'${widget.currency}  ${widget.productVarintList[index].strick_price}',
+                                            Row(
+                                                children: [
+                                                  Text(
+                                                      (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
+                                                          <=
+                                                          widget.productVarintList[index].price ||
+                                                          widget.productVarintList[index].strick_price==null )
+                                                          ? ''
+                                                          :'${widget.currency}  ${widget.productVarintList[index].strick_price}',
 
-                                                style: TextStyle(decoration: TextDecoration.lineThrough)),
-
-                                            Text(
-                                              '${widget.currency} ${widget.productVarintList[index].price}',
-                                              //style: TextStyle(decoration: TextDecoration.lineThrough)
-                                            ),
+                                                      style: TextStyle(decoration: TextDecoration.lineThrough)),
+                                                  Text(
+                                                    '${widget.currency} ${widget.productVarintList[index].price} ',
+                                                    //style: TextStyle(decoration: TextDecoration.lineThrough)
+                                                  ),
+                                                ]),
 
                                             SizedBox(
                                               height: 20.0,

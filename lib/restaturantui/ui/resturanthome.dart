@@ -625,7 +625,7 @@ class RestaurantState extends State<Restaurant> {
                             child: Padding(
                               padding: EdgeInsets.all(fixPadding),
                               child: Text(
-                                'No Restaurants available in your area.',
+                                nodata,
                                 style: headingStyle,
                               ),
                             ))
@@ -858,11 +858,16 @@ class RestaurantState extends State<Restaurant> {
                                             itemBuilder: (context, index) {
                                               return GestureDetector(
                                                 onTap: () {
-                                                  // hitNavigator(context, nearStores[index]);
-                                                  if((nearStores[index].online_status == "on" || nearStores[index].online_status == "On" || nearStores[index].online_status == "ON")){
+                                                  if ((nearStores[index].online_status ==
+                                                      "off" ||
+                                                      nearStores[index].online_status == "Off" ||
+                                                      nearStores[index].online_status ==
+                                                          "OFF")) {
+                                                  }
+                                                  else if(nearStores[index].inrange == 0){
+                                                  }
+                                                  else{
                                                     hitNavigator(context, nearStores[index]);
-                                                  }else{
-                                                    Toast.show('Restaurant are closed now!', duration: Toast.lengthShort, gravity:  Toast.bottom);
                                                   }
                                                 },
                                                 behavior: HitTestBehavior.opaque,
@@ -877,7 +882,7 @@ class RestaurantState extends State<Restaurant> {
                                                         width: MediaQuery
                                                             .of(context)
                                                             .size
-                                                            .width,
+                                                            .width ,
                                                         color: white_color,
                                                         padding: EdgeInsets.only(
                                                             left: 20.0, top: 15, bottom: 15),
@@ -902,7 +907,7 @@ class RestaurantState extends State<Restaurant> {
                                                                         .copyWith(
                                                                         color: kMainTextColor,
                                                                         fontSize: 18)),
-                                                                SizedBox(height: 8.0),
+                                                                SizedBox(height: 10.0),
                                                                 Row(
                                                                   children: <Widget>[
                                                                     Icon(
@@ -932,7 +937,8 @@ class RestaurantState extends State<Restaurant> {
                                                                             color: kMainColor,
                                                                             fontSize: 13.0)),
                                                                     Text(
-                                                                        '${nearStores[index].vendor_loc}',
+                                                                        '${nearStores[index].vendor_loc}', //equal minlines: 3
+                                                                        overflow: TextOverflow.ellipsis,
                                                                         style: Theme
                                                                             .of(context)
                                                                             .textTheme
@@ -940,7 +946,7 @@ class RestaurantState extends State<Restaurant> {
                                                                             .copyWith(
                                                                             color:
                                                                             kLightTextColor,
-                                                                            fontSize: 13.0)),
+                                                                            fontSize: 13.0))
                                                                   ],
                                                                 ),
                                                                 SizedBox(height: 6),
@@ -962,26 +968,70 @@ class RestaurantState extends State<Restaurant> {
                                                                             fontSize: 13.0)),
                                                                   ],
                                                                 ),
+
+                                                                Container(
+                                                                  margin: EdgeInsets.all(8),
+                                                                  child: Visibility(
+                                                                    visible: (nearStores[index]
+                                                                        .online_status ==
+                                                                        "off" ||
+                                                                        nearStores[index]
+                                                                            .online_status ==
+                                                                            "Off" ||
+                                                                        nearStores[index]
+                                                                            .online_status ==
+                                                                            "OFF")
+                                                                        ? true
+                                                                        : false,
+                                                                    child: Container(
+                                                                      margin: EdgeInsets.all(8),
+                                                                      height: 20,
+                                                                      width: MediaQuery.of(context)
+                                                                          .size
+                                                                          .width -
+                                                                          10,
+                                                                      alignment: Alignment.center,
+                                                                      color: kCardBackgroundColor,
+                                                                      child: Text(
+                                                                        'Store Closed Now',
+                                                                        style: TextStyle(
+                                                                            color: red_color,
+                                                                            fontSize: 15),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Container(
+                                                                  margin: EdgeInsets.all(8),
+                                                                  child: Visibility(
+                                                                    visible: (nearStores[index]
+                                                                        .inrange == 0)
+                                                                        ? true
+                                                                        : false,
+                                                                    child: Container(
+                                                                      margin: EdgeInsets.all(8),
+                                                                      height: 20,
+                                                                      width: MediaQuery.of(context)
+                                                                          .size
+                                                                          .width -
+                                                                          10,
+                                                                      alignment: Alignment.center,
+                                                                      color: kCardBackgroundColor,
+                                                                      child: Text(
+                                                                        'Store Out of Delivery Range',
+                                                                        style: TextStyle(
+                                                                            color: red_color,
+                                                                            fontSize: 15),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
                                                               ],
                                                             ),
                                                           ],
                                                         ),
                                                       ),
-                                                      Positioned(
-                                                        bottom: 20,
-                                                        child: Visibility(
-                                                          visible: (nearStores[index].online_status == "off" || nearStores[index].online_status == "Off" || nearStores[index].online_status == "OFF")?true:false,
-                                                          child: Container(
-                                                            height: 40,
-                                                            width: MediaQuery.of(context).size.width-10,
-                                                            alignment: Alignment.center,
-                                                            color: kCardBackgroundColor,
-                                                            child: Text('Store Closed Now',style: TextStyle(
-                                                                color: red_color
-                                                            ),),
-                                                          ),
-                                                        ),
-                                                      ),
+
                                                     ],
                                                   ),
                                                 ),

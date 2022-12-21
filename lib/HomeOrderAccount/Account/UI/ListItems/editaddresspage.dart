@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder2/geocoder2.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -98,7 +99,7 @@ class EditAddresspageState extends State<EditAddresspage> {
 
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+    return Scaffold(
       backgroundColor: kCardBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -587,6 +588,23 @@ class EditAddresspageState extends State<EditAddresspage> {
   void addAddres(dynamic area_id, dynamic city_id, house_no, street, pincode,
       state, BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<Location> locations = await locationFromAddress(street);
+    setState(() {
+      lat = locations[0].latitude;
+      lng = locations[0].longitude;
+    });
+
+    final marker = Marker(
+      markerId: MarkerId('location'),
+      position: LatLng(lat, lng),
+      icon: BitmapDescriptor.defaultMarker,
+    );
+    setState(() {
+      markers[MarkerId('location')] = marker;
+    });
+
+
     var url = editAddress;
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {
@@ -614,6 +632,7 @@ class EditAddresspageState extends State<EditAddresspage> {
             showDialogBox = false;
           });
           Navigator.pop(context);
+
         } else {
           print(jsonData['message']);
           setState(() {
@@ -636,25 +655,25 @@ class EditAddresspageState extends State<EditAddresspage> {
       print(e);
     });
   }
-void getMapLoc() async {
-  _getCameraMoveLocation(LatLng(lat, lng));
-}
+  void getMapLoc() async {
+    _getCameraMoveLocation(LatLng(lat, lng));
+  }
 
-void _getCameraMoveLocation(LatLng data) async {
-  Timer(Duration(seconds: 1), () async {
-    lat = data.latitude;
-    lng = data.longitude;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("lat", data.latitude.toStringAsFixed(8));
-    prefs.setString("lng", data.longitude.toStringAsFixed(8));
-    GeoData data1 = await Geocoder2.getDataFromCoordinates(
-        latitude: lat,
-        longitude: lng,
-        googleMapApiKey: apiKey);
-    setState(() {
-      currentAddress = data1.address;
+  void _getCameraMoveLocation(LatLng data) async {
+    Timer(Duration(seconds: 1), () async {
+      lat = data.latitude;
+      lng = data.longitude;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("lat", data.latitude.toStringAsFixed(8));
+      prefs.setString("lng", data.longitude.toStringAsFixed(8));
+      GeoData data1 = await Geocoder2.getDataFromCoordinates(
+          latitude: lat,
+          longitude: lng,
+          googleMapApiKey: apiKey);
+      setState(() {
+        currentAddress = data1.address;
+      });
     });
-  });
-}
+  }
 
 }
