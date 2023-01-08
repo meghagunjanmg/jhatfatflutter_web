@@ -43,10 +43,17 @@ class OrderPageState extends State<OrderPage> {
     'Cancelled',
     'Completed',
   ];
-
+  String message = '';
+  Future<void> getdata() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+  }
   @override
   void initState() {
     super.initState();
+    getdata();
     getAllThreeData();
   }
 
@@ -1834,6 +1841,19 @@ class OrderPageState extends State<OrderPage> {
                 ),
               ),
             ),
+
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
+            )
+
           ],
         ),
       ),

@@ -104,10 +104,12 @@ class _HomeState extends State<Home> {
   List<NearStores> nearStores1 = [];
   List<NearStores> nearStoresSearch1 = [];
   List<NearStores> nearStoresShimmer1 = [
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
 
   ];
   List<String> listImages1 = ['', '', '', '', ''];
@@ -1468,6 +1470,12 @@ class _HomeState extends State<Home> {
         hitBannerUrl();
         pickbanner();
         hitRestaurantService();
+
+
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.setString("message", admins!.bottomMessage.toString());
+
+
         // location.changeSettings(
         //     interval: 300, accuracy: loc.LocationAccuracy.high);
         // location.enableBackgroundMode(enable: true);

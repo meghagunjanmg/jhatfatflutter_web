@@ -59,10 +59,18 @@ class SingleProductState extends State<SingleProductPage> {
       });
     }
   }
+  String message = '';
+  Future<void> getdata() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getdata();
     getCartCount();
     getCartItem2();
   }
@@ -149,7 +157,6 @@ class SingleProductState extends State<SingleProductPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,7 +217,7 @@ class SingleProductState extends State<SingleProductPage> {
               child: Container(
                 alignment: Alignment.center,
                 child:
-                    Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 10.0),
                   child: Image(
                     image: NetworkImage(imageBaseUrl +
@@ -247,7 +254,7 @@ class SingleProductState extends State<SingleProductPage> {
                         style: TextStyle(
                             fontSize: 17,
                             color:
-                                (currentIndex == 0) ? kWhiteColor : black_color,
+                            (currentIndex == 0) ? kWhiteColor : black_color,
                             fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -273,7 +280,7 @@ class SingleProductState extends State<SingleProductPage> {
                         style: TextStyle(
                             fontSize: 17,
                             color:
-                                (currentIndex == 1) ? kWhiteColor : black_color,
+                            (currentIndex == 1) ? kWhiteColor : black_color,
                             fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -294,351 +301,363 @@ class SingleProductState extends State<SingleProductPage> {
                         widget.productWithVarient.data[0].description),
                     (widget.productVarintList.length > 0)
                         ? ListView.builder(
-                            itemCount: widget.productVarintList.length,
-                            itemBuilder: (context, index) {
-                              return Stack(
+                        itemCount: widget.productVarintList.length,
+                        itemBuilder: (context, index) {
+                          return Stack(
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 20.0, top: 30.0, right: 14.0),
-                                        child:
-                                            (widget.productVarintList != null &&
-                                                    widget.productVarintList
-                                                            .length >
-                                                        0)
-                                                ? Image.network(
-                                                    imageBaseUrl +
-                                                        widget
-                                                            .productVarintList[
-                                                                index]
-                                                            .varient_image,
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 20.0, top: 30.0, right: 14.0),
+                                    child:
+                                    (widget.productVarintList != null &&
+                                        widget.productVarintList
+                                            .length >
+                                            0)
+                                        ? Image.network(
+                                      imageBaseUrl +
+                                          widget
+                                              .productVarintList[
+                                          index]
+                                              .varient_image,
 //                                scale: 2.5
-                                                    height: 93.3,
-                                                    width: 93.3,
-                                                    fit: BoxFit.fill,
-                                                  )
-                                                : Image(
-                                                    image: AssetImage(
-                                                        'images/logos/logo_user.png'),
-                                                    height: 93.3,
-                                                    width: 93.3,
-                                                  ),
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Container(
-                                              padding:
-                                                  EdgeInsets.only(right: 20),
-                                              child: Text(
-                                                  widget.productWithVarient
-                                                      .product_name,
-                                                  style:
-                                                      bottomNavigationTextStyle
-                                                          .copyWith(
-                                                              fontSize: 15)),
-                                            ),
-                                            SizedBox(
-                                              height: 8.0,
-                                            ),
-                                            Row(
-                                                children: [
-                                                  Text(
-                                                      (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
-                                                          <=
-                                                          widget.productVarintList[index].price ||
-                                                          widget.productVarintList[index].strick_price==null )
-                                                          ? ''
-                                                          :'${widget.currency}  ${widget.productVarintList[index].strick_price}',
-
-                                                      style: TextStyle(decoration: TextDecoration.lineThrough)),
-                                                  Text(
-                                                    '${widget.currency} ${widget.productVarintList[index].price} ',
-                                                    //style: TextStyle(decoration: TextDecoration.lineThrough)
-                                                  ),
-                                                ]),
-
-                                            SizedBox(
-                                              height: 20.0,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Positioned(
-                                    left: 120,
-                                    bottom: 5,
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Container(
-                                        height: 30.0,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20.0),
-                                        decoration: BoxDecoration(
-                                          color: kCardBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                        ),
-                                        child: Row(
-                                          children: <Widget>[
-                                            Text(
-                                              '${widget.productVarintList[index].quantity} ${widget.productVarintList[index].unit}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .caption,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      height: 93.3,
+                                      width: 93.3,
+                                      fit: BoxFit.fill,
+                                    )
+                                        : Image(
+                                      image: AssetImage(
+                                          'images/logos/logo_user.png'),
+                                      height: 93.3,
+                                      width: 93.3,
                                     ),
                                   ),
-                                  Positioned(
-                                      height: 30,
-                                      right: 20.0,
-                                      bottom: 5,
-                                      child: widget.productVarintList[index]
-                                                  .add_qnty ==
-                                              0
-                                          ? Container(
-                                              height: 30.0,
-                                              child:  TextButton(
-                                                onPressed: () {
-                                                  if(restrocart==1){
-                                                    print("ALREADY");
-                                                    showMyDialog(context);
-                                                  }
-                                                  else {
-                                                    setState(() {
-                                                      var stock = int.parse(
-                                                          '${widget
-                                                              .productVarintList[index]
-                                                              .stock}');
-                                                      if (stock >
-                                                          widget
-                                                              .productVarintList[
-                                                          index]
-                                                              .add_qnty) {
-                                                        widget
-                                                            .productVarintList[
-                                                        index]
-                                                            .add_qnty++;
-                                                        addOrMinusProduct(
-                                                            widget
-                                                                .productWithVarient
-                                                                .is_id,
-                                                            widget
-                                                                .productWithVarient
-                                                                .is_pres,
-                                                            widget
-                                                                .productWithVarient
-                                                                .isbasket,
-                                                            widget
-                                                                .productWithVarient
-                                                                .product_name,
-                                                            widget
-                                                                .productVarintList[
-                                                            index]
-                                                                .unit,
-                                                            double.parse(
-                                                                '${widget
-                                                                    .productVarintList[index]
-                                                                    .price}'),
-                                                            int.parse(
-                                                                '${widget
-                                                                    .productVarintList[index]
-                                                                    .quantity}'),
-                                                            widget
-                                                                .productVarintList[
-                                                            index]
-                                                                .add_qnty,
-                                                            widget
-                                                                .productVarintList[
-                                                            index]
-                                                                .varient_image,
-                                                            widget
-                                                                .productVarintList[
-                                                            index]
-                                                                .varient_id,
-                                                        widget.productVarintList[index].vendor_id
-                                                        );
-                                                      } else {
-                                                        Toast.show(
-                                                            "No more stock available!",
-                                                            duration: Toast
-                                                                .lengthShort,
-                                                            gravity: Toast
-                                                                .bottom);
-                                                      }
-                                                    });
-                                                  }
-                                                },
-                                                child: Text(
-                                                  'Add',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .caption!
-                                                      .copyWith(
-                                                          color: kMainColor,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Container(
+                                          padding:
+                                          EdgeInsets.only(right: 20),
+                                          child: Text(
+                                              widget.productWithVarient
+                                                  .product_name,
+                                              style:
+                                              bottomNavigationTextStyle
+                                                  .copyWith(
+                                                  fontSize: 15)),
+                                        ),
+                                        SizedBox(
+                                          height: 8.0,
+                                        ),
+                                        Row(
+                                            children: [
+                                              Text(
+                                                  (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
+                                                      <=
+                                                      widget.productVarintList[index].price ||
+                                                      widget.productVarintList[index].strick_price==null )
+                                                      ? ''
+                                                      :'${widget.currency}  ${widget.productVarintList[index].strick_price}',
+
+                                                  style: TextStyle(decoration: TextDecoration.lineThrough)),
+                                              Text(
+                                                '${widget.currency} ${widget.productVarintList[index].price} ',
+                                                //style: TextStyle(decoration: TextDecoration.lineThrough)
                                               ),
-                                            )
-                                          : Container(
-                                              height: 30.0,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 11.0),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: kMainColor),
-                                                borderRadius:
-                                                    BorderRadius.circular(30.0),
-                                              ),
-                                              child: Row(
-                                                children: <Widget>[
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        widget
-                                                            .productVarintList[
-                                                                index]
-                                                            .add_qnty--;
-                                                      });
-                                                      addOrMinusProduct(
-                                                          widget
-                                                              .productWithVarient
-                                                              .is_id,
-                                                          widget
-                                                              .productWithVarient
-                                                              .is_pres,
-                                                          widget
-                                                              .productWithVarient
-                                                              .isbasket,
-                                                          widget
-                                                              .productWithVarient
-                                                              .product_name,
-                                                          widget
-                                                              .productVarintList[
-                                                                  index]
-                                                              .unit,
-                                                          double.parse(
-                                                              '${widget.productVarintList[index].price}'),
-                                                          int.parse(
-                                                              '${widget.productVarintList[index].quantity}'),
-                                                          widget
-                                                              .productVarintList[
-                                                                  index]
-                                                              .add_qnty,
-                                                          widget
-                                                              .productVarintList[
-                                                                  index]
-                                                              .varient_image,
-                                                          widget
-                                                              .productVarintList[
-                                                                  index]
-                                                              .varient_id,
-                                                          widget.productVarintList[index].vendor_id
-                                                      );
-                                                    },
-                                                    child: Icon(
-                                                      Icons.remove,
-                                                      color: kMainColor,
-                                                      size: 20.0,
+                                            ]),
+                                        SizedBox(
+                                          height: 20.0,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Positioned(
+                                left: 120,
+                                bottom: 5,
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Container(
+                                    height: 30.0,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    decoration: BoxDecoration(
+                                      color: kCardBackgroundColor,
+                                      borderRadius:
+                                      BorderRadius.circular(30.0),
+                                    ),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Text(
+                                          '${widget.productVarintList[index].quantity} ${widget.productVarintList[index].unit}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                  height: 30,
+                                  right: 20.0,
+                                  bottom: 5,
+                                  child: widget.productVarintList[index]
+                                      .add_qnty ==
+                                      0
+                                      ? Container(
+                                    height: 30.0,
+                                    child:  TextButton(
+                                      onPressed: () {
+                                        if(restrocart==1){
+                                          print("ALREADY");
+                                          showMyDialog(context);
+                                        }
+                                        else {
+                                          setState(() {
+                                            var stock = int.parse(
+                                                '${widget
+                                                    .productVarintList[index]
+                                                    .stock}');
+                                            if (stock >
+                                                widget
+                                                    .productVarintList[
+                                                index]
+                                                    .add_qnty) {
+                                              widget
+                                                  .productVarintList[
+                                              index]
+                                                  .add_qnty++;
+                                              addOrMinusProduct(
+                                                  widget
+                                                      .productWithVarient
+                                                      .is_id,
+                                                  widget
+                                                      .productWithVarient
+                                                      .is_pres,
+                                                  widget
+                                                      .productWithVarient
+                                                      .isbasket,
+                                                  widget
+                                                      .productWithVarient
+                                                      .product_name,
+                                                  widget
+                                                      .productVarintList[
+                                                  index]
+                                                      .unit,
+                                                  double.parse(
+                                                      '${widget
+                                                          .productVarintList[index]
+                                                          .price}'),
+                                                  int.parse(
+                                                      '${widget
+                                                          .productVarintList[index]
+                                                          .quantity}'),
+                                                  widget
+                                                      .productVarintList[
+                                                  index]
+                                                      .add_qnty,
+                                                  widget
+                                                      .productVarintList[
+                                                  index]
+                                                      .varient_image,
+                                                  widget
+                                                      .productVarintList[
+                                                  index]
+                                                      .varient_id,
+                                                  widget.productVarintList[index].vendor_id
+                                              );
+                                            } else {
+                                              Toast.show(
+                                                  "No more stock available!",
+                                                  duration: Toast
+                                                      .lengthShort,
+                                                  gravity: Toast
+                                                      .bottom);
+                                            }
+                                          });
+                                        }
+                                      },
+                                      child: Text(
+                                        'Add',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .caption!
+                                            .copyWith(
+                                            color: kMainColor,
+                                            fontWeight:
+                                            FontWeight.bold),
+                                      ),
+                                    ),
+                                  )
+                                      : Container(
+                                    height: 30.0,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 11.0),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: kMainColor),
+                                      borderRadius:
+                                      BorderRadius.circular(30.0),
+                                    ),
+                                    child: Row(
+                                      children: <Widget>[
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              widget
+                                                  .productVarintList[
+                                              index]
+                                                  .add_qnty--;
+                                            });
+                                            addOrMinusProduct(
+                                                widget
+                                                    .productWithVarient
+                                                    .is_id,
+                                                widget
+                                                    .productWithVarient
+                                                    .is_pres,
+                                                widget
+                                                    .productWithVarient
+                                                    .isbasket,
+                                                widget
+                                                    .productWithVarient
+                                                    .product_name,
+                                                widget
+                                                    .productVarintList[
+                                                index]
+                                                    .unit,
+                                                double.parse(
+                                                    '${widget.productVarintList[index].price}'),
+                                                int.parse(
+                                                    '${widget.productVarintList[index].quantity}'),
+                                                widget
+                                                    .productVarintList[
+                                                index]
+                                                    .add_qnty,
+                                                widget
+                                                    .productVarintList[
+                                                index]
+                                                    .varient_image,
+                                                widget
+                                                    .productVarintList[
+                                                index]
+                                                    .varient_id,
+                                                widget.productVarintList[index].vendor_id
+                                            );
+                                          },
+                                          child: Icon(
+                                            Icons.remove,
+                                            color: kMainColor,
+                                            size: 20.0,
 //size: 23.3,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 8.0),
-                                                  Text(
-                                                      widget
-                                                          .productVarintList[
-                                                              index]
-                                                          .add_qnty
-                                                          .toString(),
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .caption),
-                                                  SizedBox(width: 8.0),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        var stock = int.parse(
-                                                            '${widget.productVarintList[index].stock}');
-                                                        if (stock >
-                                                            widget
-                                                                .productVarintList[
-                                                                    index]
-                                                                .add_qnty) {
-                                                          widget
-                                                              .productVarintList[
-                                                                  index]
-                                                              .add_qnty++;
-                                                          addOrMinusProduct(
-                                                              widget
-                                                                  .productWithVarient
-                                                                  .is_id,
-                                                              widget
-                                                                  .productWithVarient
-                                                                  .is_pres,
-                                                              widget
-                                                                  .productWithVarient
-                                                                  .isbasket,
-                                                              widget
-                                                                  .productWithVarient
-                                                                  .product_name,
-                                                              widget
-                                                                  .productVarintList[
-                                                                      index]
-                                                                  .unit,
-                                                              double.parse(
-                                                                  '${widget.productVarintList[index].price}'),
-                                                              int.parse(
-                                                                  '${widget.productVarintList[index].quantity}'),
-                                                              widget
-                                                                  .productVarintList[
-                                                                      index]
-                                                                  .add_qnty,
-                                                              widget
-                                                                  .productVarintList[
-                                                                      index]
-                                                                  .varient_image,
-                                                              widget
-                                                                  .productVarintList[
-                                                                      index]
-                                                                  .varient_id,
-                                                              widget.productVarintList[index].vendor_id
-                                                          );
-                                                        } else {
-                                                          Toast.show(
-                                                              "No more stock available!",
-                                                               duration: Toast.lengthShort, gravity:  Toast.bottom);
-                                                        }
-                                                      });
-                                                    },
-                                                    child: Icon(
-                                                      Icons.add,
-                                                      color: kMainColor,
-                                                      size: 20.0,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.0),
+                                        Text(
+                                            widget
+                                                .productVarintList[
+                                            index]
+                                                .add_qnty
+                                                .toString(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .caption),
+                                        SizedBox(width: 8.0),
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              var stock = int.parse(
+                                                  '${widget.productVarintList[index].stock}');
+                                              if (stock >
+                                                  widget
+                                                      .productVarintList[
+                                                  index]
+                                                      .add_qnty) {
+                                                widget
+                                                    .productVarintList[
+                                                index]
+                                                    .add_qnty++;
+                                                addOrMinusProduct(
+                                                    widget
+                                                        .productWithVarient
+                                                        .is_id,
+                                                    widget
+                                                        .productWithVarient
+                                                        .is_pres,
+                                                    widget
+                                                        .productWithVarient
+                                                        .isbasket,
+                                                    widget
+                                                        .productWithVarient
+                                                        .product_name,
+                                                    widget
+                                                        .productVarintList[
+                                                    index]
+                                                        .unit,
+                                                    double.parse(
+                                                        '${widget.productVarintList[index].price}'),
+                                                    int.parse(
+                                                        '${widget.productVarintList[index].quantity}'),
+                                                    widget
+                                                        .productVarintList[
+                                                    index]
+                                                        .add_qnty,
+                                                    widget
+                                                        .productVarintList[
+                                                    index]
+                                                        .varient_image,
+                                                    widget
+                                                        .productVarintList[
+                                                    index]
+                                                        .varient_id,
+                                                    widget.productVarintList[index].vendor_id
+                                                );
+                                              } else {
+                                                Toast.show(
+                                                    "No more stock available!",
+                                                    duration: Toast.lengthShort, gravity:  Toast.bottom);
+                                              }
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.add,
+                                            color: kMainColor,
+                                            size: 20.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
 //                          upDataView(productVarientList[index].data[0].varient_id, index, context)
 
-                                      ),
-                                ],
-                              );
-                            })
+                              ),
+                            ],
+                          );
+                        })
                         : Container(),
+
                   ],
                 ),
               )),
+
+          Container(
+            margin: EdgeInsets.all(12),
+            alignment: Alignment.bottomCenter,
+            child:    Text(
+              message.toString(),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            )
+            ,
+          )
         ],
       ),
     );

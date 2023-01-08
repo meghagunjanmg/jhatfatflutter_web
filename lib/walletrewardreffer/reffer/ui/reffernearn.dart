@@ -29,8 +29,17 @@ class RefferScreenState extends State<RefferScreen> {
   void initState() {
     super.initState();
     getRefferText();
+    getData();
   }
 
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+
+  }
   void getRefferText() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -125,143 +134,155 @@ class RefferScreenState extends State<RefferScreen> {
       ),
       body: (!isFetchStore)
           ? Stack(
-              alignment: Alignment.topCenter,
-              children: <Widget>[
-                Positioned(
-                    top: 40,
-                    child: Container(
-                      width: 200,
-                      height: 150,
-                      decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage(
-                                  'images/refernearn/refernearn.jpg'),
-                              fit: BoxFit.fill)),
-                    )),
-                Positioned(
-                  top: 210,
-                  left: 20,
-                  right: 20,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    child: Text(
-                      '${refferText}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 25,
-                          color: kMainTextColor),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 270,
-                  left: 20,
-                  right: 20,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    child: Text(
-                      'Share your the code below or ask them to enter it during they signup. Earn when your friends signup on our app.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                          color: kHintColor),
-                    ),
-                  ),
-                ),
-                Positioned(
-                    bottom: 90,
-                    child: GestureDetector(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: refferCode));
-                        Toast.show('Code Coppied',  duration: Toast.lengthShort, gravity:  Toast.bottom);
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Card(
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: 150,
-                          height: 80,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                '${refferCode}',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: kMainTextColor),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Tap to copy',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                    color: kHintColor),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )),
-                Positioned(
-                    bottom: 15,
-                    left: 0.0,
-                    right: 0.0,
-                    child: GestureDetector(
-                      onTap: () {
-                        if (refferCode != null && refferCode.length > 0) {
-                          share();
-                        } else {
-                          Toast.show(
-                              'Generate your shared code first.', duration: Toast.lengthShort, gravity:  Toast.bottom);
-                          getRefferCode();
-                        }
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: 52,
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            color: kMainColor),
-                        child: Text(
-                          'Invite Friends',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                              color: kWhiteColor),
-                        ),
-                      ),
-                    ))
-              ],
-            )
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    '${elestxt}',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: kMainTextColor),
-                  )
-                ],
+        alignment: Alignment.topCenter,
+        children: <Widget>[
+          Positioned(
+              top: 40,
+              child: Container(
+                width: 200,
+                height: 150,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(
+                            'images/refernearn/refernearn.jpg'),
+                        fit: BoxFit.fill)),
+              )),
+          Positioned(
+            top: 210,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                '${refferText}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 25,
+                    color: kMainTextColor),
               ),
             ),
+          ),
+          Positioned(
+            top: 270,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                'Share your the code below or ask them to enter it during they signup. Earn when your friends signup on our app.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    color: kHintColor),
+              ),
+            ),
+          ),
+          Positioned(
+              bottom: 90,
+              child: GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: refferCode));
+                  Toast.show('Code Coppied',  duration: Toast.lengthShort, gravity:  Toast.bottom);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Card(
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: 150,
+                    height: 80,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          '${refferCode}',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: kMainTextColor),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'Tap to copy',
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: kHintColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )),
+          Positioned(
+              bottom: 15,
+              left: 0.0,
+              right: 0.0,
+              child: GestureDetector(
+                onTap: () {
+                  if (refferCode != null && refferCode.length > 0) {
+                    share();
+                  } else {
+                    Toast.show(
+                        'Generate your shared code first.', duration: Toast.lengthShort, gravity:  Toast.bottom);
+                    getRefferCode();
+                  }
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 52,
+                  margin: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      color: kMainColor),
+                  child: Text(
+                    'Invite Friends',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        color: kWhiteColor),
+                  ),
+                ),
+              )),
+
+          Container(
+            margin: EdgeInsets.all(12),
+            alignment: Alignment.bottomCenter,
+            child:    Text(
+              message.toString(),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            )
+            ,
+          )
+        ],
+      )
+          : Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              '${elestxt}',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: kMainTextColor),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

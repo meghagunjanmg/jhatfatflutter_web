@@ -31,6 +31,7 @@ class WalletState extends State<Wallet> {
   @override
   void initState() {
     super.initState();
+    getData();
     getWalletAmount();
     getWalletHistory();
   }
@@ -98,6 +99,13 @@ class WalletState extends State<Wallet> {
     });
   }
 
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,159 +131,182 @@ class WalletState extends State<Wallet> {
       ),
       body: (!isFetchStore)
           ? SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Card(
-                    margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-                    color: kWhiteColor,
-                    elevation: 10,
-                    child: Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width - 20,
-                        height: 200,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Text('Wallet Balance',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .caption!
-                                    .copyWith(
-                                        color: kDisabledColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 28,
-                                        letterSpacing: 0.67)),
-                            Text('$currency ${walletAmount}/-'),
-                            Text(
-                                'Minimum wallet balance $currency ${walletAmount}/-',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .caption!
-                                    .copyWith(
-                                        color: kDisabledColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                        letterSpacing: 0.67)),
-                          ],
-                        )),
+        scrollDirection: Axis.vertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Card(
+              margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+              color: kWhiteColor,
+              elevation: 10,
+              child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width - 20,
+                  height: 200,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Text('Wallet Balance',
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption!
+                              .copyWith(
+                              color: kDisabledColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28,
+                              letterSpacing: 0.67)),
+                      Text('$currency ${walletAmount}/-'),
+                      Text(
+                          'Minimum wallet balance $currency ${walletAmount}/-',
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption!
+                              .copyWith(
+                              color: kDisabledColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              letterSpacing: 0.67)),
+                    ],
+                  )),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              decoration: BoxDecoration(
+                  color: kMainColor,
+                  border: Border.all(color: kMainColor)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'S No.',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: kWhiteColor),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        'Type',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: kWhiteColor),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 30,
+                  Text(
+                    'Wallet Amount',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: kWhiteColor),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: kMainColor,
-                        border: Border.all(color: kMainColor)),
+                ],
+              ),
+            ),
+            ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             Text(
-                              'S No.',
+                              '${index + 1}',
                               style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: kWhiteColor),
+                                  color: kMainTextColor),
                             ),
                             SizedBox(
-                              width: 20,
+                              width: 35,
                             ),
                             Text(
-                              'Type',
+                              '${history[index].type}',
                               style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: kWhiteColor),
+                                  color: kMainTextColor),
                             ),
                           ],
                         ),
                         Text(
-                          'Wallet Amount',
+                          '$currency ${history[index].amount}',
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: kWhiteColor),
+                              color: kMainTextColor),
                         ),
                       ],
                     ),
-                  ),
-                  ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    '${index + 1}',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: kMainTextColor),
-                                  ),
-                                  SizedBox(
-                                    width: 35,
-                                  ),
-                                  Text(
-                                    '${history[index].type}',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: kMainTextColor),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '$currency ${history[index].amount}',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: kMainTextColor),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return Container(
-                          height: 2,
-                          color: kCardBackgroundColor,
-                        );
-                      },
-                      itemCount: history.length),
-                ],
-              ),
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return Container(
+                    height: 2,
+                    color: kCardBackgroundColor,
+                  );
+                },
+                itemCount: history.length),
+
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
             )
+          ],
+        ),
+      )
           : Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'Fetching wallet amount',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: kMainTextColor),
-                  )
-                ],
-              ),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(
+              width: 10,
             ),
+            Text(
+              'Fetching wallet amount',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: kMainTextColor),
+            ),
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
+            )
+          ],
+        ),
+      ),
     );
   }
 }

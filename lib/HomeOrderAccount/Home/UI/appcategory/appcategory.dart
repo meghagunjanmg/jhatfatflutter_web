@@ -66,9 +66,17 @@ class AppCategoryState extends State<AppCategory> {
     CategoryList('', '', '', '', '', '', '', '')
   ];
 
+  String message = '';
+  Future<void> getdata() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+  }
   @override
   void initState() {
     super.initState();
+    getdata();
     hitBannerUrl();
     Timer(Duration(seconds: 1), () {
       hitServices();
@@ -158,6 +166,7 @@ class AppCategoryState extends State<AppCategory> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -343,7 +352,6 @@ class AppCategoryState extends State<AppCategory> {
             primary: true,
             child: Column(
               children: [
-
                 Visibility(
                   visible: (!isFetch && listImage.length == 0) ? false : true,
                   child: Padding(
@@ -547,6 +555,20 @@ class AppCategoryState extends State<AppCategory> {
                         fontSize: 18),
                   ),
                 ),
+
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
+                )
+
               ],
             ),
           ),

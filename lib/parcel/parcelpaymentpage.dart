@@ -83,7 +83,7 @@ class PaymentParcelPageState extends State<PaymentParcelPage> {
     newtotalAmount = double.parse('${totalAmount}');
     super.initState();
 
-    
+
     openCheckout(
         "${paymentVia[0].payment_key}",
         totalAmount * 100);
@@ -212,15 +212,15 @@ class PaymentParcelPageState extends State<PaymentParcelPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     body: Container(
-              alignment: Alignment.center,
-              child: Text(
-                'Proceeding to Payment...',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1!
-                    .copyWith(color: kMainTextColor),
-              ),
+      body: Container(
+        alignment: Alignment.center,
+        child: Text(
+          'Proceeding to Payment...',
+          style: Theme.of(context)
+              .textTheme
+              .bodyText1!
+              .copyWith(color: kMainTextColor),
+        ),
       ),
     );
   }
@@ -281,7 +281,7 @@ class PaymentParcelPageState extends State<PaymentParcelPage> {
       }));
 
       SharedPreferences prefs =
-          await SharedPreferences.getInstance();
+      await SharedPreferences.getInstance();
 
       prefs.remove("pickupLocation");
       prefs.remove("dropLocation");
@@ -294,10 +294,6 @@ class PaymentParcelPageState extends State<PaymentParcelPage> {
       setState(() {
         showDialogBox = false;
       });
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return OrderPlaced(
-            payment_method, payment_status, order_id, rem_price, currency, "4");
-      }));
     });
   }
 

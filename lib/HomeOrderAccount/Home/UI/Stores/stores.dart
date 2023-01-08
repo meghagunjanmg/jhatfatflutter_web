@@ -36,10 +36,12 @@ class StoresPageState extends State<StoresPage> {
   List<NearStores> nearStores = [];
   List<NearStores> nearStoresSearch = [];
   List<NearStores> nearStoresShimmer = [
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
 
   ];
   List<String> listImages = ['', '', '', '', ''];
@@ -53,8 +55,19 @@ class StoresPageState extends State<StoresPage> {
   int cartCount = 0;
   double userLat = 0.0;
   double userLng = 0.0;
+
+
+  String message = '';
+  Future<void> getdata() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+  }
+
   @override
   void initState() {
+    getdata();
     getShareValue();
     super.initState();
     hitService();
@@ -356,7 +369,7 @@ class StoresPageState extends State<StoresPage> {
                                                   size: 15,
                                                 ),
                                                 SizedBox(width: 10.0),
-                                                Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), userLat, userLng)}',
+                                                Text('${nearStores[index].duration}',
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .caption!
@@ -383,7 +396,7 @@ class StoresPageState extends State<StoresPage> {
                                                     : false,
                                                 child: Container(
                                                   margin: EdgeInsets.all(8),
-                                                  height: 20,
+                                                  height: 80,
                                                   width: MediaQuery.of(context)
                                                       .size
                                                       .width -
@@ -391,7 +404,7 @@ class StoresPageState extends State<StoresPage> {
                                                   alignment: Alignment.center,
                                                   color: kCardBackgroundColor,
                                                   child: Text(
-                                                    'Store Closed Now',
+                                                    'Store Closed Now\nStore open at ${nearStores[index].opening_time.toString()}',
                                                     style: TextStyle(
                                                         color: red_color,
                                                         fontSize: 15),
@@ -408,7 +421,7 @@ class StoresPageState extends State<StoresPage> {
                                                     : false,
                                                 child: Container(
                                                   margin: EdgeInsets.all(8),
-                                                  height: 20,
+                                                  height: 80,
                                                   width: MediaQuery.of(context)
                                                       .size
                                                       .width -
@@ -473,7 +486,20 @@ class StoresPageState extends State<StoresPage> {
                       )
                     ],
                   ),
+                ),
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
                 )
+
               ],
             ),
           ),

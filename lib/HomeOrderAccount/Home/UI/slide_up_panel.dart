@@ -44,7 +44,7 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                               leading: CircleAvatar(
                                 radius: 22.0,
                                 backgroundImage:
-                                    AssetImage('images/profile.png'),
+                                AssetImage('images/profile.png'),
                               ),
                               title: Text(
                                 widget.ongoingOrders.delivery_boy_name != null
@@ -58,9 +58,9 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                                     .textTheme
                                     .headline6!
                                     .copyWith(
-                                        fontSize: 11.7,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xffc2c2c2)),
+                                    fontSize: 11.7,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xffc2c2c2)),
                               ),
                               trailing: FittedBox(
                                 fit: BoxFit.fill,
@@ -68,15 +68,15 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                                   children: <Widget>[
                                     IconButton(
                                       icon:
-                                          Icon(Icons.phone, color: kMainColor),
+                                      Icon(Icons.phone, color: kMainColor),
                                       onPressed: () {
                                         if (widget.ongoingOrders
-                                                    .delivery_boy_phone !=
-                                                null &&
+                                            .delivery_boy_phone !=
+                                            null &&
                                             widget.ongoingOrders
-                                                    .delivery_boy_phone
-                                                    .toString()
-                                                    .length >
+                                                .delivery_boy_phone
+                                                .toString()
+                                                .length >
                                                 5) {
                                           _launchURL(
                                               "tel://${widget.ongoingOrders.delivery_boy_phone}");
@@ -120,8 +120,8 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                                 .textTheme
                                 .headline4!
                                 .copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 15.0),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15.0),
                           ),
                           subtitle: Text(
                             '${widget.ongoingOrders.data[index].quantity} ${widget.ongoingOrders.data[index].unit} x ${widget.ongoingOrders.data[index].qty}',
@@ -145,7 +145,7 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                   Container(
                     width: double.infinity,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Text('PAYMENT INFO',
                         style: Theme.of(context).textTheme.headline4!.copyWith(
                             color: kDisabledColor,
@@ -156,7 +156,7 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -173,7 +173,7 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -187,10 +187,69 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                           ),
                         ]),
                   ),
+
+                  (widget.ongoingOrders.surgecharge>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Surge Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.surgecharge.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
+                  (widget.ongoingOrders.nightcharge>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Night Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.nightcharge.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
+                  (widget.ongoingOrders.convcharge>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Convenience Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.convcharge.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
+
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -207,7 +266,7 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -224,33 +283,33 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: (widget.ongoingOrders.payment_method == "Card" ||
-                            widget.ongoingOrders.payment_method == "Wallet")
+                        widget.ongoingOrders.payment_method == "Wallet")
                         ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                                Text(
-                                  'Payment Status',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                                Text(
-                                  '${widget.ongoingOrders.payment_status}',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                              ])
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Payment Status',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.payment_status}',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ])
                         : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                                Text(
-                                  'Cash on Delivery',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                                Text(
-                                  '${widget.currency} ${widget.ongoingOrders.remaining_amount}',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                              ]),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Cash on Delivery',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                          Text(
+                            '${widget.currency} ${widget.ongoingOrders.remaining_amount}',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ]),
                   ),
                 ],
               ),

@@ -66,6 +66,7 @@ class AddressTile1 extends StatelessWidget {
 }
 
 class AddressTile2 extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -104,6 +105,7 @@ class SetLocationState extends State<SetLocation> {
   final instructioncontroler = TextEditingController();
   final recievernamecontroler = TextEditingController();
   final recievercontactcontroler = TextEditingController();
+  String message = '';
 
 
   void getData() async {
@@ -119,7 +121,9 @@ class SetLocationState extends State<SetLocation> {
 
     // print(pickaddresslat);
     // print(pickaddresslng);
-
+    setState((){
+      message = prefs.getString("message")!;
+    });
 
     setState(() {
       if(pickupaddress==null){
@@ -388,6 +392,17 @@ class SetLocationState extends State<SetLocation> {
                           ),
                         ),
 
+                        Container(
+                          margin: EdgeInsets.all(12),
+                          alignment: Alignment.bottomCenter,
+                          child:    Text(
+                            message.toString(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12),
+                          )
+                          ,
+                        )
                       ],
 
                     ),

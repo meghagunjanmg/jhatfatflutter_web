@@ -27,7 +27,15 @@ class OfferScreenState extends State<OfferScreen> {
   void initState() {
     setNotificationListner();
     super.initState();
+    getData();
     getNotificationList();
+  }
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
   }
 
   void setNotificationListner() async {
@@ -98,79 +106,110 @@ class OfferScreenState extends State<OfferScreen> {
       backgroundColor: kCardBackgroundColor,
       body: (notificationList != null && notificationList.length > 0)
           ? SingleChildScrollView(
-              primary: true,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ListView.separated(
-                      shrinkWrap: true,
-                      primary: false,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                          color: white_color,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${notificationList[index].noti_title}',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: kMainTextColor),
-                              ),
-                              const SizedBox(
-                                height: 6,
-                              ),
-                              Text(
-                                '${notificationList[index].noti_message}',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: kHintColor),
-                              ),
-                              const SizedBox(
-                                height: 6,
-                              ),
-                              (notificationList[index].image != null &&
-                                      notificationList[index].image != 'N/A')
-                                  ? Image.network(
-                                      '${imageBaseUrl + notificationList[index].image}',
-                                      height: 150,
-                                      width: MediaQuery.of(context).size.width,
-                                      fit: BoxFit.fitWidth,
-                                    )
-                                  : Container(
-                                      height: 0.0,
-                                    )
-                            ],
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return const Divider(
-                          height: 8,
-                          color: Colors.transparent,
-                        );
-                      },
-                      itemCount: notificationList.length)
-                ],
-              ),
-            )
-          : Center(
-              child: Text(
-                'No offer available....',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w400,
-                    color: kMainTextColor),
-              ),
+        primary: true,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 20,
             ),
+            ListView.separated(
+                shrinkWrap: true,
+                primary: false,
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    color: white_color,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${notificationList[index].noti_title}',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: kMainTextColor),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Text(
+                          '${notificationList[index].noti_message}',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: kHintColor),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        (notificationList[index].image != null &&
+                            notificationList[index].image != 'N/A')
+                            ? Image.network(
+                          '${imageBaseUrl + notificationList[index].image}',
+                          height: 150,
+                          width: MediaQuery.of(context).size.width,
+                          fit: BoxFit.fitWidth,
+                        )
+                            : Container(
+                          height: 0.0,
+                        )
+                      ],
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return const Divider(
+                    height: 8,
+                    color: Colors.transparent,
+                  );
+                },
+                itemCount: notificationList.length)
+
+            ,
+
+
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
+            )
+
+
+          ],
+        ),
+      )
+          : Column(
+          children:[
+            Text(
+              'No offer available....',
+              style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w400,
+                  color: kMainTextColor),
+            ),
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
+            )
+          ]
+
+      ),
     );
   }
 }

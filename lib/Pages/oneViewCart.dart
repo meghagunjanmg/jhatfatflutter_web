@@ -56,7 +56,9 @@ class _oneViewCartState extends State<oneViewCart> {
   List<RestaurantCartItem> cartListII = [];
 
   var totalAmount = 0.0;
+  var couponAmount = 0.0;
   dynamic deliveryCharge = 0.0;
+  dynamic storedeliveryCharge = 0.0;
 
   var showDialogBox = false;
 
@@ -72,17 +74,9 @@ class _oneViewCartState extends State<oneViewCart> {
   int idd = 0;
   int idd1 = 0;
   bool basketvalue = false;
-
-  dynamic storedeliveryCharge = 0.0;
   List<instructionbean> instruction = [];
-  bool isCoupon = false;
-  double coupAmount = 0.0;
-  int radioId = -1;
-  List<CouponList> couponL = [];
-  CouponList? selectedcoupon;
-  bool visiblity = false;
-  String promocode = '';
-
+  String Errormessage = '';
+  String message = '';
   int is_id_req = 0;
   int is_pres_req = 0;
   int is_basket_req = 0;
@@ -91,6 +85,20 @@ class _oneViewCartState extends State<oneViewCart> {
   String? iduploadedALready = null;
   String? presuploaded = null;
 
+
+  bool isCoupon = false;
+  double coupAmount = 0.0;
+
+  int surge_charges = 0;
+  int night_charges = 0;
+  int conv_charges = 0;
+
+
+  int radioId = -1;
+  List<CouponList> couponL = [];
+  CouponList? selectedcoupon;
+  bool visiblity = false;
+  String promocode = '';
 
   void getResStoreName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -144,6 +152,7 @@ class _oneViewCartState extends State<oneViewCart> {
     getStoreName();
     getid();
     ordercharg();
+    servicecharge();
 
     firstDate = toDateMonthYear(DateTime.now());
     prepareData(firstDate);
@@ -164,6 +173,10 @@ class _oneViewCartState extends State<oneViewCart> {
 
 
     getCatC();
+
+
+
+
   }
 
   void getResCartItem() async {
@@ -421,7 +434,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
     getResCartItem();
     getCatC();
-
+    getCouponList();
     // DatabaseHelper db = DatabaseHelper.instance;
     // Future<int?> existing = db.getRestProductcount(int.parse(varient_id));
     // existing.then((value) {
@@ -812,15 +825,16 @@ class _oneViewCartState extends State<oneViewCart> {
      }
 
 
+
     if(radioId!=-1){
       if(couponL[radioId].type=='percentage') {
         setState(() {
-          totalAmount = totalAmount - ((double.parse(couponL[radioId].amount)/totalAmount)*100);
+          couponAmount = ((double.parse(couponL[radioId].amount)/100)*totalAmount);
         });
       }
       else{
         setState(() {
-          totalAmount = totalAmount - double.parse(couponL[radioId].amount);
+          couponAmount = double.parse(couponL[radioId].amount);
         });
       }
     }
@@ -849,18 +863,15 @@ class _oneViewCartState extends State<oneViewCart> {
     //   });
     // }
   }
-
   void callThisMethod(bool isVisible) {
     getCouponList();
-
     getid();
     getCartItem();
     getResCartItem();
     setidpres(cartListI);
-
     getCatC();
-
     ordercharg();
+    servicecharge();
 
   }
 
@@ -1157,14 +1168,41 @@ class _oneViewCartState extends State<oneViewCart> {
                             itemCount: cartListII.length)
                             : Container(),
 
-                        Divider(
+                        // Divider(
+                        //   color: kCardBackgroundColor,
+                        //   thickness: 6.7,
+                        // ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.all(10.0),
                           color: kCardBackgroundColor,
-                          thickness: 6.7,
+                          child: Text('Order will be delivered instantly, given below is the maximum time',
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                  color: Color(0xff616161),
+                                  letterSpacing: 0.67)),
+                        ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.all(10.0),
+                          color: kCardBackgroundColor,
+                          child: Text('1) Order will be delivered within 30-60 mins.\n2) Order from 2-3 different shops will be delivered in 1-2 hour.\n3) Restraunt orders will be delivered instantly.',
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                  color: Color(0xff616161),
+                                  letterSpacing: 0.67)),
                         ),
 
                         (cartListI.isNotEmpty)
                             ?
-                        timewidget(context, itemHeight, itemWidth)
+                        //timewidget(context, itemHeight, itemWidth)
+                        Container()
                             :
                         Container(),
 
@@ -1200,7 +1238,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                       .caption,
                                 ),
                                 Text(
-                                  '$currency ${totalAmount}',
+                                  '$currency ${totalAmount.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1208,10 +1246,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                 ),
                               ]),
                         ),
-                        Divider(
-                          color: kCardBackgroundColor,
-                          thickness: 1.0,
-                        ),
+
+                        (surge_charges>0)?
                         Container(
                           color: Colors.white,
                           padding: EdgeInsets.symmetric(
@@ -1221,22 +1257,115 @@ class _oneViewCartState extends State<oneViewCart> {
                               MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Text(
-                                  'Service Fee',
+                                  'Surge Charge',
                                   style: Theme
                                       .of(context)
                                       .textTheme
                                       .caption,
                                 ),
-                                (cartListI.length>0)?
                                 Text(
-                                  '$currency $storedeliveryCharge',
+                                  '$currency ${surge_charges.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
                                       .caption,
-                                ):
+                                ),
+                              ]),
+                        ): Container(),
+                        (night_charges>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
                                 Text(
-                                  '$currency $deliveryCharge',
+                                  'Night Charge',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${night_charges.toStringAsFixed(2)}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+                        (conv_charges>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Convenience Charge',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${conv_charges}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+                        (couponAmount>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Coupon Discount',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '- $currency ${couponAmount.toStringAsFixed(2)}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+
+                        (storedeliveryCharge==0.0)?
+                        Container(): Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Delivery Charges',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${storedeliveryCharge.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1244,12 +1373,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                 )
                               ]),
                         ),
-                        Divider(
-                          color: kCardBackgroundColor,
-                          thickness: 1.0,
-                        ),
 
-                        (cartListII.isNotEmpty)?
+                        (cartListII.isNotEmpty && packcharge>0)?
                         Container(
                           color: Colors.white,
                           padding: EdgeInsets.symmetric(
@@ -1266,7 +1391,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                       .caption,
                                 ),
                                 Text(
-                                  '$currency $packcharge',
+                                  '$currency ${packcharge.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1276,11 +1401,6 @@ class _oneViewCartState extends State<oneViewCart> {
                         )
                             :
                         Container(),
-
-                        Divider(
-                          color: kCardBackgroundColor,
-                          thickness: 1.0,
-                        ),
 
                         Container(
                           color: Colors.white,
@@ -1299,7 +1419,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                       .copyWith(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  '$currency ${totalAmount + deliveryCharge + storedeliveryCharge}',
+                                  '$currency '
+                                      '${((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1376,6 +1497,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                                                 setState(() {
                                                                   radioId = -1;
                                                                   selectedcoupon=null;
+                                                                  couponAmount = 0.0;
                                                                   // showDialogBox =
                                                                   // true;
                                                                   //appCoupon(couponL[t].coupon_code);
@@ -1495,84 +1617,110 @@ class _oneViewCartState extends State<oneViewCart> {
                                         .caption!
                                         .copyWith(
                                         fontSize: 11.7,
-                                        color: Color(0xffb7b7b7)))
+                                        color: Color(0xffb7b7b7))),
+
+                                Text(
+                                    '${Errormessage != ''
+                                        ? '${Errormessage}'
+                                        : '' }'
+                                    ,
+                                    style: Theme
+                                        .of(context)
+                                        .textTheme
+                                        .caption!
+                                        .copyWith(
+                                        fontSize: 11.7,
+                                        color: Colors.red))
                               ],
                             ),
                           ),
                         ),
                         ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                primary: kMainColor,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 150, vertical: 20),
-                                textStyle: TextStyle(color: kWhiteColor,
-                                    fontWeight: FontWeight.w400)),
+                          style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              primary: kMainColor,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 150, vertical: 20),
+                              textStyle: TextStyle(color: kWhiteColor,
+                                  fontWeight: FontWeight.w400)),
 
-                            onPressed: () {
-                              if(addressDelivery!=null) {
-                                if (cartListI.isNotEmpty) {
-                                  if (is_id_req == 1 &&
-                                      iduploaded != null) createCart(context);
-                                  else if(is_id_req == 1 &&
-                                      iduploaded == null) {
-                                    Fluttertoast.showToast(
-                                        msg: "Upload Id Proof",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.CENTER,
-                                        timeInSecForIosWeb: 1,
-                                        backgroundColor: Colors.black,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0
-                                    );
-                                  }
-
-                                  if (is_pres_req == 1 &&
-                                      presuploaded != null) createCart(context);
-                                  else if(is_pres_req == 1 &&
-                                      presuploaded == null) {
-                                    Fluttertoast.showToast(
-                                        msg: "Upload Prescription",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.CENTER,
-                                        timeInSecForIosWeb: 1,
-                                        backgroundColor: Colors.black,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0
-                                    );
-                                  }
-
-                                  if (is_pres_req == 0 &&
-                                      is_id_req == 0) createCart(context);
-                                  if (is_pres_req == 0 && is_id_req == 1 &&
-                                      iduploaded != null) createCart(context);
-                                  if (is_id_req == 0 && is_pres_req == 1 &&
-                                      presuploaded != null) createCart(context);
+                          onPressed: () {
+                            if(addressDelivery!=null) {
+                              if (cartListI.isNotEmpty) {
+                                if (is_id_req == 1 &&
+                                    iduploaded != null) createCart(context);
+                                else if(is_id_req == 1 &&
+                                    iduploaded == null) {
+                                  Fluttertoast.showToast(
+                                      msg: "Upload Id Proof",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
                                 }
-                                else if (cartListII.isNotEmpty) {
-                                  createResCart(context);
+
+                                if (is_pres_req == 1 &&
+                                    presuploaded != null) createCart(context);
+                                else if(is_pres_req == 1 &&
+                                    presuploaded == null) {
+                                  Fluttertoast.showToast(
+                                      msg: "Upload Prescription",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
                                 }
+
+                                if (is_pres_req == 0 &&
+                                    is_id_req == 0) createCart(context);
+                                if (is_pres_req == 0 && is_id_req == 1 &&
+                                    iduploaded != null) createCart(context);
+                                if (is_id_req == 0 && is_pres_req == 1 &&
+                                    presuploaded != null) createCart(context);
                               }
-                              else{
-                                Fluttertoast.showToast(
-                                    msg: "Select Delivery Address",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.black,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
+                              else if (cartListII.isNotEmpty) {
+                                createResCart(context);
                               }
-                            },
-                            child: Text("Pay $currency "
-                                '${totalAmount + deliveryCharge + storedeliveryCharge + packcharge}')
-                        ),
+                            }
+                            else{
+                              Fluttertoast.showToast(
+                                  msg: "Select Delivery Address",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.black,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
+                            }
+                          },
+                          child: Text("Pay $currency "+
+                              '${((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
+                          ),
+                        )
                       ],
                     ),
                   ),
+
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    alignment: Alignment.bottomCenter,
+                    child:    Text(
+                      message.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+                    ,
+                  )
                 ],
               ),
               Positioned.fill(
@@ -1598,9 +1746,12 @@ class _oneViewCartState extends State<oneViewCart> {
                       ),
                     ),
                   )),
+
+
             ],
           )
-              : Container(
+              :
+          Container(
             width: MediaQuery
                 .of(context)
                 .size
@@ -1646,13 +1797,26 @@ class _oneViewCartState extends State<oneViewCart> {
                         color: kWhiteColor,
                         fontWeight: FontWeight.w400),
                   ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
                 )
+
               ],
             ),
           ),
         ),
       );
   }
+
   void createResCart(BuildContext context) async {
 
     iduploaded = null;
@@ -2045,6 +2209,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
     getCartItem();
 
+    getCouponList();
 
     //
     // db.getcount(varient_id).then((value) {
@@ -2462,41 +2627,24 @@ class _oneViewCartState extends State<oneViewCart> {
     //   });
     // });
   }
-
-  void setidpres(List<CartItem> cartListI) {
-    setState(() {
-      is_id_req=0;
-      is_pres_req=0;
-    });
-    if(cartListI.isNotEmpty) {
-      for (int i = 0; i < cartListI.length; i++) {
-        if (cartListI[i].is_pres == 1) {
-          setState(() {
-            is_pres_req = 1;
-          });
-        }
-        if (cartListI[i].is_id == 1) {
-          checkId();
-        }
-      }
-    }
-
-    if(cartListI.isNotEmpty) {
-      outerloop:
-      for (var i = 0; i < cartListI.length; i++) {
-        if (cartListI[i].isBasket == 1) {
-          setState(() {
-            is_basket_req = 1;
-          });
-          break outerloop;
-        }
-      }
-    }
-  }
-
   void getCouponList() async {
+    getCartItem();
+
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? vendorId = preferences.getString('vendor_id');
+    String? vendorId ="";
+    if(cartListI.isNotEmpty) {
+      vendorId = '54';
+    }
+    else {
+      vendorId = preferences.getString('vendor_id');
+    }
+    List<OrderArrayGrocery> orderArray = [];
+    for (CartItem item in cartListI) {
+      orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
+          int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
+    }
+
+
     setState(() {
       currency = preferences.getString('curency')!;
     });
@@ -2504,7 +2652,11 @@ class _oneViewCartState extends State<oneViewCart> {
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {
       'cart_value': '$totalAmount',
+      'vendor_id': '$vendorId',
+      'order_array': orderArray.toString(),
     }).then((value) {
+      print("COUPON "+value.body);
+
       if (value.statusCode == 200) {
         var jsonData = jsonDecode(value.body);
         if (jsonData['status'] == "1") {
@@ -2522,6 +2674,7 @@ class _oneViewCartState extends State<oneViewCart> {
       print(e);
     });
   }
+
   void appCoupon(couponCode,cart_id) {
     var url = applyCoupon;
     Uri myUri = Uri.parse(url);
@@ -2561,6 +2714,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
   Future<void> ordercharg() async {
     getCartItem();
+    getResCartItem();
 
     var url = ordercharges;
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -2572,16 +2726,28 @@ class _oneViewCartState extends State<oneViewCart> {
           int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
     }
 
-    print("order_array"+orderArray.toString());
-    print("order_array"+userId.toString());
+    List<OrderArray> restorderArray = [];
+    List<OrderAdonArray> orderAddonArray = [];
+    for (RestaurantCartItem item in cartListII) {
+      restorderArray.add(OrderArray(
+          int.parse('${item.add_qnty}'), int.parse('${item.varient_id}')));
+      if (item.addon.length > 0) {
+        for (AddonCartItem addItem in item.addon) {
+          orderAddonArray
+              .add(OrderAdonArray(int.parse('${addItem.addonid}')));
+        }
+      }
+    }
 
 
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {
       'user_id': userId.toString(),
       'order_array': orderArray.toString(),
+      'rest_order_array': restorderArray.toString(),
 
     }).then((value) {
+      print("ORDERCHARGE  "+value.body);
       var jsonData = jsonDecode(value.body);
       if (jsonData['status'] == '1') {
         setState(() {
@@ -2590,11 +2756,69 @@ class _oneViewCartState extends State<oneViewCart> {
       }
       else{
         setState(() {
-          storedeliveryCharge = 0;
+          storedeliveryCharge = 0.0;
+          Errormessage = jsonData['meesage'];
         });
       }
     });
 
+  }
+  void servicecharge() async {
+    var url = servicecharges;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int? userId = pref.getInt('user_id');
+
+    Uri myUri = Uri.parse(url);
+    http.post(myUri, body: {
+      'user_id': userId.toString(),
+    }).then((value) {
+      var jsonData = jsonDecode(value.body);
+      print("SERVICE "+value.body.toString());
+      if (jsonData['status'] == "1") {
+        setState(() {
+          surge_charges = jsonData['surge_charges'];
+          night_charges = jsonData['night_charges'];
+          conv_charges = jsonData['conv_charges'];
+        });
+      }
+      else{
+        setState(() {
+          surge_charges = 0;
+          night_charges = 0;
+          conv_charges = 0;
+        });
+      }
+    });
+  }
+  void setidpres(List<CartItem> cartListI) {
+    setState(() {
+      is_id_req=0;
+      is_pres_req=0;
+    });
+    if(cartListI.isNotEmpty) {
+      for (int i = 0; i < cartListI.length; i++) {
+        if (cartListI[i].is_pres == 1) {
+          setState(() {
+            is_pres_req = 1;
+          });
+        }
+        if (cartListI[i].is_id == 1) {
+          checkId();
+        }
+      }
+    }
+
+    if(cartListI.isNotEmpty) {
+      outerloop:
+      for (var i = 0; i < cartListI.length; i++) {
+        if (cartListI[i].isBasket == 1) {
+          setState(() {
+            is_basket_req = 1;
+          });
+          break outerloop;
+        }
+      }
+    }
   }
 
 }

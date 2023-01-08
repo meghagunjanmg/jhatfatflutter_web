@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:jhatfat/Routes/routes.dart';
 import 'package:jhatfat/Themes/colors.dart';
@@ -30,9 +31,16 @@ class _RestaurantState extends State<Restaurant_Sub> {
   bool isCartCount = false;
 
   var cartCount = 0;
-
+  String message = '';
+  Future<void> getdata() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+  }
   @override
   void initState() {
+    getdata();
     getCartCount();
     super.initState();
   }
@@ -112,7 +120,6 @@ class _RestaurantState extends State<Restaurant_Sub> {
       // getResturantFavioute(widget.item.vendor_id);
     });
   }
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -122,223 +129,246 @@ class _RestaurantState extends State<Restaurant_Sub> {
       child: Scaffold(
         backgroundColor: scaffoldBgColor,
         body: SafeArea(
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  expandedHeight: 230,
-                  backgroundColor: Colors.white,
-                  pinned: true,
-                  elevation: 0.0,
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: innerBoxIsScrolled ? kMainTextColor : kWhiteColor,
-                      size: 24.0,
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  actions: <Widget>[
-                    // IconButton(
-                    //   icon: (favourite)
-                    //       ? Icon(
-                    //           Icons.bookmark,
-                    //           color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,
-                    //         )
-                    //       : Icon(
-                    //           Icons.bookmark_border,
-                    //           color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,
-                    //         ),
-                    //   onPressed: () {
-                    //     // setState(() {
-                    //     //   favourite = !favourite;
-                    //     // });
-                    //     favourite
-                    //         ? removeFavourite(widget.item, context)
-                    //         : setFaviouriteResturant(widget.item, context);
-                    //   },
-                    // ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
-                      child: Stack(
-                        children: [
-                          IconButton(
-                              icon: ImageIcon(
-                                AssetImage('images/icons/ic_cart blk.png'),
-                                color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,
-                              ),
-                              onPressed: () {
-                                  Navigator.pushNamed(context, PageRoutes.viewCart);
+            child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      expandedHeight: 230,
+                      backgroundColor: Colors.white,
+                      pinned: true,
+                      elevation: 0.0,
+                      leading: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: innerBoxIsScrolled ? kMainTextColor : kWhiteColor,
+                          size: 24.0,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      actions: <Widget>[
+                        // IconButton(
+                        //   icon: (favourite)
+                        //       ? Icon(
+                        //           Icons.bookmark,
+                        //           color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,
+                        //         )
+                        //       : Icon(
+                        //           Icons.bookmark_border,
+                        //           color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,
+                        //         ),
+                        //   onPressed: () {
+                        //     // setState(() {
+                        //     //   favourite = !favourite;
+                        //     // });
+                        //     favourite
+                        //         ? removeFavourite(widget.item, context)
+                        //         : setFaviouriteResturant(widget.item, context);
+                        //   },
+                        // ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6.0),
+                          child: Stack(
+                            children: [
+                              IconButton(
+                                  icon: ImageIcon(
+                                    AssetImage('images/icons/ic_cart blk.png'),
+                                    color: innerBoxIsScrolled?kMainTextColor:kWhiteColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, PageRoutes.viewCart);
 
 //                        getCurrency();
-                              }),
-                          Positioned(
-                              right: 5,
-                              top: 2,
-                              child: Visibility(
-                                visible: isCartCount,
-                                child: CircleAvatar(
-                                  minRadius: 4,
-                                  maxRadius: 8,
-                                  backgroundColor: innerBoxIsScrolled?kMainColor:kWhiteColor,
-                                  child: Text(
-                                    '$cartCount',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 7,
-                                        color: innerBoxIsScrolled?kWhiteColor:kMainTextColor,
-                                        fontWeight: FontWeight.w200),
-                                  ),
-                                ),
-                              ))
-                        ],
-                      ),
-                    ),
-                  ],
-                  title: Visibility(
-                    visible: innerBoxIsScrolled ? true : false,
-                    child: Text('${widget.item.vendor_name}'.toUpperCase(),
-                        style: TextStyle(
-                          color:
-                              innerBoxIsScrolled ? kMainTextColor : kWhiteColor,
-                          fontSize: 13.0,
-                          fontFamily: 'OpenSans',
-                          fontWeight: FontWeight.w500,
-                        )),
-                  ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          top: 0.0,
-                          left: 0.0,
-                          child: Container(
-                            height: 180,
-                            width: width,
-                            alignment: Alignment.bottomCenter,
-                            // decoration: BoxDecoration(
-                            //   image: DecorationImage(
-                            //     image: AssetImage(
-                            //         'assets/restaurant/restaurant_3.png'),
-                            //     fit: BoxFit.cover,
-                            //   ),
-                            // ),
-                            child: Image.network(
-                              imageBaseUrl + widget.item.vendor_logo,
-                              fit: BoxFit.cover,
-                              width: width,
-                              height: 180,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 0.0,
-                          left: 0.0,
-                          child: Container(
-                            height: 180.0,
-                            width: width,
-                            color: kMainTextColor.withOpacity(0.6),
-                            alignment: Alignment.bottomLeft,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(fixPadding),
-                                  child: Text(
-                                    '${widget.item.vendor_name}',
-                                    style: TextStyle(
-                                      fontSize: 22.0,
-                                      color: innerBoxIsScrolled
-                                          ? kMainTextColor
-                                          : kWhiteColor,
-                                      fontFamily: 'OpenSans',
-                                      fontWeight: FontWeight.w500,
+                                  }),
+                              Positioned(
+                                  right: 5,
+                                  top: 2,
+                                  child: Visibility(
+                                    visible: isCartCount,
+                                    child: CircleAvatar(
+                                      minRadius: 4,
+                                      maxRadius: 8,
+                                      backgroundColor: innerBoxIsScrolled?kMainColor:kWhiteColor,
+                                      child: Text(
+                                        '$cartCount',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 7,
+                                            color: innerBoxIsScrolled?kWhiteColor:kMainTextColor,
+                                            fontWeight: FontWeight.w200),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    right: fixPadding,
-                                    left: fixPadding,
-                                  ),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.location_on,
-                                        color: kWhiteColor,
-                                        size: 18.0,
-                                      ),
-                                      SizedBox(width: 2.0),
-                                      Expanded(
-                                        child: Text(
-                                          '${widget.item.vendor_loc}',
-                                          style: whiteSubHeadingStyle,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Padding(
-                                //   padding: EdgeInsets.all(fixPadding),
-                                //   child: Row(
-                                //     mainAxisAlignment: MainAxisAlignment.start,
-                                //     crossAxisAlignment:
-                                //         CrossAxisAlignment.center,
-                                //     children: <Widget>[
-                                //       Icon(Icons.star,
-                                //           color: Colors.lime, size: 18.0),
-                                //       SizedBox(width: 2.0),
-                                //       Text(
-                                //         '4.5',
-                                //         style: whiteSubHeadingStyle,
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                                heightSpace,
-                              ],
-                            ),
+                                  ))
+                            ],
                           ),
                         ),
                       ],
+                      title: Visibility(
+                        visible: innerBoxIsScrolled ? true : false,
+                        child: Text('${widget.item.vendor_name}'.toUpperCase(),
+                            style: TextStyle(
+                              color:
+                              innerBoxIsScrolled ? kMainTextColor : kWhiteColor,
+                              fontSize: 13.0,
+                              fontFamily: 'OpenSans',
+                              fontWeight: FontWeight.w500,
+                            )),
+                      ),
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Stack(
+                          children: <Widget>[
+                            Positioned(
+                              top: 0.0,
+                              left: 0.0,
+                              child: Container(
+                                height: 180,
+                                width: width,
+                                alignment: Alignment.bottomCenter,
+                                // decoration: BoxDecoration(
+                                //   image: DecorationImage(
+                                //     image: AssetImage(
+                                //         'assets/restaurant/restaurant_3.png'),
+                                //     fit: BoxFit.cover,
+                                //   ),
+                                // ),
+                                child: Image.network(
+                                  imageBaseUrl + widget.item.vendor_logo,
+                                  fit: BoxFit.cover,
+                                  width: width,
+                                  height: 180,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0.0,
+                              left: 0.0,
+                              child: Container(
+                                height: 180.0,
+                                width: width,
+                                color: kMainTextColor.withOpacity(0.6),
+                                alignment: Alignment.bottomLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.all(fixPadding),
+                                      child: Text(
+                                        '${widget.item.vendor_name}',
+                                        style: TextStyle(
+                                          fontSize: 22.0,
+                                          color: innerBoxIsScrolled
+                                              ? kMainTextColor
+                                              : kWhiteColor,
+                                          fontFamily: 'OpenSans',
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        right: fixPadding,
+                                        left: fixPadding,
+                                      ),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.location_on,
+                                            color: kWhiteColor,
+                                            size: 18.0,
+                                          ),
+                                          SizedBox(width: 2.0),
+                                          Expanded(
+                                            child: Text(
+                                              '${widget.item.vendor_loc}',
+                                              style: whiteSubHeadingStyle,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // Padding(
+                                    //   padding: EdgeInsets.all(fixPadding),
+                                    //   child: Row(
+                                    //     mainAxisAlignment: MainAxisAlignment.start,
+                                    //     crossAxisAlignment:
+                                    //         CrossAxisAlignment.center,
+                                    //     children: <Widget>[
+                                    //       Icon(Icons.star,
+                                    //           color: Colors.lime, size: 18.0),
+                                    //       SizedBox(width: 2.0),
+                                    //       Text(
+                                    //         '4.5',
+                                    //         style: whiteSubHeadingStyle,
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
+                                    heightSpace,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      bottom: TabBar(
+                        indicatorColor: darkPrimaryColor,
+                        labelColor: kMainTextColor,
+                        indicatorPadding: EdgeInsets.only(right: 15.0, left: 15.0),
+                        tabs: [
+                          Tab(text: 'Products'),
+                          // Tab(text: 'Review'),
+                          Tab(text: 'Information'),
+                        ],
+                      ),
                     ),
-                  ),
-                  bottom: TabBar(
-                    indicatorColor: darkPrimaryColor,
-                    labelColor: kMainTextColor,
-                    indicatorPadding: EdgeInsets.only(right: 15.0, left: 15.0),
-                    tabs: [
-                      Tab(text: 'Products'),
-                      // Tab(text: 'Review'),
-                      Tab(text: 'Information'),
-                    ],
-                  ),
-                ),
-              ];
-            },
-            body: Container(
-              height: height,
-              width: width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
-                color: kMainColor,
-              ),
-              child: TabBarView(
-                children: [
-                  ProductTabData(widget.item,widget.currencySymbol,(){
-                    getCartCount();
-                  }),
-                  // ReviewTabData(widget.item),
-                  RestaurantInformation(widget.item),
-                ],
-              ),
-            ),
-          ),
+                  ];
+                },
+                body:
+                Container(
+                    height: height,
+                    width: width,
+                    child:  Column(
+                      children: [
+                        Container(
+                          height: height - 100 ,
+                          width: width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+                            color: kMainColor,
+                          ),
+                          child: TabBarView(
+                            children: [
+                              ProductTabData(widget.item,widget.currencySymbol,(){
+                                getCartCount();
+                              }),
+                              // ReviewTabData(widget.item),
+                              RestaurantInformation(widget.item),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.all(12),
+                          alignment: Alignment.bottomCenter,
+                          child:    Text(
+                            message.toString(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12),
+                          )
+                          ,
+                        )
+
+                      ],
+                    )
+
+                )
+            )
         ),
+
       ),
     );
   }
