@@ -122,28 +122,32 @@ class EditAddresspageState extends State<EditAddresspage> {
   }
 
   void getPlaces(context) async {
+    // PlacesAutocomplete.show(
+    //   context: context,
+    //   apiKey: apiKey,
+    //   mode: Mode.fullscreen,
+    //   onError: (response) {
+    //     print(response.predictions);
+    //   },
+    //   language: "en",
+    //     components: [new Component(Component.country, "in")]
+    // ).then((value) {
+    //   //displayPrediction(value);
+    // }).catchError((e) {
+    //   print(e);
+    // });
 
-    Map<String,String> headers = new Map();
-    headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
-    headers.putIfAbsent("origin", () => "*");
 
-    PlacesAutocomplete.show(
-        context: context,
-        apiKey: apiKey,
-        mode: Mode.fullscreen,
-        headers: headers,
-        proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-        onError: (response) {
-          print(response.predictions);
-        },
-        language: "en",
-        components: [new Component(Component.country, "in")]
-    ).then((value) {
-      displayPrediction(value!);
-    }).catchError((e) {
-      print(e);
-    });
+    final Prediction? p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: apiKey,
+      onError: onError,
+      mode: Mode.overlay, // or Mode.fullscreen
+      language: 'en',
+      components: [Component(Component.country, 'in')],
+    );
 
+    if (p != null) displayPrediction(p);
   }
   void onError(PlacesAutocompleteResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -153,14 +157,11 @@ class EditAddresspageState extends State<EditAddresspage> {
     );
   }
 
-  Future<void> displayPrediction(Prediction p) async {
-
+  Future<Null> displayPrediction(Prediction p) async {
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
-      baseUrl: 'https://maps.googleapis.com/maps/api',
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
-
     PlacesDetailsResponse detail =
     await _places.getDetailsByPlaceId(p.placeId!);
     final lat = detail.result.geometry!.location.lat;
@@ -169,16 +170,14 @@ class EditAddresspageState extends State<EditAddresspage> {
     print("${p.description} - $lat/$lng");
 
     final marker = Marker(
-      markerId: const MarkerId('location'),
+      markerId: MarkerId('location'),
       position: LatLng(lat, lng),
       icon: BitmapDescriptor.defaultMarker,
     );
     setState(() {
-      markers[const MarkerId('location')] = marker;
+      markers[MarkerId('location')] = marker;
       _goToTheLake(lat, lng);
     });
-
-
 
   }
   // Future<Null> displayPrediction(Prediction p) async {

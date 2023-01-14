@@ -44,7 +44,7 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                               leading: CircleAvatar(
                                 radius: 22.0,
                                 backgroundImage:
-                                    AssetImage('images/profile.png'),
+                                AssetImage('images/profile.png'),
                               ),
                               title: Text(
                                 widget.ongoingOrders.deliveryBoyName != null
@@ -58,9 +58,9 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                                     .textTheme
                                     .headline6!
                                     .copyWith(
-                                        fontSize: 11.7,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xffc2c2c2)),
+                                    fontSize: 11.7,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xffc2c2c2)),
                               ),
                               trailing: FittedBox(
                                 fit: BoxFit.fill,
@@ -68,15 +68,15 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                                   children: <Widget>[
                                     IconButton(
                                       icon:
-                                          Icon(Icons.phone, color: kMainColor),
+                                      Icon(Icons.phone, color: kMainColor),
                                       onPressed: () {
                                         if (widget.ongoingOrders
-                                                    .deliveryBoyPhone !=
-                                                null &&
+                                            .deliveryBoyPhone !=
+                                            null &&
                                             widget.ongoingOrders
-                                                    .deliveryBoyPhone
-                                                    .toString()
-                                                    .length >
+                                                .deliveryBoyPhone
+                                                .toString()
+                                                .length >
                                                 5) {
                                           _launchURL(
                                               "tel://${widget.ongoingOrders.deliveryBoyPhone}");
@@ -105,33 +105,6 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                     ),
                   ),
                   SizedBox(height: 6.0),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
-                    child: ListTile(
-                      title: Text(
-                        (widget.ongoingOrders.parcelDescription != null)
-                            ? '${widget.ongoingOrders.parcelId}\n${widget.ongoingOrders.parcelDescription}'
-                            : '${widget.ongoingOrders.parcelId}',
-                        style: Theme.of(context).textTheme.headline4!.copyWith(
-                            fontWeight: FontWeight.w500, fontSize: 15.0),
-                      ),
-                      subtitle: Text(
-                        'Parcel Weight :- ${widget.ongoingOrders.weight} KG \nDimension :- ${widget.ongoingOrders.length} x ${widget.ongoingOrders.width} x ${widget.ongoingOrders.height}',
-                        style: Theme.of(context)
-                            .textTheme
-                            .caption!
-                            .copyWith(fontSize: 13.3),
-                      ),
-                      trailing: Text(
-                        '${widget.currency} ${(double.parse('${widget.ongoingOrders.distance}') > 1) ? double.parse('${widget.ongoingOrders.charges}') * double.parse('${widget.ongoingOrders.distance}') : double.parse('${widget.ongoingOrders.charges}')}\n\n',
-                        style: Theme.of(context)
-                            .textTheme
-                            .caption!
-                            .copyWith(fontSize: 13.3),
-                      ),
-                    ),
-                  ),
                   SizedBox(height: 6.0),
                   Container(
                     width: double.infinity,

@@ -884,17 +884,19 @@ class _OrderMapRestState extends State<OrderMapRest> {
   }
 
   void mymap(AsyncSnapshot<QuerySnapshot> snapshot) async {
-    await _controller!
-        .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: LatLng(
-          snapshot.data!.docs.singleWhere(
-                  (element) =>
-              element.id == user_id.toString())['latitude'],
-          snapshot.data!.docs.singleWhere(
-                  (element) =>
-              element.id == user_id.toString())['longitude'],
-        ),
-        zoom: 14)));
+    Timer(Duration(minutes: 120), () async {
+      await _controller!
+          .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: LatLng(
+            snapshot.data!.docs.singleWhere(
+                    (element) =>
+                element.id == user_id.toString())['latitude'],
+            snapshot.data!.docs.singleWhere(
+                    (element) =>
+                element.id == user_id.toString())['longitude'],
+          ),
+          zoom: 14)));
+    });
     _addMarker(LatLng(_originLatitude,_originLongitude), "source", await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(90,90)), 'assets/delivery.png'));
     _addMarker(LatLng(_destLatitude, _destLongitude), "dest", BitmapDescriptor.defaultMarkerWithHue(90));
   }

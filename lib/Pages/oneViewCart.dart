@@ -358,7 +358,6 @@ class _oneViewCartState extends State<oneViewCart> {
 
     http.post(myUri, body: {
       'user_id': '${userId}',
-      'vendor_id': '${vendorId}'
     }).then((value) {
       if (value.statusCode == 200) {
         var jsonData = json.decode(value.body);
@@ -369,14 +368,12 @@ class _oneViewCartState extends State<oneViewCart> {
           setState(() {
             isCartFetch = false;
             addressDelivery = addressWelcome.data!;
-            deliveryCharge =
-                double.parse('${addressDelivery?.delivery_charge}');
+
           });
         } else {
           setState(() {
             isCartFetch = false;
             //addressDelivery = null;
-            deliveryCharge = 0.0;
           });
           // Toast.show("Address not found!", context,
           //     duration: Toast.LENGTH_SHORT);
@@ -385,7 +382,6 @@ class _oneViewCartState extends State<oneViewCart> {
         setState(() {
           isCartFetch = false;
           //addressDelivery = null;
-          deliveryCharge = 0.0;
         });
 
         // Toast.show('No Address found!', context, duration: Toast.LENGTH_SHORT);
@@ -394,7 +390,6 @@ class _oneViewCartState extends State<oneViewCart> {
       setState(() {
         isCartFetch = false;
         //addressDelivery = null;
-        deliveryCharge = 0.0;
       });
     });
   }

@@ -66,7 +66,6 @@ class AddressTile1 extends StatelessWidget {
 }
 
 class AddressTile2 extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -101,11 +100,11 @@ class SetLocationState extends State<SetLocation> {
   String drop = '';
   String droplat = '';
   String droplng = '';
+  String message = '';
   final parcelcontroler = TextEditingController();
   final instructioncontroler = TextEditingController();
   final recievernamecontroler = TextEditingController();
   final recievercontactcontroler = TextEditingController();
-  String message = '';
 
 
   void getData() async {
@@ -121,11 +120,11 @@ class SetLocationState extends State<SetLocation> {
 
     // print(pickaddresslat);
     // print(pickaddresslng);
-    setState((){
-      message = prefs.getString("message")!;
-    });
+
 
     setState(() {
+      message = prefs.getString("message")!;
+
       if(pickupaddress==null){
         pickup = "";
         pickuplat = "";
@@ -229,6 +228,12 @@ class SetLocationState extends State<SetLocation> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+
+
+                        Padding(
+                          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
+                          child: AddressTile1(),
+                        ),
                         Padding(
                           padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
                           child: Text(          "Pickup Address: "+ '${pickup}',
@@ -238,10 +243,9 @@ class SetLocationState extends State<SetLocation> {
                             TextStyle(color: Colors.black, fontSize: 14),
                           ),
                         ),
-
                         Padding(
                           padding:  EdgeInsets.only(left: 18.0,right: 18.0),
-                          child: AddressTile1(),
+                          child: AddressTile2(),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
@@ -252,10 +256,6 @@ class SetLocationState extends State<SetLocation> {
                             style:
                             TextStyle(color: Colors.black, fontSize: 14),
                           ),
-                        ),
-                        Padding(
-                          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
-                          child: AddressTile2(),
                         ),
 
                         Padding(
@@ -391,7 +391,6 @@ class SetLocationState extends State<SetLocation> {
                             ),
                           ),
                         ),
-
                         Container(
                           margin: EdgeInsets.all(12),
                           alignment: Alignment.bottomCenter,

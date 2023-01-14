@@ -203,7 +203,7 @@ class _SlideUpPanelRestState extends State<SlideUpPanelRest> {
                             style: Theme.of(context).textTheme.caption,
                           ),
                           Text(
-                            '${widget.currency} ${widget.ongoingOrders.price}',
+                            '${widget.currency} ${widget.ongoingOrders.price_without_delivery}',
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ]),
@@ -220,7 +220,7 @@ class _SlideUpPanelRestState extends State<SlideUpPanelRest> {
                             style: Theme.of(context).textTheme.caption,
                           ),
                           Text(
-                            '${widget.currency} ${widget.ongoingOrders.del_charge}',
+                            '${widget.currency} ${widget.ongoingOrders.delivery_charge}',
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ]),
@@ -334,7 +334,9 @@ class _SlideUpPanelRestState extends State<SlideUpPanelRest> {
                             style: Theme.of(context).textTheme.headline4,
                           ),
                         ])
-                        : Row(
+                        :
+                    (widget.ongoingOrders.remaining_amount!=0)?
+                    Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
@@ -345,7 +347,7 @@ class _SlideUpPanelRestState extends State<SlideUpPanelRest> {
                             '${widget.currency} ${widget.ongoingOrders.remaining_amount}',
                             style: Theme.of(context).textTheme.headline4,
                           ),
-                        ]),
+                        ]):Row(),
                   ),
                 ],
               ),

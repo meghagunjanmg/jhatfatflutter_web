@@ -175,7 +175,6 @@ class SetLocationState extends State<SetLocations> {
       });
     });
   }
-
   void getPlaces(context) async {
 
     setState(() {
@@ -249,6 +248,7 @@ class SetLocationState extends State<SetLocations> {
   //     _getCameraMoveLocation(LatLng(lat, lng));
   //   }
   // }
+
 
   @override
   Widget build(BuildContext context) {

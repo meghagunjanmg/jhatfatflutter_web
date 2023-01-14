@@ -174,7 +174,6 @@ class SetLocationState extends State<SetLocationss> {
       });
     });
   }
-
   void getPlaces(context) async {
 
     setState(() {
