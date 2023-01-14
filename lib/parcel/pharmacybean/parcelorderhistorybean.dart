@@ -7,51 +7,48 @@ class TodayOrderParcel {
   String? sourceName;
   String? destinationLat;
   String? destinationLng;
-  dynamic destinationName;
-  dynamic destinationPhone;
+  String? destinationName;
+  int? destinationPhone;
   int? destinationAddressId;
   String? cartId;
   int? userId;
-  dynamic vendorId;
-  dynamic weight;
-  dynamic length;
-  dynamic height;
-  dynamic width;
-  dynamic pickupTime;
-  dynamic pickupDate;
-  dynamic cityId;
-  dynamic lat;
-  dynamic lng;
+  Null? vendorId;
+  Null? weight;
+  Null? length;
+  Null? height;
+  Null? width;
+  Null? pickupTime;
+  String? pickupDate;
+  Null? lat;
+  Null? lng;
   String? charges;
   String? distance;
   String? paymentMethod;
   String? orderStatus;
   String? paymentStatus;
   String? wallet;
-  dynamic dboyId;
+  Null? dboyId;
   String? userName;
   String? userEmail;
   String? userImage;
   String? userPhone;
   String? userPassword;
-  dynamic deviceId;
+  Null? deviceId;
   String? walletCredits;
   String? rewards;
-  dynamic otp;
+  Null? otp;
   int? phoneVerified;
   String? referralCode;
-  dynamic sourcePincode;
-  dynamic sourceHouseno;
-  dynamic sourceLandmark;
+  Null? sourcePincode;
+  Null? sourceHouseno;
+  Null? sourceLandmark;
   String? sourceAdd;
-  dynamic sourceState;
-  dynamic sourceCity;
-  dynamic destinationPincode;
-  dynamic destinationHouseno;
-  dynamic destinationLandmark;
+  Null? sourceState;
+  Null? destinationPincode;
+  Null? destinationHouseno;
+  Null? destinationLandmark;
   String? destinationAdd;
-  dynamic destinationState;
-  dynamic destinationCity;
+  Null? destinationState;
   String? vendorName;
   String? owner;
   String? vendorEmail;
@@ -66,10 +63,13 @@ class TodayOrderParcel {
   int? deliveryRange;
   int? uiType;
   String? onlineStatus;
-  dynamic deliveryBoyId;
-  dynamic deliveryBoyName;
-  dynamic deliveryBoyPhone;
-  String? parcelDescription;
+  Null? deliveryBoyId;
+  Null? deliveryBoyName;
+  Null? deliveryBoyPhone;
+  Null? parcelDescription;
+  int? surgecharge;
+  int? nightcharge;
+  int? convcharge;
 
   TodayOrderParcel(
       {this.parcelId,
@@ -92,7 +92,6 @@ class TodayOrderParcel {
         this.width,
         this.pickupTime,
         this.pickupDate,
-        this.cityId,
         this.lat,
         this.lng,
         this.charges,
@@ -118,13 +117,11 @@ class TodayOrderParcel {
         this.sourceLandmark,
         this.sourceAdd,
         this.sourceState,
-        this.sourceCity,
         this.destinationPincode,
         this.destinationHouseno,
         this.destinationLandmark,
         this.destinationAdd,
         this.destinationState,
-        this.destinationCity,
         this.vendorName,
         this.owner,
         this.vendorEmail,
@@ -142,7 +139,10 @@ class TodayOrderParcel {
         this.deliveryBoyId,
         this.deliveryBoyName,
         this.deliveryBoyPhone,
-        this.parcelDescription});
+        this.parcelDescription,
+        this.surgecharge,
+        this.nightcharge,
+        this.convcharge});
 
   TodayOrderParcel.fromJson(Map<String, dynamic> json) {
     parcelId = json['parcel_id'];
@@ -165,7 +165,6 @@ class TodayOrderParcel {
     width = json['width'];
     pickupTime = json['pickup_time'];
     pickupDate = json['pickup_date'];
-    cityId = json['city_id'];
     lat = json['lat'];
     lng = json['lng'];
     charges = json['charges'];
@@ -191,13 +190,11 @@ class TodayOrderParcel {
     sourceLandmark = json['source_landmark'];
     sourceAdd = json['source_add'];
     sourceState = json['source_state'];
-    sourceCity = json['source_city'];
     destinationPincode = json['destination_pincode'];
     destinationHouseno = json['destination_houseno'];
     destinationLandmark = json['destination_landmark'];
     destinationAdd = json['destination_add'];
     destinationState = json['destination_state'];
-    destinationCity = json['destination_city'];
     vendorName = json['vendor_name'];
     owner = json['owner'];
     vendorEmail = json['vendor_email'];
@@ -216,6 +213,9 @@ class TodayOrderParcel {
     deliveryBoyName = json['delivery_boy_name'];
     deliveryBoyPhone = json['delivery_boy_phone'];
     parcelDescription = json['parcel_description'];
+    surgecharge = json['surgecharge'];
+    nightcharge = json['nightcharge'];
+    convcharge = json['convcharge'];
   }
 
   Map<String, dynamic> toJson() {
@@ -240,7 +240,6 @@ class TodayOrderParcel {
     data['width'] = this.width;
     data['pickup_time'] = this.pickupTime;
     data['pickup_date'] = this.pickupDate;
-    data['city_id'] = this.cityId;
     data['lat'] = this.lat;
     data['lng'] = this.lng;
     data['charges'] = this.charges;
@@ -266,13 +265,11 @@ class TodayOrderParcel {
     data['source_landmark'] = this.sourceLandmark;
     data['source_add'] = this.sourceAdd;
     data['source_state'] = this.sourceState;
-    data['source_city'] = this.sourceCity;
     data['destination_pincode'] = this.destinationPincode;
     data['destination_houseno'] = this.destinationHouseno;
     data['destination_landmark'] = this.destinationLandmark;
     data['destination_add'] = this.destinationAdd;
     data['destination_state'] = this.destinationState;
-    data['destination_city'] = this.destinationCity;
     data['vendor_name'] = this.vendorName;
     data['owner'] = this.owner;
     data['vendor_email'] = this.vendorEmail;
@@ -291,6 +288,9 @@ class TodayOrderParcel {
     data['delivery_boy_name'] = this.deliveryBoyName;
     data['delivery_boy_phone'] = this.deliveryBoyPhone;
     data['parcel_description'] = this.parcelDescription;
+    data['surgecharge'] = this.surgecharge;
+    data['nightcharge'] = this.nightcharge;
+    data['convcharge'] = this.convcharge;
     return data;
   }
 }

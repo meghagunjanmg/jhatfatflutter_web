@@ -207,7 +207,7 @@ class SetLocationState extends State<SetLocation> {
             child: CustomAppBar(
               leading: GestureDetector(
                 onTap: () {
-                  Navigator.push(context,MaterialPageRoute(builder: (context) => new HomeOrderAccount(0)));
+                  Navigator.push(context,MaterialPageRoute(builder: (context) => new HomeOrderAccount(0,1)));
                   /* Write listener code here */ },
                 child: Icon(
                   Icons.arrow_back,  // add custom icons also

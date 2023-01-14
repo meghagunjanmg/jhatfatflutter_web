@@ -136,7 +136,7 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                   Container(
                     width: double.infinity,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Text('PAYMENT INFO',
                         style: Theme.of(context).textTheme.headline4!.copyWith(
                             color: kDisabledColor,
@@ -147,7 +147,7 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -156,7 +156,7 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                             style: Theme.of(context).textTheme.caption,
                           ),
                           Text(
-                            '${widget.currency} ${(double.parse('${widget.ongoingOrders.distance}') > 1) ? double.parse('${widget.ongoingOrders.charges}') * double.parse('${widget.ongoingOrders.distance}') : double.parse('${widget.ongoingOrders.charges}')}\n\n',
+                            '${widget.currency} ${double.parse(widget.ongoingOrders.charges.toString()) * double.parse(widget.ongoingOrders.distance.toString())}',
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ]),
@@ -164,7 +164,7 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -178,70 +178,85 @@ class _SlideUpPanelParcelState extends State<SlideUpPanelParcel> {
                           ),
                         ]),
                   ),
+                  (widget.ongoingOrders.surgecharge!>0)?
                   Container(
                     color: Colors.white,
-                    padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
                     child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            'Coupon Discount',
+                            'Surge Charge',
                             style: Theme.of(context).textTheme.caption,
                           ),
                           Text(
-                            '- ${widget.currency} 0.0',
+                            '${widget.ongoingOrders.surgecharge!.toStringAsFixed(2)}',
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ]),
-                  ),
+                  ): Container(),
+                  (widget.ongoingOrders.nightcharge!>0)?
                   Container(
                     color: Colors.white,
-                    padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
                     child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            'Paid by wallet',
+                            'Night Charge',
                             style: Theme.of(context).textTheme.caption,
                           ),
                           Text(
-                            '${widget.currency} ${widget.ongoingOrders.wallet}',
+                            '${widget.ongoingOrders.nightcharge!.toStringAsFixed(2)}',
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ]),
-                  ),
+                  ): Container(),
+                  (widget.ongoingOrders.convcharge!>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Convenience Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.convcharge!.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
                   Container(
                     color: Colors.white,
                     padding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: (widget.ongoingOrders.paymentMethod == "Card" ||
-                            widget.ongoingOrders.paymentMethod == "Wallet")
+                        widget.ongoingOrders.paymentMethod == "Wallet")
                         ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                                Text(
-                                  'Payment Status',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                                Text(
-                                  '${widget.ongoingOrders.paymentStatus}',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                              ])
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Payment Status',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.paymentStatus}',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ])
                         : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                                Text(
-                                  'Cash on Delivery',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                                Text(
-                                  '${widget.currency} ${(double.parse('${widget.ongoingOrders.distance}') > 1) ? double.parse('${widget.ongoingOrders.charges}') * double.parse('${widget.ongoingOrders.distance}') : double.parse('${widget.ongoingOrders.charges}')}\n\n',
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                              ]),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                        ]),
                   ),
                 ],
               ),

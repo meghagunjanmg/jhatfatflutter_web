@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,8 @@ import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/Themes/constantfile.dart';
 import 'package:jhatfat/bean/latlng.dart';
 
+import '../baseurlp/baseurl.dart';
+
 class DropMap extends StatelessWidget {
   final dynamic lat;
   final dynamic lng;
@@ -26,15 +30,15 @@ class DropMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SetLocation(lat, lng);
+    return SetLocations(lat, lng);
   }
 }
 
-class SetLocation extends StatefulWidget {
+class SetLocations extends StatefulWidget {
   final dynamic lat;
   final dynamic lng;
 
-  SetLocation(this.lat, this.lng);
+  SetLocations(this.lat, this.lng);
 
   @override
   SetLocationState createState() => SetLocationState(lat, lng);
@@ -42,7 +46,7 @@ class SetLocation extends StatefulWidget {
 
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey);
 
-class SetLocationState extends State<SetLocation> {
+class SetLocationState extends State<SetLocations> {
   dynamic lat;
   dynamic lng;
   CameraPosition? kGooglePlex;
@@ -62,7 +66,7 @@ class SetLocationState extends State<SetLocation> {
   bool button = false;
 
   var currentAddress = '';
-
+  var streetController = TextEditingController();
 
   Future<void> _goToTheLake(lat, lng) async {
     final CameraPosition _kLake = CameraPosition(
@@ -75,11 +79,10 @@ class SetLocationState extends State<SetLocation> {
   @override
   void initState() {
     super.initState();
+    getdata();
     setState(() {
       button = false;
     });
-    getdata();
-
     /// _getLocation();
   }
 
@@ -174,36 +177,32 @@ class SetLocationState extends State<SetLocation> {
   }
 
   void getPlaces(context) async {
-    // PlacesAutocomplete.show(
-    //   context: context,
-    //   apiKey: apiKey,
-    //   mode: Mode.fullscreen,
-    //   onError: (response) {
-    //     print(response.predictions);
-    //   },
-    //   language: "en",
-    //     components: [new Component(Component.country, "in")]
-    // ).then((value) {
-    //   //displayPrediction(value);
-    // }).catchError((e) {
-    //   print(e);
-    // });
 
     setState(() {
       button = false;
     });
 
-    final Prediction? p = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: apiKey,
-      onError: onError,
-      mode: Mode.overlay, // or Mode.fullscreen
-      proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-      language: 'en',
-      components: [Component(Component.country, 'in')],
-    );
+    Map<String,String> headers = new Map();
+    headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
+    headers.putIfAbsent("origin", () => "*");
 
-    if (p != null) displayPrediction(p);
+    PlacesAutocomplete.show(
+        context: context,
+        apiKey: apiKey,
+        mode: Mode.fullscreen,
+        headers: headers,
+        proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+        onError: (response) {
+          print(response.predictions);
+        },
+        language: "en",
+        components: [new Component(Component.country, "in")]
+    ).then((value) {
+      displayPrediction(value!);
+    }).catchError((e) {
+      print(e);
+    });
+
   }
   void onError(PlacesAutocompleteResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -213,7 +212,8 @@ class SetLocationState extends State<SetLocation> {
     );
   }
 
-  Future<Null> displayPrediction(Prediction p) async {
+  Future<void> displayPrediction(Prediction p) async {
+
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
       baseUrl: 'https://maps.googleapis.com/maps/api',
@@ -228,12 +228,12 @@ class SetLocationState extends State<SetLocation> {
     print("${p.description} - $lat/$lng");
 
     final marker = Marker(
-      markerId: MarkerId('location'),
+      markerId: const MarkerId('location'),
       position: LatLng(lat, lng),
       icon: BitmapDescriptor.defaultMarker,
     );
     setState(() {
-      markers[MarkerId('location')] = marker;
+      markers[const MarkerId('location')] = marker;
       _goToTheLake(lat, lng);
     });
 
@@ -385,6 +385,29 @@ class SetLocationState extends State<SetLocation> {
               ],
             ),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+            child:
+            TextFormField(
+              controller: streetController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText:'Address (optional)',
+                contentPadding:
+                EdgeInsets.only(left: 20, top: 20, bottom: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                  BorderSide(color: Colors.black, width: 1),
+                ),
+                hintStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: kHintColor,
+                    fontSize: 16),
+              ),
+            ),
+
+          ),
 
           (button)?
           ElevatedButton(
@@ -397,8 +420,7 @@ class SetLocationState extends State<SetLocation> {
                 textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
 
             onPressed: () {
-              setData();
-              Navigator.pop(context);
+              CheckLocation(lat, lng);
             },
             child: Text(
               'Continue',
@@ -425,18 +447,54 @@ class SetLocationState extends State<SetLocation> {
             ),
           )
 
+
         ],
       ),
     );
   }
   void setData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("dropLocation",'${currentAddress}');
+    prefs.setString("dropLocation",'${currentAddress.toString()} '+' ${streetController.text.toString()}');
     prefs.setString("dlt",'${lat}');
     prefs.setString("dln",'${lng}');
   }
   void getMapLoc() async {
     _getCameraMoveLocation(LatLng(lat, lng));
+  }
+
+  void CheckLocation(lat, lng) {
+    var url = parcel_check_location;
+    Uri myUri = Uri.parse(url);
+    var client = http.Client();
+    client.post(myUri, body: {'lat': lat.toString(),'lng':lng.toString()})
+        .then((value) {
+      if (value.statusCode == 200) {
+        var jsonData = jsonDecode(value.body);
+        if (jsonData['status'] == 1) {
+          setData();
+          Navigator.pop(context);
+        }
+        else{
+          dailog(jsonData['message']);
+        }
+      }}).catchError((e) {
+      print(e);
+    });
+  }
+  Future<bool> dailog(message) async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Notice'),
+        content: new Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: new Text('OK'),
+          ),
+        ],
+      ),
+    )) ?? false;
   }
 }
 

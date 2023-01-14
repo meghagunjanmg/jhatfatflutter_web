@@ -50,21 +50,31 @@ import '../Closed.dart';
 import 'appcategory/appcategory.dart';
 
 
+
 class HomePage2 extends StatelessWidget {
+  int value;
+  HomePage2(this.value);
+
   @override
   Widget build(BuildContext context) {
-    return Home();
+    return Home(this.value);
   }
 
 }
 
 class Home extends StatefulWidget {
+
+  int value;
+
+  Home(this.value);
+
   @override
-  _HomeState createState() => _HomeState();
+  _HomeState createState() => _HomeState(this.value);
 }
 
 class _HomeState extends State<Home> {
   Adminsetting? admins;
+  int _value = -1;
 
   String? cityName = 'NO LOCATION SELECTED';
   String? currency = '';
@@ -104,7 +114,6 @@ class _HomeState extends State<Home> {
   List<NearStores> nearStores1 = [];
   List<NearStores> nearStoresSearch1 = [];
   List<NearStores> nearStoresShimmer1 = [
-
     NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
     NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
     NearStores("", "", 0, "", "", "", "", "", "", "", "", "","","","",""),
@@ -125,12 +134,19 @@ class _HomeState extends State<Home> {
   bool subscriptionbanner = true;
   bool subscriptionStore = false;
 
+  int value;
+
+  _HomeState(this.value);
+
+
   @override
   void initState() {
     super.initState();
     checksubscription();
-
-    getData();
+    if(value == 0) _getLocation(context);
+    else {
+      getData();
+    }
   }
 
 

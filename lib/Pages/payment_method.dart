@@ -24,13 +24,14 @@ class PaymentPage extends StatefulWidget {
   final double totalAmount;
   final List<PaymentVia> tagObjs;
   final String orderArray;
+  dynamic maxincash;
 
   PaymentPage(this.vendor_ids, this.order_id, this.cart_id, this.totalAmount,
-      this.tagObjs, this.orderArray);
+      this.tagObjs, this.orderArray,this.maxincash);
 
   @override
   State<StatefulWidget> createState() {
-    return PaymentPageState(order_id, cart_id, totalAmount, tagObjs);
+    return PaymentPageState(order_id, cart_id, totalAmount, tagObjs,maxincash);
   }
 }
 
@@ -83,7 +84,9 @@ class PaymentPageState extends State<PaymentPage> {
 
   List<CouponList> couponL = [];
 
-  PaymentPageState(this.order_id, this.cart_id, this.totalAmount, this.paymentVia);
+  dynamic maxincash;
+
+  PaymentPageState(this.order_id, this.cart_id, this.totalAmount, this.paymentVia,this.maxincash);
 
 
   @override
@@ -94,8 +97,16 @@ class PaymentPageState extends State<PaymentPage> {
     newtotalAmount = double.parse('${totalAmount}');
     getCouponList();
     getWalletAmount();
-  }
+    getData();
 
+  }
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
+  }
   void getWalletAmount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     dynamic userId = prefs.getInt('user_id');
@@ -129,7 +140,7 @@ class PaymentPageState extends State<PaymentPage> {
             } else {
               iswallet = false;
             }
-            totalAmount = 0.0;
+            newtotalAmount = totalAmount;
             walletUsedAmount = newtotalAmount;
           } else {
             iswallet = false;
@@ -214,6 +225,7 @@ class PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(maxincash.toString());
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(64.0),
@@ -293,12 +305,12 @@ class PaymentPageState extends State<PaymentPage> {
                                             if (val==true) {
                                               setState(() {
                                                 wallet = true;
-                                                newtotalAmount = newtotalAmount - walletAmount;
+                                                newtotalAmount = totalAmount - walletUsedAmount;
                                               });
                                             } else {
                                               setState(() {
                                                 wallet = false;
-                                                newtotalAmount = newtotalAmount + walletAmount;
+                                                newtotalAmount = totalAmount;
                                               });
                                             }
                                           }),
@@ -363,6 +375,8 @@ class PaymentPageState extends State<PaymentPage> {
                                     ],
                                   ),
                                 ),
+
+
                                 SizedBox(
                                   height: 5,
                                 ),
@@ -434,32 +448,39 @@ class PaymentPageState extends State<PaymentPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 16.0),
-                            color: kCardBackgroundColor,
-                            child: Text(
-                              'CASH',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption!
-                                  .copyWith(
-                                  color: kDisabledColor,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.67),
-                            ),
-                          ),
-                          BuildListTile(
-                              image: 'images/payment/amount.png',
-                              text: 'Cash on Delivery',
-                              onTap: () async{
-                                setState(() {
-                                  setProgressText =
-                                  'Proceeding to placed order please wait!....';
-                                  showDialogBox = true;
-                                });
-                                placedOrder("success", "COD");
-                              }),
+                          Visibility(
+                            visible: (newtotalAmount < maxincash) ? true : false,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children:[
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 16.0),
+                                    color: kCardBackgroundColor,
+                                    child: Text(
+                                      'CASH',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .caption!
+                                          .copyWith(
+                                          color: kDisabledColor,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.67),
+                                    ),
+                                  ),
+                                  BuildListTile(
+                                      image: 'images/payment/amount.png',
+                                      text: 'Cash on Delivery',
+                                      onTap: () async{
+                                        setState(() {
+                                          setProgressText =
+                                          'Proceeding to placed order please wait!....';
+                                          showDialogBox = true;
+                                        });
+                                        placedOrder("success", "COD");
+                                      }),
+                                ]),),
+
                           (totalAmount > 0.0 &&
                               paymentVia != null &&
                               paymentVia.length > 0)
@@ -527,15 +548,16 @@ class PaymentPageState extends State<PaymentPage> {
                         ],
                       ),
                     ),
+
                     Visibility(
-                        visible: (totalAmount > 0.0) ? false : true,
+                        visible: (wallet && newtotalAmount==0) ? true : false,
                         child: Container(
-                          height: 250,
                           alignment: Alignment.bottomCenter,
                           child: SizedBox(
                             height: 40,
                             width: 150,
-                            child: ElevatedButton(
+                            child:
+                            ElevatedButton(
                               onPressed: () {
                                 if (!showDialogBox) {
                                   setState(() {
@@ -552,7 +574,20 @@ class PaymentPageState extends State<PaymentPage> {
                               ),
                             ),
                           ),
-                        ))
+                        )),
+
+                    Container(
+                      margin: EdgeInsets.all(12),
+                      alignment: Alignment.bottomCenter,
+                      child:    Text(
+                        message.toString(),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12),
+                      )
+                      ,
+                    ),
+
                   ],
                 ),
               ),

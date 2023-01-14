@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,8 @@ import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/Themes/constantfile.dart';
 import 'package:jhatfat/bean/latlng.dart';
 
+import '../baseurlp/baseurl.dart';
+
 class PickMap extends StatelessWidget {
   final dynamic lat;
   final dynamic lng;
@@ -26,15 +30,15 @@ class PickMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SetLocation(lat, lng);
+    return SetLocationss(lat, lng);
   }
 }
 
-class SetLocation extends StatefulWidget {
+class SetLocationss extends StatefulWidget {
   final dynamic lat;
   final dynamic lng;
 
-  SetLocation(this.lat, this.lng);
+  SetLocationss(this.lat, this.lng);
 
   @override
   SetLocationState createState() => SetLocationState(lat, lng);
@@ -42,7 +46,7 @@ class SetLocation extends StatefulWidget {
 
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey);
 
-class SetLocationState extends State<SetLocation> {
+class SetLocationState extends State<SetLocationss> {
   dynamic lat;
   dynamic lng;
   CameraPosition? kGooglePlex;
@@ -54,6 +58,7 @@ class SetLocationState extends State<SetLocation> {
     );
   }
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  var streetController = TextEditingController();
 
   bool isCard = false;
   Completer<GoogleMapController> _controller = Completer();
@@ -62,8 +67,6 @@ class SetLocationState extends State<SetLocation> {
   bool button = false;
 
   var currentAddress = '';
-
-
 
   Future<void> _goToTheLake(lat, lng) async {
     final CameraPosition _kLake = CameraPosition(
@@ -79,9 +82,10 @@ class SetLocationState extends State<SetLocation> {
     setState(() {
       button = false;
     });
+
     getdata();
 
-   /// _getLocation();
+    /// _getLocation();
   }
 
   Future<void> getdata() async {
@@ -111,7 +115,6 @@ class SetLocationState extends State<SetLocation> {
         Timer(Duration(seconds: 5), () async {
           double lat = position.latitude;
           double lng = position.longitude;
-
           GeoData data = await Geocoder2.getDataFromCoordinates(
               latitude: lat,
               longitude: lng,
@@ -161,8 +164,6 @@ class SetLocationState extends State<SetLocation> {
     Timer(Duration(seconds: 1), () async {
       lat = data.latitude;
       lng = data.longitude;
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
       GeoData data1 = await Geocoder2.getDataFromCoordinates(
           latitude: lat,
           longitude: lng,
@@ -170,42 +171,37 @@ class SetLocationState extends State<SetLocation> {
       setState(() {
         currentAddress = data1.address;
         button = true;
-
       });
     });
   }
 
   void getPlaces(context) async {
-    // PlacesAutocomplete.show(
-    //   context: context,
-    //   apiKey: apiKey,
-    //   mode: Mode.fullscreen,
-    //   onError: (response) {
-    //     print(response.predictions);
-    //   },
-    //   language: "en",
-    //     components: [new Component(Component.country, "in")]
-    // ).then((value) {
-    //   //displayPrediction(value);
-    // }).catchError((e) {
-    //   print(e);
-    // });
 
     setState(() {
       button = false;
     });
 
-    final Prediction? p = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: apiKey,
-      onError: onError,
-      mode: Mode.overlay, // or Mode.fullscreen
-      proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-      language: 'en',
-      components: [Component(Component.country, 'in')],
-    );
+    Map<String,String> headers = new Map();
+    headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
+    headers.putIfAbsent("origin", () => "*");
 
-    if (p != null) displayPrediction(p);
+    PlacesAutocomplete.show(
+        context: context,
+        apiKey: apiKey,
+        mode: Mode.fullscreen,
+        headers: headers,
+        proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+        onError: (response) {
+          print(response.predictions);
+        },
+        language: "en",
+        components: [new Component(Component.country, "in")]
+    ).then((value) {
+      displayPrediction(value!);
+    }).catchError((e) {
+      print(e);
+    });
+
   }
   void onError(PlacesAutocompleteResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -215,13 +211,14 @@ class SetLocationState extends State<SetLocation> {
     );
   }
 
-  Future<Null> displayPrediction(Prediction p) async {
+  Future<void> displayPrediction(Prediction p) async {
 
     GoogleMapsPlaces _places = GoogleMapsPlaces(
       apiKey: apiKey,
       baseUrl: 'https://maps.googleapis.com/maps/api',
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
+
     PlacesDetailsResponse detail =
     await _places.getDetailsByPlaceId(p.placeId!);
     final lat = detail.result.geometry!.location.lat;
@@ -230,12 +227,12 @@ class SetLocationState extends State<SetLocation> {
     print("${p.description} - $lat/$lng");
 
     final marker = Marker(
-      markerId: MarkerId('location'),
+      markerId: const MarkerId('location'),
       position: LatLng(lat, lng),
       icon: BitmapDescriptor.defaultMarker,
     );
     setState(() {
-      markers[MarkerId('location')] = marker;
+      markers[const MarkerId('location')] = marker;
       _goToTheLake(lat, lng);
     });
 
@@ -388,6 +385,29 @@ class SetLocationState extends State<SetLocation> {
               ],
             ),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+            child:
+            TextFormField(
+              controller: streetController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText:'Address (optional)',
+                contentPadding:
+                EdgeInsets.only(left: 20, top: 20, bottom: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                  BorderSide(color: Colors.black, width: 1),
+                ),
+                hintStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: kHintColor,
+                    fontSize: 16),
+              ),
+            ),
+
+          ),
 
           (button)?
           ElevatedButton(
@@ -400,8 +420,8 @@ class SetLocationState extends State<SetLocation> {
                 textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
 
             onPressed: () {
-              setData();
-              Navigator.pop(context);
+              CheckLocation(lat,lng);
+
             },
             child: Text(
               'Continue',
@@ -435,7 +455,7 @@ class SetLocationState extends State<SetLocation> {
 
   void setData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("pickupLocation",'${currentAddress}');
+    prefs.setString("pickupLocation",'${currentAddress.toString()} '+' ${streetController.text.toString()}');
     prefs.setString("plt",'${lat}');
     prefs.setString("pln",'${lng}');
     print('setdata');
@@ -447,6 +467,41 @@ class SetLocationState extends State<SetLocation> {
 
   void getMapLoc() async {
     _getCameraMoveLocation(LatLng(lat, lng));
+  }
+
+  void CheckLocation(lat, lng) {
+    var url = parcel_check_location;
+    Uri myUri = Uri.parse(url);
+    var client = http.Client();
+    client.post(myUri, body: {'lat': lat.toString(),'lng':lng.toString()})
+        .then((value) {
+      if (value.statusCode == 200) {
+        var jsonData = jsonDecode(value.body);
+        if (jsonData['status'] == 1) {
+          setData();
+          Navigator.pop(context);
+        }
+        else{
+          dailog(jsonData['message']);
+        }
+      }}).catchError((e) {
+      print(e);
+    });
+  }
+  Future<bool> dailog(message) async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Notice'),
+        content: new Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: new Text('OK'),
+          ),
+        ],
+      ),
+    )) ?? false;
   }
 }
 
