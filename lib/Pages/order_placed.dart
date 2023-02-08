@@ -53,95 +53,91 @@ class OrderPlaced extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        Navigator.pushAndRemoveUntil(context,
-            MaterialPageRoute(builder: (context) {
-              return HomeOrderAccount(0,1);
-            }), (Route<dynamic> route) => true);
-        return true; //
-      },
+        onWillPop: () async {
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) {
+                return HomeOrderAccount(0,1);
+              }), (Route<dynamic> route) => true);
+          return true; //
+        },
 
-      child: Scaffold(
-        body: Column(
-          children: <Widget>[
-            Spacer(
-              flex: 1,
-            ),
-            Padding(
-              padding: EdgeInsets.all(60.0),
-              child: Image.asset(
-                'images/order_placed.png',
+        child: Scaffold(
+          body:
+          SingleChildScrollView(
+            child:
+            Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(60.0),
+                  child: Image.asset(
+                    'images/order_placed.png',
 
-                alignment: Alignment.center,
-              ),
-            ),
-            Text(
-              'Order id - $order_id has been Placed \n Please keep $currency $rem_price!!',
-              textAlign: TextAlign.center,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .bodyText1!
-                  .copyWith(fontSize: 24, color: kMainTextColor),
-            ),
-            Text(
-              '\n\nThanks for choosing us for delivering your needs.\n\nYou can check your order status in my order section.',
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.fade,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .subtitle2!
-                  .copyWith(color: kDisabledColor),
-            ),
-            Spacer(
-              flex: 2,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      primary: kMainColor,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 20),
-                      textStyle: TextStyle(
-                          color: kWhiteColor, fontWeight: FontWeight.w400)),
-                  onPressed: () {
-                    CallAPI('$order_id',context);
-                  },
+                    alignment: Alignment.center,
+                  ),
+                ),
+                Text(
+                  'Order id - $order_id has been Placed !!',
+                  textAlign: TextAlign.center,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(fontSize: 24, color: kMainTextColor),
+                ),
+                Text(
+                  '\n\nThanks for choosing us for delivering your needs.\n\nYou can check your order status in my order section.',
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.fade,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .subtitle2!
+                      .copyWith(color: kDisabledColor),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          primary: kMainColor,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 20),
+                          textStyle: TextStyle(
+                              color: kWhiteColor, fontWeight: FontWeight.w400)),
+                      onPressed: () {
+                        CallAPI('$order_id',context);
+                      },
 
-                  child: Text("Start Tracking")
-              ),
+                      child: Text("Start Tracking")
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          primary: kMainColor,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 20),
+                          textStyle: TextStyle(
+                              color: kWhiteColor, fontWeight: FontWeight.w400)),
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(context,
+                            MaterialPageRoute(builder: (context) {
+                              return HomeOrderAccount(0,1);
+                            }), (Route<dynamic> route) => false);},
+
+                      child: Text("Go To Home")
+                  ),
+                )
+              ],
             ),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      primary: kMainColor,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 20),
-                      textStyle: TextStyle(
-                          color: kWhiteColor, fontWeight: FontWeight.w400)),
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(context,
-                        MaterialPageRoute(builder: (context) {
-                          return HomeOrderAccount(0,1);
-                        }), (Route<dynamic> route) => false);},
-
-                  child: Text("Go To Home")
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   void CallAPI(String orderid,BuildContext context) async {
@@ -153,6 +149,7 @@ class OrderPlaced extends StatelessWidget {
       Uri myUri = Uri.parse(url);
       http.post(myUri, body: {'user_id': '$userId', 'cart_id': '$orderid'})
           .then((value) {
+        print("Parceldetails:::"+value.body.toString());
         if (value.statusCode == 200 && value.body != null) {
           {
             var tagObjsJson = jsonDecode(value.body) as List;
@@ -160,7 +157,7 @@ class OrderPlaced extends StatelessWidget {
                 .map((tagJson) => TodayOrderParcel.fromJson(tagJson))
                 .toList();
             //Navigator.popUntil(context, (route) => false);
-            Navigator.pushAndRemoveUntil(context,
+            Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) {
                   return OrderMapParcelPage(
                       pageTitle:
@@ -170,7 +167,7 @@ class OrderPlaced extends StatelessWidget {
                       currency: currency,
                       user_id: orders[0].cartId.toString()
                   );
-                }), (Route<dynamic> route) => false);
+                }));
 
           }
         }
@@ -206,7 +203,8 @@ class OrderPlaced extends StatelessWidget {
                 print("NAME " + i.toString() + " " + vendor);
               }
               VendorName.toSet().toList();
-              Navigator.pushAndRemoveUntil(context,
+
+              Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {
                     return  OrderMapPage(
                       pageTitle:
@@ -219,7 +217,7 @@ class OrderPlaced extends StatelessWidget {
                           .cart_id
                           .toString(),
                     );
-                  }), (Route<dynamic> route) => false);
+                  }));
 
 
             }
@@ -229,7 +227,7 @@ class OrderPlaced extends StatelessWidget {
                   .map((tagJson) =>
                   OrderHistoryRestaurant.fromJson(tagJson))
                   .toList();
-              Navigator.pushAndRemoveUntil(context,
+              Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {
                     return OrderMapRestPage(
                       pageTitle:
@@ -239,7 +237,7 @@ class OrderPlaced extends StatelessWidget {
                       currency: currency,
                       user_id: orders[0].cart_id.toString(),
                     );
-                  }), (Route<dynamic> route) => false);
+                  }));
             }
           }
         }

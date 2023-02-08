@@ -866,6 +866,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "scroll_to_index",
+      "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/scroll_to_index-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "scrollable_positioned_list",
       "rootUri": "file:///media/megha/043164b3-92b2-484c-a9aa-c1c188a673c61/Softwares/flutter_linux_3.3.0-stable/flutter/.pub-cache/hosted/pub.dartlang.org/scrollable_positioned_list-0.3.5",
       "packageUri": "lib/",
@@ -1130,7 +1136,7 @@
       "languageVersion": "2.18"
     }
   ],
-  "generated": "2022-11-19T16:26:24.196947Z",
+  "generated": "2023-02-08T05:04:18.432289Z",
   "generator": "pub",
   "generatorVersion": "2.18.0"
 }

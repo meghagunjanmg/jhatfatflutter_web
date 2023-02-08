@@ -175,33 +175,36 @@ class SetLocationState extends State<SetLocations> {
       });
     });
   }
-  void getPlaces(context) async {
 
+  void getPlaces(context) async {
+    // PlacesAutocomplete.show(
+    //   context: context,
+    //   apiKey: apiKey,
+    //   mode: Mode.fullscreen,
+    //   onError: (response) {
+    //     print(response.predictions);
+    //   },
+    //   language: "en",
+    //     components: [new Component(Component.country, "in")]
+    // ).then((value) {
+    //   //displayPrediction(value);
+    // }).catchError((e) {
+    //   print(e);
+    // });
     setState(() {
       button = false;
     });
 
-    Map<String,String> headers = new Map();
-    headers.putIfAbsent("X-Requested-With", () => "XMLHttpRequest");
-    headers.putIfAbsent("origin", () => "*");
+    final Prediction? p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: apiKey,
+      onError: onError,
+      mode: Mode.overlay, // or Mode.fullscreen
+      language: 'en',
+      components: [Component(Component.country, 'in')],
+    );
 
-    PlacesAutocomplete.show(
-        context: context,
-        apiKey: apiKey,
-        mode: Mode.fullscreen,
-        headers: headers,
-        proxyBaseUrl: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
-        onError: (response) {
-          print(response.predictions);
-        },
-        language: "en",
-        components: [new Component(Component.country, "in")]
-    ).then((value) {
-      displayPrediction(value!);
-    }).catchError((e) {
-      print(e);
-    });
-
+    if (p != null) displayPrediction(p);
   }
   void onError(PlacesAutocompleteResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -225,7 +228,13 @@ class SetLocationState extends State<SetLocations> {
     final lng = detail.result.geometry!.location.lng;
     _getCameraMoveLocation(LatLng(lat, lng));
     print("${p.description} - $lat/$lng");
-
+    GeoData data = await Geocoder2.getDataFromCoordinates(
+        latitude: lat,
+        longitude: lng,
+        googleMapApiKey: apiKey);
+    setState(() {
+      currentAddress = data.address;
+    });
     final marker = Marker(
       markerId: const MarkerId('location'),
       position: LatLng(lat, lng),
@@ -239,15 +248,6 @@ class SetLocationState extends State<SetLocations> {
 
 
   }
-  // Future<Null> displayPrediction(Prediction p) async {
-  //   if (p != null) {
-  //     PlacesDetailsResponse detail =
-  //         await _places.getDetailsByPlaceId(p.placeId!);
-  //     final lat = detail.result.geometry!.location.lat;
-  //     final lng = detail.result.geometry!.location.lng;
-  //     _getCameraMoveLocation(LatLng(lat, lng));
-  //   }
-  // }
 
 
   @override

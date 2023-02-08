@@ -271,25 +271,25 @@ class AppCategoryState extends State<AppCategory> {
                             getCartCount();
                           });
                         }),
-                    Positioned(
-                        right: 5,
-                        top: 2,
-                        child: Visibility(
-                          visible: isCartCount,
-                          child: CircleAvatar(
-                            minRadius: 4,
-                            maxRadius: 8,
-                            backgroundColor: kMainColor,
-                            child: Text(
-                              '$cartCount',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 7,
-                                  color: kWhiteColor,
-                                  fontWeight: FontWeight.w200),
-                            ),
-                          ),
-                        ))
+                    // Positioned(
+                    //     right: 5,
+                    //     top: 2,
+                    //     child: Visibility(
+                    //       visible: isCartCount,
+                    //       child: CircleAvatar(
+                    //         minRadius: 4,
+                    //         maxRadius: 8,
+                    //         backgroundColor: kMainColor,
+                    //         child: Text(
+                    //           '$cartCount',
+                    //           overflow: TextOverflow.ellipsis,
+                    //           style: TextStyle(
+                    //               fontSize: 7,
+                    //               color: kWhiteColor,
+                    //               fontWeight: FontWeight.w200),
+                    //         ),
+                    //       ),
+                    //     ))
                   ],
                 ),
               ),                  ],

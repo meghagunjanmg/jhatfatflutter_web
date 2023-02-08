@@ -1,21 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 import 'dart:io';
 
-import 'package:csv/csv.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hive/hive.dart';
 import 'package:horizontal_calendar_view_widget/date_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:jhatfat/Routes/routes.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_web/sembast_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,12 +25,13 @@ import 'package:jhatfat/bean/cartdetails.dart';
 import 'package:jhatfat/bean/cartitem.dart';
 import 'package:jhatfat/bean/orderarray.dart';
 import 'package:jhatfat/bean/paymentstatus.dart';
+import 'package:jhatfat/databasehelper/dbhelper.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../bean/Product.dart';
 import '../bean/couponlist.dart';
+import '../bean/orderarray.dart';
 import '../bean/resturantbean/restaurantcartitem.dart';
-import '../databasehelper/dbhelper.dart';
 import '../restaturantui/pages/payment_restaurant_page.dart';
 
 class oneViewCart extends StatefulWidget {
@@ -45,6 +41,7 @@ class oneViewCart extends StatefulWidget {
 
 class _oneViewCartState extends State<oneViewCart> {
   String storeName = '';
+
   dynamic packcharge = 0.0;
   String vendorCatId = '';
   String uiType = '';
@@ -55,10 +52,11 @@ class _oneViewCartState extends State<oneViewCart> {
   List<CartItem> cartListI = [];
   List<RestaurantCartItem> cartListII = [];
 
+  var timeslotmessage ='';
   var totalAmount = 0.0;
   var couponAmount = 0.0;
-  dynamic deliveryCharge = 0.0;
   dynamic storedeliveryCharge = 0.0;
+  dynamic gstCharge = 0;
 
   var showDialogBox = false;
 
@@ -75,7 +73,7 @@ class _oneViewCartState extends State<oneViewCart> {
   int idd1 = 0;
   bool basketvalue = false;
   List<instructionbean> instruction = [];
-  String Errormessage = '';
+  String? Errormessage='';
   String message = '';
   int is_id_req = 0;
   int is_pres_req = 0;
@@ -100,6 +98,10 @@ class _oneViewCartState extends State<oneViewCart> {
   CouponList? selectedcoupon;
   bool visiblity = false;
   String promocode = '';
+
+  List<CartArray> cartarray = [];
+  List<double> subTotals = [];
+  List<int> ven =[];
 
   void getResStoreName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -138,6 +140,8 @@ class _oneViewCartState extends State<oneViewCart> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? id_proof = prefs.getString('id_proof');
     setState((){
+      message = prefs.getString("message")!;
+
       iduploadedALready = id_proof.toString();
     });
   }
@@ -145,15 +149,20 @@ class _oneViewCartState extends State<oneViewCart> {
   @override
   void initState() {
     super.initState();
-    getAddress(context);
-    getCouponList();
-    getResCartItem();
     getCartItem();
-    getResStoreName();
     getStoreName();
-    getid();
-    ordercharg();
+    getResCartItem();
+    getResStoreName();
+    hitDateCounter();
+    getCouponList();
+    getAddress(context);
+
     servicecharge();
+    if(addressDelivery!=null)  ordercharg();
+
+    getCatC();
+    getid();
+
 
     firstDate = toDateMonthYear(DateTime.now());
     prepareData(firstDate);
@@ -170,91 +179,9 @@ class _oneViewCartState extends State<oneViewCart> {
         .length == 1) ? '0' + firstDate.month.toString() : firstDate
         .month}-${firstDate.year}';
 
-    hitDateCounter(date);
-
-
-    getCatC();
 
 
 
-
-  }
-
-  void getResCartItem() async {
-
-    var store = intMapStoreFactory.store();
-    var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
-
-    final recordSnapshot = await store.find(await db);
-    List<RestaurantCartItem> product = recordSnapshot.map((snapshot){
-      final product = RestaurantCartItem.fromJson(snapshot.value);
-      return product;
-    }).toList();
-
-    var db1 = await factory.openDatabase(DatabaseHelper.addontable);
-    final recordSnapshot1 = await store.find(db1);
-    List<AddonCartItem> product1 = recordSnapshot1.map((snapshot){
-      final product1 = AddonCartItem.fromJson(snapshot.value);
-      return product1;
-    }).toList();
-
-    List<RestaurantCartItem> tagObjs = [];
-    for(int i=0;i<product.length;i++) {
-      List<AddonCartItem> tag = [];
-      print("RES CART add get "+product1.toString());
-      for(int j =0;j<product1.length;j++){
-        print("RES CART add get "+j.toString()+ " "+product1[j].toString());
-        if(product1[j].varient_id.toString() == product[i].varient_id.toString()){
-                tag.add(product1[j]);
-         print("RES CART add same "+tag.toString());
-       }
-      }
-      tagObjs.add(new RestaurantCartItem(
-          product[i].varient_id,
-          product[i].store_name,
-          product[i].add_qnty,
-          product[i].qnty,
-          product[i].unit,
-          product[i].price,
-          product[i].product_name,
-          tag));
-    }
-    setState(() {
-      isCartFetch = true;
-      cartListII.clear();
-      cartListII = List.from(tagObjs);
-    });
-
-    print("RES CART "+cartListII.toString());
-
-    getCatC();
-
-
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // db.getResturantOrderList().then((value) {
-    //   List<RestaurantCartItem> tagObjs =
-    //   value.map((tagJson) => RestaurantCartItem.fromJson(tagJson)).toList();
-    //   setState(() {
-    //     cartListII = List.from(tagObjs);
-    //     isCartFetch = true;
-    //   });
-    //   for (int i = 0; i < cartListII.length; i++) {
-    //     print('${cartListII[i].varient_id}');
-    //     db
-    //         .getAddOnListWithPrice(int.parse('${cartListII[i].varient_id}'))
-    //         .then((values) {
-    //       List<AddonCartItem> tagObjsd =
-    //       values.map((tagJson) => AddonCartItem.fromJson(tagJson)).toList();
-    //       setState(() {
-    //         cartListII[i].addon = tagObjsd;
-    //       });
-    //     });
-    //   }
-    //   setState(() {
-    //     isCartFetch = false;
-    //   });
-    // });
   }
 
   void prepareData(firstDate) {
@@ -281,68 +208,6 @@ class _oneViewCartState extends State<oneViewCart> {
 
     return selectedDates;
   }
-  void getCartItem() async {
-   // List<CartItem> tagObjs = [];
-   //
-   //  Box<Product> items = Hive.box<Product>(DatabaseHelper.table);
-   //  for(int i=0;i<items.keys.cast<int>().toList().length;i++) {
-   //    final Product data = items.get(i)!;
-   //    tagObjs.add(new CartItem(data.storename, data.vendor, i, data.product_name, data.quantity, data.price, data.unit,  data.itemCount , data.varient_id, data.varient_image, data.is_id, data.is_pres, data.isBasket, data.addedBasket));
-   //  }
-   //
-   // List<CartItem> newList = [];
-   // for (var element in tagObjs) {
-   //   var list = newList.where((i) => i.varient_id == element.varient_id).toList();
-   //   newList.removeWhere((element) => element.add_qnty == 0);
-   //   if(list.isEmpty){
-   //     newList.add(element);
-   //   }
-   // }
-
-    var store = intMapStoreFactory.store();
-    var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.table);
-
-    final recordSnapshot = await store.find(await db);
-    List<Product> product = recordSnapshot.map((snapshot){
-      final product = Product.fromJson(snapshot.value);
-      return product;
-    }).toList();
-    List<CartItem> tagObjs = [];
-    for(int i=0;i<product.length;i++) {
-      tagObjs.add(new CartItem(product[i].storename, product[i].vendor, i, product[i].product_name, product[i].quantity, product[i].price, product[i].unit, product[i].itemCount, product[i].varient_id, product[i].varient_image, product[i].is_id, product[i].is_pres, product[i].isBasket, product[i].addedBasket));
-    }
-
-    setState(() {
-     isCartFetch = false;
-     cartListI.clear();
-     cartListI = tagObjs;
-   });
-
-
-   setidpres(cartListI);
-
-
-    //
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // db.queryAllRows().then((value) {
-    //   List<CartItem> tagObjs =
-    //   value.map((tagJson) => CartItem.fromJson(tagJson)).toList();
-    //
-    //   if (tagObjs.isEmpty) {add_qnty
-    //     setState(() {});
-    //   }
-    //   else {
-    //     setState(() {
-    //       isCartFetch = false;
-    //       cartListI.clear();
-    //       cartListI = tagObjs;
-    //     });
-    //   }
-    // });
-    //
-    // print("CART: "+cartListI.toString());
-  }
 
 
   void getAddress(BuildContext context) async {
@@ -352,7 +217,6 @@ class _oneViewCartState extends State<oneViewCart> {
       currency = prefs.getString('curency')!;
     });
     int? userId = prefs.getInt('user_id');
-    String? vendorId = prefs.getString('vendor_id');
     var url = address_selection;
     Uri myUri = Uri.parse(url);
 
@@ -368,8 +232,10 @@ class _oneViewCartState extends State<oneViewCart> {
           setState(() {
             isCartFetch = false;
             addressDelivery = addressWelcome.data!;
-
           });
+
+          if(addressDelivery!=null)  ordercharg();
+
         } else {
           setState(() {
             isCartFetch = false;
@@ -394,80 +260,53 @@ class _oneViewCartState extends State<oneViewCart> {
     });
   }
 
-  void addOrMinusProduct2( produtId, productName, unit, price,
-      quantity, itemquan,
-      varient_id,price_d) async {
+  void addOrMinusProduct2( product_id, product_name, unit, price,
+      quantity, itemCount,
+      varient_id, index, price_d,vendorid) async {
+    DatabaseHelper db = DatabaseHelper.instance;
+    Future<int?> existing = db.getRestProductcount(int.parse(varient_id));
+    existing.then((value) {
+      var vae = {
+        DatabaseHelper.productId: product_id,
+        DatabaseHelper.productName: product_name,
+        DatabaseHelper.price: price,
+        DatabaseHelper.unit: unit,
+        DatabaseHelper.quantitiy: quantity,
+        DatabaseHelper.addQnty: itemCount,
+        DatabaseHelper.varientId: varient_id,
+        DatabaseHelper.vendor_id: vendorId,
 
-    var store = intMapStoreFactory.store();
-    var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
-    var value = await store.record(produtId).get(db);
-    Map map2 = Map.from(value!);
-    print(map2);
-    if (produtId.toString() == map2.values.elementAt(0).toString()) {
-      var key1 = await store.record(produtId).delete(db);
-      var key = await store.record(produtId).add(db, <String, Object?>{
-        'varient_id': produtId,
-        'store_name': productName.toString(),
-        "add_qnty": itemquan,
-        "qnty": quantity,
-        "unit": unit,
-        "price": (price_d * itemquan),
-        "product_name": productName.toString(),
-      });
-      print("SAME VAR " + key.toString());
-    }
+      };
 
-    if (itemquan == 0) {
-      await store.record(produtId).delete(db);
-      Navigator.pop(context);
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => HomeOrderAccount(3,1)),
-            (Route<dynamic> route) => true,
-      );
-    }
+      if (value == 0) {
+        db.insertRaturantOrder(vae);
+        getResCartItem();
+        getCatC();
+      }
+      else {
+        if (itemCount==0) {
+          db.deleteResProduct(varient_id).then((value) {
+            db.deleteAddOn(varient_id);
+          });
+          getResCartItem();
+          getCatC();
+        }
 
-    getResCartItem();
+        else {
+          db.updateRestProductData(vae, varient_id);
+          getResCartItem();
+          getCatC();
+        }
+      }
+      if (itemCount == 0) {
+        getResCartItem();
+        getCatC();
+      }
+    });
 
     getCatC();
     getCouponList();
 
-
-
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // Future<int?> existing = db.getRestProductcount(int.parse(varient_id));
-    // existing.then((value) {
-    //   var vae = {
-    //     DatabaseHelper.productId: product_id,
-    //     DatabaseHelper.productName: product_name,
-    //     DatabaseHelper.price: (price_d * itemCount),
-    //     DatabaseHelper.unit: unit,
-    //     DatabaseHelper.quantitiy: quantity,
-    //     DatabaseHelper.addQnty: itemCount,
-    //     DatabaseHelper.varientId: varient_id
-    //   };
-    //
-    //   if (value == 0) {
-    //     db.insertRaturantOrder(vae);
-    //   }
-    //   else {
-    //     if (itemCount==0) {
-    //       db.deleteResProduct(varient_id).then((value) {
-    //         db.deleteAddOn(varient_id);
-    //       });
-    //       getResCartItem();
-    //
-    //     } else {
-    //       db.updateRestProductData(vae, varient_id);
-    //     }
-    //   }
-    //   if (itemCount == 0) {
-    //     getResCartItem();
-    //   }
-    // });
-    //
-    // getCatC();
   }
 
   Widget timewidget(BuildContext context, double itemHeight, double itemWidth) {
@@ -477,7 +316,7 @@ class _oneViewCartState extends State<oneViewCart> {
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.all(10.0),
             color: kCardBackgroundColor,
-            child: Text('Time Slot',
+            child: Text('Order will be delivered instantly, given below is the maximum time',
                 style: Theme
                     .of(context)
                     .textTheme
@@ -654,14 +493,16 @@ class _oneViewCartState extends State<oneViewCart> {
                             cartListII[index].add_qnty = addQ;
 
                             addOrMinusProduct2(
-                            cartListII[index].varient_id,
+                                cartListII[index].varient_id,
                                 cartListII[index].product_name,
                                 cartListII[index].unit,
                                 cartListII[index].price,
                                 cartListII[index].qnty,
                                 cartListII[index].add_qnty,
                                 cartListII[index].varient_id,
-                                price_d
+                                index,
+                                price_d,
+                                cartListII[index].vendor_id
                             );
                           }
                           ,
@@ -698,7 +539,9 @@ class _oneViewCartState extends State<oneViewCart> {
                                 cartListII[index].qnty,
                                 cartListII[index].add_qnty,
                                 cartListII[index].varient_id,
-                                price_d
+                                index,
+                                price_d,
+                                cartListII[index].vendor_id
                             );
                           },
                           child: Icon(
@@ -777,110 +620,32 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
 
-  void deleteAddOn(addonid) async {
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // db.deleteAddOnId(int.parse(addonid)).then((value) {
-    //   getResCartItem();
-    // });
-    var store = intMapStoreFactory.store();
-    var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.addontable);
-
-    var key1 = await store.record(addonid).delete(db);
-    getResCartItem();
-
-  }
-  void getCatC() async {
-    if (cartListI.isNotEmpty) {
-      List<CartItem> newList = [];
-      for (var element in cartListI) {
-        var list = newList.where((i) => i.varient_id == element.varient_id).toList();
-        newList.removeWhere((element) => element.add_qnty == 0);
-        if(list.isEmpty){
-          newList.add(element);
-        }
-      }
-      var Amount=0.0;
-      for(int i=0;i<newList.length;i++) {
-        Amount = newList.elementAt(i).price + Amount;
-      }
-      setState(() {
-        totalAmount = Amount;
-      });
-    }
-
-     if (cartListII.isNotEmpty) {
-       var Amount=0.0;
-       for(int i=0;i<cartListII.length;i++) {
-         if(cartListII[i].addon.isNotEmpty){
-           for(int j = 0;j<cartListII[i].addon.length;j++){
-             Amount = cartListII.elementAt(i).price + cartListII.elementAt(i).addon[j].price + Amount;
-           }
-         }
-        else Amount = cartListII.elementAt(i).price + Amount;
-       }
-       setState(() {
-         totalAmount = Amount;
-       });
-     }
-
-
-
-    if(radioId!=-1){
-      if(couponL[radioId].type=='percentage') {
-        setState(() {
-          couponAmount = ((double.parse(couponL[radioId].amount)/100)*totalAmount);
-        });
-      }
-      else{
-        setState(() {
-          couponAmount = double.parse(couponL[radioId].amount);
-        });
-      }
-    }
-
-
-    // if (cartListII.isNotEmpty) {
-    //   DatabaseHelper db = DatabaseHelper.instance;
-    //   db.calculateTotalRest().then((value) {
-    //     db.calculateTotalRestAdon().then((valued) {
-    //       var tagObjsJson = value as List;
-    //       var tagObjsJsond = valued as List;
-    //       setState(() {
-    //         dynamic totalAmount_1 = tagObjsJson[0]['Total'];
-    //         dynamic totalAmount_2 = tagObjsJsond[0]['Total'];
-    //
-    //         if (value.isEmpty) {
-    //           if (valued.isEmpty) {}
-    //           else {
-    //             totalAmount = totalAmount_1 + totalAmount_2;
-    //           }
-    //         } else {
-    //             totalAmount = totalAmount_1;
-    //         }
-    //       });
-    //     });
-    //   });
-    // }
-  }
   void callThisMethod(bool isVisible) {
-    getCouponList();
-    getid();
     getCartItem();
+    getStoreName();
     getResCartItem();
-    setidpres(cartListI);
-    getCatC();
-    ordercharg();
+    getResStoreName();
+    hitDateCounter();
+    getCouponList();
+    getAddress(context);
+
+    // ordercharg();
     servicecharge();
 
-  }
+    if(addressDelivery!=null)  ordercharg();
 
+    getCatC();
+    getid();
+
+
+    setidpres(cartListI);
+
+  }
   _showDialog() async{
     List<CartItem> cartbasket=[];
     for(int i=0;i<cartListI.length;i++){
       if(cartListI[i].isBasket==1) cartbasket.add(cartListI[i]);
     }
-
 
     await showDialog<String>(
       context: context,
@@ -913,6 +678,7 @@ class _oneViewCartState extends State<oneViewCart> {
   }
   @override
   Widget build(BuildContext context) {
+    getCartItem();
     getCatC();
     var size = MediaQuery
         .of(context)
@@ -982,35 +748,117 @@ class _oneViewCartState extends State<oneViewCart> {
                           padding: EdgeInsets.all(20.0),
                           color: kCardBackgroundColor,
                         ),
+
                         Column(
-                            children: <Widget>[ (cartListI.length > 0)
-                                ? ListView.separated(
-                                primary: false,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  return cartOrderItemListTile1(
-                                    context,
-                                    currency,
-                                    cartListI[index].isBasket,
-                                    '${cartListI[index].product_name}',
-                                    (cartListI[index].price /
-                                        cartListI[index].add_qnty),
-                                    cartListI[index].add_qnty,
-                                    cartListI[index].qnty,
-                                    cartListI[index].unit,
-                                    cartListI[index].store_name,
-                                    cartListI[index].is_id,
-                                    cartListI[index].is_pres,
-                                    index,
-                                  );
-                                },
-                                separatorBuilder: (context, index) {
-                                  return Divider(
-                                    color: kCardBackgroundColor,
-                                    thickness: 1.0,
-                                  );
-                                },
-                                itemCount: cartListI.length) : Container(),
+                            children: <Widget>[
+                              (cartarray.length > 0)
+                                  ?
+
+                              ListView.separated(
+                                  primary: false,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    return
+                                      Column(
+                                        children: [
+                                          Text(
+                                            cartarray[index].vendor_name,
+                                            style: Theme
+                                                .of(context)
+                                                .textTheme
+                                                .subtitle2!
+                                                .copyWith(color: kMainTextColor),
+                                          ),
+
+                                          ListView.separated(
+                                              primary: false,
+                                              shrinkWrap: true,
+                                              itemBuilder: (context, ind) {
+                                                return cartOrderItemListTile1(
+                                                  context,
+                                                  currency,
+                                                  cartarray[index].cartitems[ind].isBasket,
+                                                  '${cartarray[index].cartitems[ind].product_name}',
+                                                  (cartarray[index].cartitems[ind].price /
+                                                      cartarray[index].cartitems[ind].add_qnty),
+                                                  cartarray[index].cartitems[ind].add_qnty,
+                                                  cartarray[index].cartitems[ind].qnty,
+                                                  cartarray[index].cartitems[ind].unit,
+                                                  cartarray[index].cartitems[ind].store_name,
+                                                  cartarray[index].cartitems[ind].is_id,
+                                                  cartarray[index].cartitems[ind].is_pres,
+                                                  cartarray[index].cartitems[ind],
+                                                );}, separatorBuilder: (context, index) {
+                                            return Divider(
+                                              color: kCardBackgroundColor,
+                                              thickness: 1.0,
+                                            );
+                                          },
+                                              itemCount: cartarray[index].cartitems.length),
+
+                                          (cartarray[index].subtotal>0)?
+                                          Container(
+                                            color: Colors.white,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 4.0, horizontal: 20.0),
+                                            child: Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Subtotal',
+                                                    style: Theme
+                                                        .of(context)
+                                                        .textTheme
+                                                        .caption,
+                                                  ),
+                                                  Text(
+                                                    '$currency ${cartarray[index].subtotal.toStringAsFixed(2)}',
+                                                    style: Theme
+                                                        .of(context)
+                                                        .textTheme
+                                                        .caption,
+                                                  ),
+                                                ]),
+                                          ): Container(),
+
+                                          (cartarray[index].discount>0)?
+                                          Container(
+                                            color: Colors.white,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 4.0, horizontal: 20.0),
+                                            child: Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Coupon Discount',
+                                                    style: Theme
+                                                        .of(context)
+                                                        .textTheme
+                                                        .caption,
+                                                  ),
+                                                  Text(
+                                                    '- $currency ${cartarray[index].discount.toStringAsFixed(2)}',
+                                                    style: Theme
+                                                        .of(context)
+                                                        .textTheme
+                                                        .caption,
+                                                  ),
+                                                ]),
+                                          ): Container(),
+
+                                        ],
+
+                                      );
+                                  },
+                                  separatorBuilder: (context, index) {
+                                    return Divider(
+                                      color: kCardBackgroundColor,
+                                      thickness: 1.0,
+                                    );
+                                  },
+                                  itemCount: cartarray.length) : Container(),
 
                               (is_id_req == 1) ?
                               (iduploadedALready!.isNotEmpty)?
@@ -1189,7 +1037,7 @@ class _oneViewCartState extends State<oneViewCart> {
                           alignment: Alignment.centerLeft,
                           padding: EdgeInsets.all(10.0),
                           color: kCardBackgroundColor,
-                          child: Text('1) Order will be delivered within 30-60 mins.\n2) Order from 2-3 different shops will be delivered in 1-2 hour.\n3) Restraunt orders will be delivered instantly.',
+                          child: Text('${timeslotmessage}',
                               style: Theme
                                   .of(context)
                                   .textTheme
@@ -1236,7 +1084,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                                       thickness: 2.3,
                                                     ),
 
-                                                    (couponL[t].cart_value<=totalAmount)?
+                                                    (couponL[t].status)?
                                                     Row(
                                                       mainAxisAlignment:
                                                       MainAxisAlignment
@@ -1244,23 +1092,18 @@ class _oneViewCartState extends State<oneViewCart> {
                                                       children: [
                                                         Expanded(
                                                             child: Text(
-                                                                '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}')),
+                                                                '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}\nStore: ${couponL[t].vendor_name }')),
                                                         Radio(
                                                             value: t,
                                                             groupValue: radioId,
                                                             toggleable: true,
                                                             onChanged: (val) {
-                                                              print('${val}');
-                                                              print(
-                                                                  '${radioId} - ${t}');
                                                               if (radioId != t ||
                                                                   radioId == -1) {
                                                                 setState(() {
                                                                   if (totalAmount !=
                                                                       0.0) {
                                                                     radioId = t;
-                                                                    print(
-                                                                        '${radioId} - ${t}');
 
                                                                     selectedcoupon = couponL[t];
                                                                     // setProgressText =
@@ -1275,6 +1118,12 @@ class _oneViewCartState extends State<oneViewCart> {
                                                                   radioId = -1;
                                                                   selectedcoupon=null;
                                                                   couponAmount = 0.0;
+                                                                  for(int i = 0;i<cartarray.length;i++){
+                                                                    setState(() {
+                                                                      cartarray[i].discount = 0;
+                                                                    });
+                                                                  }
+
                                                                   // showDialogBox =
                                                                   // true;
                                                                   //appCoupon(couponL[t].coupon_code);
@@ -1291,7 +1140,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                                       children: [
                                                         Expanded(
                                                             child: Text(
-                                                              '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}',
+                                                              '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}\nStore: ${couponL[t].vendor_name }',
                                                               style: TextStyle(color: Colors.red),
                                                             )),
                                                       ],
@@ -1459,6 +1308,32 @@ class _oneViewCartState extends State<oneViewCart> {
                               ]),
                         ): Container(),
 
+                        (gstCharge>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'GST ',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${gstCharge.toStringAsFixed(2)}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+
                         (storedeliveryCharge==0.0)?
                         Container(): Container(
                           color: Colors.white,
@@ -1531,7 +1406,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                 ),
                                 Text(
                                   '$currency '
-                                      '${((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
+                                      '${((totalAmount - couponAmount) + gstCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1580,19 +1455,15 @@ class _oneViewCartState extends State<oneViewCart> {
                                             fontWeight: FontWeight.bold)),
                                     Spacer(),
                                     GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences prefs =
-                                        await SharedPreferences
-                                            .getInstance();
-                                        String? vendorId =
-                                        prefs.getString('vendor_id');
+                                      onTap: () {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) {
                                                   return SavedAddressesPage(
-                                                      vendorId);
+                                                      "");
                                                 })).then((value) {
                                           getAddress(context);
+                                          //  ordercharg();
                                         });
                                       },
                                       child: Text('CHANGE',
@@ -1624,7 +1495,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                         color: Color(0xffb7b7b7))),
 
                                 Text(
-                                    '${Errormessage != ''
+                                    '${Errormessage!.length > 0
                                         ? '${Errormessage}'
                                         : '' }'
                                     ,
@@ -1645,54 +1516,70 @@ class _oneViewCartState extends State<oneViewCart> {
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
                               primary: kMainColor,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 150, vertical: 20),
+                              padding: EdgeInsets.all(15),
                               textStyle: TextStyle(color: kWhiteColor,
                                   fontWeight: FontWeight.w400)),
 
                           onPressed: () {
                             if(addressDelivery!=null) {
-                              if (cartListI.isNotEmpty) {
-                                if (is_id_req == 1 &&
-                                    iduploaded != null) createCart(context);
-                                else if(is_id_req == 1 &&
-                                    iduploaded == null) {
-                                  Fluttertoast.showToast(
-                                      msg: "Upload Id Proof",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.black,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0
-                                  );
-                                }
-
-                                if (is_pres_req == 1 &&
-                                    presuploaded != null) createCart(context);
-                                else if(is_pres_req == 1 &&
-                                    presuploaded == null) {
-                                  Fluttertoast.showToast(
-                                      msg: "Upload Prescription",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.black,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0
-                                  );
-                                }
-
-                                if (is_pres_req == 0 &&
-                                    is_id_req == 0) createCart(context);
-                                if (is_pres_req == 0 && is_id_req == 1 &&
-                                    iduploaded != null) createCart(context);
-                                if (is_id_req == 0 && is_pres_req == 1 &&
-                                    presuploaded != null) createCart(context);
+                              if(Errormessage!.toString().length != 1 && Errormessage!.toString().length > 0) {
+                                Fluttertoast.showToast(
+                                    msg: Errormessage!.toString(),
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
                               }
-                              else if (cartListII.isNotEmpty) {
-                                createResCart(context);
+                              else{
+                                if (cartListI.isNotEmpty) {
+                                  if (is_id_req == 1 &&
+                                      iduploaded != null)
+                                    createCart(context);
+                                  else if (is_id_req == 1 &&
+                                      iduploaded == null) {
+                                    Fluttertoast.showToast(
+                                        msg: "Upload Id Proof",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.black,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0
+                                    );
+                                  }
+
+                                  if (is_pres_req == 1 &&
+                                      presuploaded != null)
+                                    createCart(context);
+                                  else if (is_pres_req == 1 &&
+                                      presuploaded == null) {
+                                    Fluttertoast.showToast(
+                                        msg: "Upload Prescription",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.black,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0
+                                    );
+                                  }
+
+                                  if (is_pres_req == 0 &&
+                                      is_id_req == 0) createCart(context);
+                                  if (is_pres_req == 0 && is_id_req == 1 &&
+                                      iduploaded != null) createCart(context);
+                                  if (is_id_req == 0 && is_pres_req == 1 &&
+                                      presuploaded != null) createCart(
+                                      context);
+                                }
+                                else if (cartListII.isNotEmpty) {
+                                  createResCart(context);
+                                }
                               }
+
                             }
                             else{
                               Fluttertoast.showToast(
@@ -1707,7 +1594,7 @@ class _oneViewCartState extends State<oneViewCart> {
                             }
                           },
                           child: Text("Pay $currency "+
-                              '${((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
+                              '${((totalAmount - couponAmount) + gstCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
                           ),
                         )
                       ],
@@ -1839,7 +1726,8 @@ class _oneViewCartState extends State<oneViewCart> {
         List<OrderAdonArray> orderAddonArray = [];
         for (RestaurantCartItem item in cartListII) {
           orderArray.add(OrderArray(
-              int.parse('${item.add_qnty}'), int.parse('${item.varient_id}')));
+              int.parse('${item.add_qnty}'),
+              int.parse('${item.varient_id}')));
           if (item.addon.length > 0) {
             for (AddonCartItem addItem in item.addon) {
               orderAddonArray
@@ -1848,21 +1736,19 @@ class _oneViewCartState extends State<oneViewCart> {
           }
         }
 
-        print(
-            '$userId $vendorId ${orderArray.toString()} ${orderAddonArray
-                .toString()}');
 
         Uri myUri = Uri.parse(url);
         http.post(myUri, body: {
           'user_id': '${userId}',
           'vendor_id': vendorId,
           'order_array': orderArray.toString(),
-          'instruction':instruction.toString(),
+          'instruction': instruction.toString(),
           'order_array1':
           (orderAddonArray.length > 0) ? orderAddonArray.toString() : '',
-          'ui_type': ui_type
+          'ui_type': ui_type,
+          'del_c':storedeliveryCharge.toString(),
         }).then((value) {
-          print('${value.statusCode} ${value.body}');
+          print("ORDERC::"+value.body.toString()+"\n"+storedeliveryCharge.toString());
           if (value.statusCode == 200) {
             var jsonData = jsonDecode(value.body);
             if (jsonData['status'] == "1") {
@@ -1871,12 +1757,15 @@ class _oneViewCartState extends State<oneViewCart> {
               CartDetail details = CartDetail.fromJson(jsonData['data']);
 
               pref.remove("r_instructions");
-              if(radioId!=-1){
-                appCoupon( selectedcoupon!.coupon_code , details.cart_id);
+              if (radioId != -1) {
+                appCoupon(selectedcoupon!.coupon_code, details.cart_id);
               }
 
 
-              getVendorPayment(vendorId!, details,(totalAmount + deliveryCharge + packcharge + storedeliveryCharge));
+              getVendorPayment(vendorId!, details,
+                  ((totalAmount - couponAmount)+ gstCharge + storedeliveryCharge +
+                      packcharge + surge_charges + night_charges +
+                      conv_charges).toStringAsFixed(2));
             } else {
               // Toast.show(jsonData['message'], context,
               //     duration: Toast.LENGTH_SHORT);
@@ -1913,9 +1802,9 @@ class _oneViewCartState extends State<oneViewCart> {
       setState(() {
         showDialogBox = false;
       });
-      // Toast.show('Please add some items into cart!', context,
-      //     duration: Toast.LENGTH_SHORT);
     }
+
+
   }
 
   void getVendorPayment(String vendorId, CartDetail details,totalAmount) async {
@@ -1923,12 +1812,12 @@ class _oneViewCartState extends State<oneViewCart> {
     setState(() {
       currency = preferences.getString('curency')!;
     });
+
     var url = paymentvia;
     var client = http.Client();
     Uri myUri = Uri.parse(url);
 
     client.post(myUri, body: {'vendor_id': '${vendorId}'}).then((value) {
-      print('${value.statusCode} - ${value.body}');
       if (value.statusCode == 200) {
         setState(() {
           showDialogBox = false;
@@ -1942,12 +1831,11 @@ class _oneViewCartState extends State<oneViewCart> {
 
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return PaymentRestPage(vendorId, details.order_id, details.cart_id,
-                double.parse(totalAmount.toString()), tagObjs,maxincash);
+                double.parse(totalAmount.toString()), tagObjs , maxincash);
           }));
         }
       }
     }).catchError((e) {
-      print(e);
     });
   }
 
@@ -1980,123 +1868,112 @@ class _oneViewCartState extends State<oneViewCart> {
     if(iduploaded!=null) uploadid(context);
 
     if (cartListI.length > 0) {
-      if (radioList.length > 0) {
-        if (totalAmount > 0.0) {
-          var url = addToCart;
+      if (totalAmount > 0.0) {
 
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          int? userId = pref.getInt('user_id');
-          String? vendorId = pref.getString('vendor_id');
-          String? ui_type = "1";
-          String? instruction = pref.getString("instructions");
+        var url = addToCart;
 
-          List<OrderArrayGrocery> orderArray = [];
-          for (CartItem item in cartListI) {
-            orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
-                int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
-          }
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        int? userId = pref.getInt('user_id');
+        String? vendorId = pref.getString('vendor_id');
+        String? ui_type = "1";
+        String? instruction = pref.getString("instructions");
 
+        List<OrderArrayGrocery> orderArray = [];
+        for (CartItem item in cartListI) {
+          orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
+              int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
+        }
+        final now = DateTime.now();
 
-          print("ins:    "+instruction.toString());
-          Uri myUri = Uri.parse(url);
-          http.post(myUri, body: {
-            'user_id': userId.toString(),
-            'order_array': orderArray.toString(),
-            'delivery_date': dateTimeSt,
-            'instruction':instruction.toString(),
-            'time_slot': '${radioList[idd1]}',
-            'ui_type': ui_type,
-            if(presuploaded!=null)  'pres':presuploaded
+        Uri myUri = Uri.parse(url);
+        http.post(myUri, body: {
+          'user_id': userId.toString(),
+          'order_array': orderArray.toString(),
+          'delivery_date': dateTimeSt,
+          'instruction':instruction.toString(),
+          'time_slot':now.hour.toString() +" : "+ now.minute.toString(),
+          'ui_type': ui_type,
+          'del_c': storedeliveryCharge.toString(),
+          if(presuploaded!=null)  'pres':presuploaded
 
-          }).then((value) {
-            print('order' + value.body);
-            if (value.statusCode == 200) {
-              var jsonData = jsonDecode(value.body);
-              if (jsonData['status'] == "1")
-              {
-                // Toast.show(jsonData['message'], context,
-                //     duration: Toast.LENGTH_SHORT);
-                CartDetail details = CartDetail.fromJson(jsonData['data']);
+        }).then((value) {
+          print("Ordercart"+value.body.toString()+"\n"+storedeliveryCharge.toString());
+          if (value.statusCode == 200) {
+            var jsonData = jsonDecode(value.body);
+            if (jsonData['status'] == "1")
+            {
+              // Toast.show(jsonData['message'], context,
+              //     duration: Toast.LENGTH_SHORT);
+              CartDetail details = CartDetail.fromJson(jsonData['data']);
 
-                if(radioId!=-1){
-                  appCoupon( selectedcoupon!.coupon_code , details.cart_id);
-                }
-
-
-                getVendorPayment2(vendorId!, details, orderArray.toString(),(totalAmount + deliveryCharge + storedeliveryCharge + packcharge));
-
-                pref.remove("instructions");
-                setState(() {
-                  iduploaded = null;
-                  presuploaded = null;
-                });
-
-
+              if(radioId!=-1){
+                appCoupon( selectedcoupon!.coupon_code , details.cart_id);
               }
-              else if(jsonData['status'] == "0"){
-                Fluttertoast.showToast(
-                    msg: jsonData['message'],
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              }
-              else {
-                // Toast.show(jsonData['message'], context,
-                //     duration: Toast.LENGTH_SHORT);
-                Fluttertoast.showToast(
-                    msg: jsonData['message'],
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-                setState(() {
-                  showDialogBox = false;
-                });
-              }
-            } else {
+
+
+              getVendorPayment2(vendorId!, details, orderArray.toString(),((totalAmount - couponAmount) + gstCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2));
+
+              pref.remove("instructions");
+              setState(() {
+                iduploaded = null;
+                presuploaded = null;
+              });
+            }
+            else if(jsonData['status'] == "0"){
+              Fluttertoast.showToast(
+                  msg: jsonData['message'],
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+            }
+            else {
+              // Toast.show(jsonData['message'], context,
+              //     duration: Toast.LENGTH_SHORT);
+              Fluttertoast.showToast(
+                  msg: jsonData['message'],
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
               setState(() {
                 showDialogBox = false;
               });
             }
-          }).catchError((_) {
+          } else {
             setState(() {
               showDialogBox = false;
             });
-          });
-        } else {
+          }
+        }).catchError((_) {
           setState(() {
             showDialogBox = false;
           });
-          if (addressDelivery != null) {
-            // Toast.show('Please add something in your cart to proceed!', context,
-            //     duration: Toast.LENGTH_SHORT);
-          } else {
-            // Toast.show(
-            //     'Please add your delivery address to continue shopping..',
-            //     context,
-            //     duration: Toast.LENGTH_SHORT);
-          }
-        }
+        });
       } else {
         setState(() {
           showDialogBox = false;
         });
-        // Toast.show('Please select a delivery time to continue!', context,
-        //     duration: Toast.LENGTH_SHORT);
+        if (addressDelivery != null) {
+          // Toast.show('Please add something in your cart to proceed!', context,
+          //     duration: Toast.LENGTH_SHORT);
+        } else {
+          // Toast.show(
+          //     'Please add your delivery address to continue shopping..',
+          //     context,
+          //     duration: Toast.LENGTH_SHORT);
+        }
       }
     } else {
       setState(() {
         showDialogBox = false;
       });
-      // Toast.show('Please add some items into cart!', context,
-      //     duration: Toast.LENGTH_SHORT);
     }
   }
 
@@ -2106,6 +1983,7 @@ class _oneViewCartState extends State<oneViewCart> {
     setState(() {
       currency = preferences.getString('curency')!;
     });
+
     var url = paymentvia;
     var client = http.Client();
     Uri myUri = Uri.parse(url);
@@ -2131,8 +2009,7 @@ class _oneViewCartState extends State<oneViewCart> {
                 double.parse(totalAmount.toString()),
                 tagObjs,
                 orderArray,
-              maxincash
-
+                maxincash
             );
           }));
         }
@@ -2145,136 +2022,69 @@ class _oneViewCartState extends State<oneViewCart> {
   void addOrMinusProduct(is_id, is_pres, isBasket,addedbas, product_name, unit, price,
       quantity, itemCount,
       varient_image, varient_id, vendorid,storename) async {
-    //
-    // print("CARTDATA"+product_name);
-    // Box<Product> dataBox;
-    //
-    // dataBox = Hive.box<Product>(DatabaseHelper.table);
-    //
-    // Box<Product> item = Hive.box<Product>(DatabaseHelper.table);
-    //
-    // Product product = Product(
-    //     product_name.toString(),
-    //     storename!.toString(),
-    //     vendorid.toString(),
-    //     (price * itemCount),
-    //     unit.toString(),
-    //     quantity,
-    //     itemCount,
-    //     varient_image.toString(),
-    //     is_id,
-    //     is_pres,
-    //     isBasket,
-    //     0,
-    //     varient_id.toString());
-    //
-    // print("CARTDATA "+dataBox.values.toString());
-    // await dataBox.add(product);
-    //
-    // for(int i=0;i<item.keys.cast<int>().toList().length;i++) {
-    //   final Product data = item.get(i)!;
-    //   if(varient_id.toString() == data.varient_id.toString())
-    //   {
-    //     product = item.getAt(i)!;
-    //     print("CARTDATA varient "+varient_id.toString() + data.varient_id.toString() + product.varient_id);
-    //     product.delete();
-    //     dataBox.delete(i);
-    //   }
-    // }
+    DatabaseHelper db = DatabaseHelper.instance;
 
-    var store = intMapStoreFactory.store();
-    var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.table);
+    db.getcount(varient_id).then((value) {
+      print('value d - $value');
+      var vae = {
+        DatabaseHelper.productName: product_name,
+        DatabaseHelper.storeName: storename,
+        DatabaseHelper.vendor_id: vendorid,
+        DatabaseHelper.price: price,
+        DatabaseHelper.unit: unit,
+        DatabaseHelper.quantitiy: quantity,
+        DatabaseHelper.addQnty: itemCount,
+        DatabaseHelper.productImage: varient_image,
+        DatabaseHelper.is_id: is_id,
+        DatabaseHelper.is_pres: is_pres,
+        DatabaseHelper.isBasket: isBasket,
+        DatabaseHelper.addedBasket: addedbas,
+        DatabaseHelper.varientId: varient_id
+      };
+      if (value == 0) {
+        db.getCountVendor()
+            .then((value) {
+          if (value != null && value < 3) {
+            db.insert(vae);
+            getCartItem();
+            getCatC();
+          }
+        }
+        );
+      } else {
+        if (itemCount == 0) {
+          print('Delete - $varient_id');
 
-    var value = await store.record(varient_id).get(db);
-    Map map2 = Map.from(value!);
-    print(map2);
-    if(varient_id.toString() == map2.values.elementAt(12).toString()) {
-      var key1 = await store.record(varient_id).delete(db);
-      print("SAME VAR 1 " + key1.toString());
-      var key = await store.record(varient_id).add(db, <String, Object?>{
-        'product_name': product_name.toString(),
-        'storename': storeName.toString(),
-        'vendor': vendorid.toString(),
-        "price": (price * itemCount),
-        "unit": unit.toString(),
-        "quantity": quantity,
-        "itemCount": itemCount,
-        "varient_image": varient_image.toString(),
-        "is_id": is_id,
-        "is_pres": is_pres,
-        "isBasket": isBasket,
-        "addedBasket": addedbas,
-        "varient_id": varient_id,
-      });
-    }
+          db.delete(varient_id);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => HomeOrderAccount(3,1)),
+                (Route<dynamic> route) => false,
+          );
+          getCartItem();
+          getCatC();
 
-    if(itemCount==0){
-      await store.record(varient_id).delete(db);
-    }
-
+        } else {
+          db.updateData(vae, int.parse('${varient_id}')).then((vay) {
+            print('vay - $vay');
+          });
+          getCartItem();
+          getCatC();
+        }
+      }
+    }).catchError((e) {
+      print(e);
+    });
 
     getCartItem();
-
     getCatC();
     getCouponList();
-
-    //
-    // db.getcount(varient_id).then((value) {
-    //   print('value d - $value');
-    //   var vae = {
-    //     DatabaseHelper.productName: product_name,
-    //     DatabaseHelper.storeName: storename,
-    //     DatabaseHelper.vendor_id: vendorid,
-    //     DatabaseHelper.price: (price * itemCount),
-    //     DatabaseHelper.unit: unit,
-    //     DatabaseHelper.quantitiy: quantity,
-    //     DatabaseHelper.addQnty: itemCount,
-    //     DatabaseHelper.productImage: varient_image,
-    //     DatabaseHelper.is_id: is_id,
-    //     DatabaseHelper.is_pres: is_pres,
-    //     DatabaseHelper.isBasket: isBasket,
-    //     DatabaseHelper.addedBasket: addedbas,
-    //     DatabaseHelper.varientId: varient_id
-    //   };
-    //   if (value == 0) {
-    //     db.getCountVendor()
-    //         .then((value) {
-    //       if (value != null && value < 3) {
-    //         db.insert(vae);
-    //       }
-    //     }
-    //     );
-    //   } else {
-    //     if (itemCount == 0) {
-    //       print('Delete - $varient_id');
-    //
-    //       db.delete(varient_id);
-    //
-    //       Navigator.pushAndRemoveUntil(
-    //         context,
-    //         MaterialPageRoute(builder: (context) => HomeOrderAccount(3)),
-    //             (Route<dynamic> route) => true,
-    //       );
-    //     } else {
-    //       db.updateData(vae, int.parse('${varient_id}')).then((vay) {
-    //         print('vay - $vay');
-    //       });
-    //     }
-    //   }
-    // }).catchError((e) {
-    //   print(e);
-    // });
-
-
-
-
   }
 
   Widget cartOrderItemListTile1(BuildContext context,
       currency,
       isbasket,
-  String title,
+      String title,
       dynamic price,
       int itemCount,
       int qnty,
@@ -2290,44 +2100,36 @@ class _oneViewCartState extends State<oneViewCart> {
         Padding(
             padding: const EdgeInsets.only(left: 7.0, top: 13.3),
             child: ListTile(
-              title: 
+              title:
               Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    store_name,
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .subtitle2!
-                        .copyWith(color: kMainTextColor),
-                  ),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
 
-                  Text(
-                    title,
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .subtitle1!
-                        .copyWith(color: kMainTextColor),
-                  ),
+                        Text(
+                          title,
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .subtitle1!
+                              .copyWith(color: kMainTextColor),
+                        ),
 
-                  Text(
-                    '${currency} ${price}',
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .subtitle1!
-                        .copyWith(color: kMainTextColor),
-                  ),
-                ],
-              ),
+                        Text(
+                          '${currency} ${price}',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .subtitle1!
+                              .copyWith(color: kMainTextColor),
+                        ),
+                      ],
+                    ),
 
-             ]
+                  ]
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 15.0, bottom: 14.2),
@@ -2365,25 +2167,25 @@ class _oneViewCartState extends State<oneViewCart> {
                             InkWell(
                               onTap: () {
                                 setState(() {
-                                  var price_d = cartListI[index].price /
-                                      cartListI[index].add_qnty;
-                                  cartListI[index].add_qnty--;
-                                  cartListI[index].price = (price_d *
-                                      cartListI[index].add_qnty);
+                                  var price_d = index.price /
+                                      index.add_qnty;
+                                  index.add_qnty--;
+                                  index.price = (price_d *
+                                      index.add_qnty);
                                   addOrMinusProduct(
-                                    cartListI[index].is_id,
-                                    cartListI[index].is_pres,
-                                    cartListI[index].isBasket,
-                                  cartListI[index].addedBasket,
-                                  cartListI[index].product_name,
-                                      cartListI[index].unit,
-                                      cartListI[index].price,
-                                      cartListI[index].qnty,
-                                      cartListI[index].add_qnty,
-                                      cartListI[index].product_img,
-                                      cartListI[index].varient_id,
-                                    cartListI[index].vendor_id,
-                                    cartListI[index].store_name
+                                      index.is_id,
+                                      index.is_pres,
+                                      index.isBasket,
+                                      index.addedBasket,
+                                      index.product_name,
+                                      index.unit,
+                                      index.price,
+                                      index.qnty,
+                                      index.add_qnty,
+                                      index.product_img,
+                                      index.varient_id,
+                                      index.vendor_id,
+                                      index.store_name
                                   );
                                 });
                               },
@@ -2404,25 +2206,25 @@ class _oneViewCartState extends State<oneViewCart> {
                             InkWell(
                               onTap: () {
                                 setState(() {
-                                  var price_d = cartListI[index].price /
-                                      cartListI[index].add_qnty;
-                                  cartListI[index].add_qnty++;
-                                  cartListI[index].price = (price_d *
-                                      cartListI[index].add_qnty);
+                                  var price_d = index.price /
+                                      index.add_qnty;
+                                  index.add_qnty++;
+                                  index.price = (price_d *
+                                      index.add_qnty);
                                   addOrMinusProduct(
-                                      cartListI[index].is_id,
-                                      cartListI[index].is_pres,
-                                      cartListI[index].isBasket,
-                                      cartListI[index].addedBasket,
-                                      cartListI[index].product_name,
-                                      cartListI[index].unit,
-                                      cartListI[index].price,
-                                      cartListI[index].qnty,
-                                      cartListI[index].add_qnty,
-                                      cartListI[index].product_img,
-                                      cartListI[index].varient_id,
-                                      cartListI[index].vendor_id,
-                                      cartListI[index].store_name
+                                      index.is_id,
+                                      index.is_pres,
+                                      index.isBasket,
+                                      index.addedBasket,
+                                      index.product_name,
+                                      index.unit,
+                                      index.price,
+                                      index.qnty,
+                                      index.add_qnty,
+                                      index.product_img,
+                                      index.varient_id,
+                                      index.vendor_id,
+                                      index.store_name
                                   );
                                 });
                               },
@@ -2438,8 +2240,9 @@ class _oneViewCartState extends State<oneViewCart> {
                       // Spacer(),
                     ]),
               ),
+            )),
+        SizedBox(height: 16,),
 
-            ))
       ],
     );
   }
@@ -2472,6 +2275,7 @@ class _oneViewCartState extends State<oneViewCart> {
       setState(() {
         debugPrint("SELECTED IMAGE PICK   $imageFile");
       });
+
     } else {
       print("You have not taken image");
     }
@@ -2565,7 +2369,7 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
 
-  void hitDateCounter(date) async {
+  void hitDateCounter() async {
     setState(() {
       isFetchingTime = true;
     });
@@ -2574,28 +2378,19 @@ class _oneViewCartState extends State<oneViewCart> {
     var url = timeSlots;
     Uri myUri = Uri.parse(url);
     http.post(myUri,
-        body: {'vendor_id': vendorId, 'selected_date': '$date'}).then((value) {
+      // body: {'vendor_id': vendorId, 'selected_date': '$date'})
+    ).then((value) {
       if (value.statusCode == 200) {
         var jsonData = jsonDecode(value.body);
         if (jsonData['status'] == "1") {
+          setState(() {
+            timeslotmessage = jsonData['message'];
+          });
           var rdlist = jsonData['data'] as List;
           print('list $rdlist');
-          setState(() {
-            radioList.clear();
-            radioList = rdlist;
-          });
-        } else {
-          setState(() {
-            radioList = [];
-          });
-          // Toast.show(jsonData['message'], context,
-          //     duration: Toast.LENGTH_SHORT);
         }
-      } else {
-        setState(() {
-          radioList = [];
-          // radioList = rdlist;
-        });
+        // Toast.show(jsonData['message'], context,
+        //     duration: Toast.LENGTH_SHORT);
       }
       setState(() {
         isFetchingTime = false;
@@ -2608,60 +2403,73 @@ class _oneViewCartState extends State<oneViewCart> {
     });
   }
 
-  void clearCart() async {
+
+  void setidpres(List<CartItem> cartListI) {
     setState(() {
-      isCartFetch = true;
+      is_id_req=0;
+      is_pres_req=0;
     });
-    var store = intMapStoreFactory.store();
-    var factory = databaseFactoryWeb;
-    var db = await factory.openDatabase(DatabaseHelper.table);
-    var db1 = await factory.openDatabase(DatabaseHelper.resturantOrder);
-    var db2 = await factory.openDatabase(DatabaseHelper.addontable);
-    await store.drop(db);
-    await store.drop(db1);
-    await store.drop(db2);
-
-    Navigator.pop(context);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => HomeOrderAccount(3,1)),
-                (Route<dynamic> route) => true,
-          );
-    //
-    // db.deleteAllRestProdcut().then((value) {
-    //   db.deleteAllAddOns().then((values) {
-    //     cartListII.clear();
-    //     getResCartItem();
-    //   });
-    // });
-  }
-  void getCouponList() async {
-    getCartItem();
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? vendorId ="";
     if(cartListI.isNotEmpty) {
-      vendorId = '54';
-    }
-    else {
-      vendorId = preferences.getString('vendor_id');
-    }
-    List<OrderArrayGrocery> orderArray = [];
-    for (CartItem item in cartListI) {
-      orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
-          int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
+      for (int i = 0; i < cartListI.length; i++) {
+        if (cartListI[i].is_pres == 1) {
+          setState(() {
+            is_pres_req = 1;
+          });
+        }
+        if (cartListI[i].is_id == 1) {
+          checkId();
+        }
+      }
     }
 
+    if(cartListI.isNotEmpty) {
+      outerloop:
+      for (var i = 0; i < cartListI.length; i++) {
+        if (cartListI[i].isBasket == 1) {
+          setState(() {
+            is_basket_req = 1;
+          });
+          break outerloop;
+        }
+      }
+    }
+  }
 
-    setState(() {
-      currency = preferences.getString('curency')!;
-    });
+  void getCouponList() async {
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    // String? vendorId ="";
+    // if(cartListI.isNotEmpty) {
+    //   vendorId = '54';
+    // }
+    // else {
+    //   vendorId = preferences.getString('vendor_id');
+    // }
+    // List<OrderArrayGrocery> orderArray = [];
+    // for (CartItem item in cartListI) {
+    //   orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
+    //       int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
+    // }
+    //
+    // setState(() {
+    //   currency = preferences.getString('curency')!;
+    // });
+
+
+    if(cartListII.isNotEmpty) {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? vendorId = pref.getString('res_vendor_id');
+      List<int> v = [];
+      v.add(int.parse(vendorId.toString()));
+      setState(() {
+        ven = v;
+      });
+    }
+    print("VENDORS::"+vendorId + ven.toString());
+
     var url = couponList;
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {
-      'cart_value': '$totalAmount',
-      'vendor_id': '$vendorId',
-      'order_array': orderArray.toString(),
+      'vendors':ven.toString()
     }).then((value) {
       print("COUPON "+value.body);
 
@@ -2672,6 +2480,30 @@ class _oneViewCartState extends State<oneViewCart> {
           List<CouponList> tagObjs = tagObjsJson
               .map((tagJson) => CouponList.fromJson(tagJson))
               .toList();
+
+          if(cartListI.isNotEmpty) {
+            for (int i = 0; i < cartarray.length; i++) {
+              for (int j = 0; j < tagObjs.length; j++) {
+                if (cartarray[i].subtotal >= tagObjs[j].cart_value) {
+                  tagObjs[j].status = true;
+                }
+                else {
+                  tagObjs[j].status = false;
+                }
+              }
+            }
+          }
+          else if(cartListII.isNotEmpty) {
+            for (int j = 0; j < tagObjs.length; j++) {
+              if (totalAmount >= tagObjs[j].cart_value) {
+                tagObjs[j].status = true;
+              }
+              else {
+                tagObjs[j].status = false;
+              }
+            }
+          }
+
           setState(() {
             couponL.clear();
             couponL = tagObjs;
@@ -2686,7 +2518,6 @@ class _oneViewCartState extends State<oneViewCart> {
   void appCoupon(couponCode,cart_id) {
     var url = applyCoupon;
     Uri myUri = Uri.parse(url);
-
     http.post(myUri, body: {
       'coupon_code': couponCode.toString(),
       'cart_id': cart_id.toString()
@@ -2748,29 +2579,63 @@ class _oneViewCartState extends State<oneViewCart> {
     }
 
 
-    Uri myUri = Uri.parse(url);
-    http.post(myUri, body: {
-      'user_id': userId.toString(),
-      'order_array': orderArray.toString(),
-      'rest_order_array': restorderArray.toString(),
+    if(cartListI.isNotEmpty) {
+      print("ORDERCHARGE  " +  orderArray.toString() + userId.toString());
 
-    }).then((value) {
-      print("ORDERCHARGE  "+value.body);
-      var jsonData = jsonDecode(value.body);
-      if (jsonData['status'] == '1') {
-        setState(() {
-          storedeliveryCharge = jsonData['delivery_charges'];
-        });
-      }
-      else{
-        setState(() {
-          storedeliveryCharge = 0.0;
-          Errormessage = jsonData['meesage'];
-        });
-      }
-    });
+      Uri myUri = Uri.parse(url);
+      http.post(myUri, body: {
+        'user_id': userId.toString(),
+        'order_array': orderArray.toString(),
+      }).then((value) {
+        print("ORDERCHARGE  " + value.body);
+        var jsonData = jsonDecode(value.body);
+        if (jsonData['status'] == '1') {
+          setState(() {
+            storedeliveryCharge = jsonData['delivery_charges'];
+            gstCharge = jsonData['gst'];
+            Errormessage = '';
+          });
+        }
+        else {
+          setState(() {
+            storedeliveryCharge = 0.0;
+            gstCharge = 0.0;
+            Errormessage = jsonData['meesage'];
+          });
+        }
+      });
+    }
+
+    print("ORDERCHARGE  " +restorderArray.toString());
+
+    if(cartListII.isNotEmpty) {
+      Uri myUri = Uri.parse(url);
+      http.post(myUri, body: {
+        'user_id': userId.toString(),
+        'rest_order_array': restorderArray.toString(),
+      }).then((value) {
+        print("ORDERCHARGE  " + value.body);
+        var jsonData = jsonDecode(value.body);
+        if (jsonData['status'] == '1') {
+          setState(() {
+            storedeliveryCharge = jsonData['delivery_charges'];
+            gstCharge = jsonData['gst'];
+            Errormessage='';
+          });
+        }
+        else {
+          setState(() {
+            storedeliveryCharge = 0.0;
+            gstCharge = 0.0;
+            Errormessage = jsonData['meesage'];
+          });
+        }
+      });
+    }
+
 
   }
+
   void servicecharge() async {
     var url = servicecharges;
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -2802,37 +2667,231 @@ class _oneViewCartState extends State<oneViewCart> {
     });
   }
 
+  void getResCartItem() async {
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.resturantOrder);
 
+    final recordSnapshot = await store.find(await db);
+    List<RestaurantCartItem> product = recordSnapshot.map((snapshot){
+      final product = RestaurantCartItem.fromJson(snapshot.value);
+      return product;
+    }).toList();
 
-  void setidpres(List<CartItem> cartListI) {
+    var db1 = await factory.openDatabase(DatabaseHelper.addontable);
+    final recordSnapshot1 = await store.find(db1);
+    List<AddonCartItem> product1 = recordSnapshot1.map((snapshot){
+      final product1 = AddonCartItem.fromJson(snapshot.value);
+      return product1;
+    }).toList();
+
+    List<RestaurantCartItem> tagObjs = [];
+    for(int i=0;i<product.length;i++) {
+      List<AddonCartItem> tag = [];
+      print("RES CART add get "+product1.toString());
+      for(int j =0;j<product1.length;j++){
+        print("RES CART add get "+j.toString()+ " "+product1[j].toString());
+        if(product1[j].varient_id.toString() == product[i].varient_id.toString()){
+          tag.add(product1[j]);
+          print("RES CART add same "+tag.toString());
+        }
+      }
+      tagObjs.add(new RestaurantCartItem(
+          product[i].varient_id,
+          product[i].store_name,
+          product[i].add_qnty,
+          product[i].qnty,
+          product[i].unit,
+          product[i].price,
+          product[i].product_name,
+          tag,
+          product[i].vendor_id
+      ));
+    }
     setState(() {
-      is_id_req=0;
-      is_pres_req=0;
+      ven.clear();
+      isCartFetch = true;
+      cartListII.clear();
+      cartListII = List.from(tagObjs);
     });
-    if(cartListI.isNotEmpty) {
-      for (int i = 0; i < cartListI.length; i++) {
-        if (cartListI[i].is_pres == 1) {
-          setState(() {
-            is_pres_req = 1;
-          });
-        }
-        if (cartListI[i].is_id == 1) {
-          checkId();
-        }
-      }
+
+    print("RES CART "+cartListII.toString());
+
+    getCatC();
+
+  }
+
+  void getCartItem() async {
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.table);
+
+    final recordSnapshot = await store.find(await db);
+    List<Product> product = recordSnapshot.map((snapshot){
+      final product = Product.fromJson(snapshot.value);
+      return product;
+    }).toList();
+    List<CartItem> tagObjs = [];
+    for(int i=0;i<product.length;i++) {
+      tagObjs.add(new CartItem(product[i].storename, product[i].vendor, i, product[i].product_name, product[i].quantity, product[i].price, product[i].unit, product[i].itemCount, product[i].varient_id, product[i].varient_image, product[i].is_id, product[i].is_pres, product[i].isBasket, product[i].addedBasket));
     }
 
-    if(cartListI.isNotEmpty) {
-      outerloop:
-      for (var i = 0; i < cartListI.length; i++) {
-        if (cartListI[i].isBasket == 1) {
-          setState(() {
-            is_basket_req = 1;
-          });
-          break outerloop;
+    setState(() {
+      isCartFetch = false;
+      cartListI.clear();
+      cartListI = tagObjs;
+    });
+
+
+    setidpres(cartListI);
+
+
+    List<CartArray> cart=[];
+    List<CartItem> vendorcart=[];
+    List<CartItem> carts= cartListI;
+    double subt = 0.0;
+    List<int> v=[];
+    setState(() {
+      subTotals.clear();
+      ven.clear();
+    });
+
+    for(int i = 0;i<cartListI.length;i++)
+    {
+      vendorcart=[];
+      for(int j = 0 ;j<carts.length;j++){
+        if(cartListI[i].vendor_id == carts[j].vendor_id){
+          vendorcart.add(carts[j]);
+          v.add(int.parse(carts[j].vendor_id.toString()));
         }
       }
+      for(int k=0;k<vendorcart.length;k++){
+        subt = subt + vendorcart[k].price;
+      }
+      cart.add(CartArray(cartListI[i].vendor_id, cartListI[i].store_name, vendorcart,subt,0));
+
+      setState(() {
+        subTotals.add(subt);
+        ven=v;
+        subt = 0.0;
+      });
     }
+    final ids = cart.map((e) => e.vendor_id).toSet();
+    cart.retainWhere((x) => ids.remove(x.vendor_id));
+
+    setState(() {
+      isCartFetch = false;
+      cartarray.clear();
+      cartarray = cart;
+      packcharge = 0.0;
+    });
+  }
+
+  void deleteAddOn(addonid) async {
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // db.deleteAddOnId(int.parse(addonid)).then((value) {
+    //   getResCartItem();
+    // });
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.addontable);
+
+    var key1 = await store.record(addonid).delete(db);
+    getResCartItem();
+
+  }
+
+  void getCatC() async {
+
+
+    if (cartListI.isNotEmpty) {
+
+      dynamic coupondis = 0.0;
+      if(radioId!=-1){
+        for(int i = 0;i<cartarray.length;i++){
+          if(cartarray[i].vendor_id.toString() == couponL[radioId].vendor_id.toString()) {
+            if (couponL[radioId].type == 'percentage') {
+              setState(() {
+                coupondis = ((double.parse(couponL[radioId].amount) / 100) *
+                    cartarray[i].subtotal);
+                cartarray[i].discount = coupondis;
+
+              });
+            }  else{
+              setState(() {
+                coupondis = double.parse(couponL[radioId].amount);
+                cartarray[i].discount = coupondis;
+              });
+            }
+          }
+        }
+      }
+
+      double t = 0.0 ;
+      for(int i=0;i<cartarray.length;i++){
+        t = t + (cartarray[i].subtotal - cartarray[i].discount);
+      }
+      setState(() {
+        totalAmount = t;
+      });
+    }
+
+    if (cartListII.isNotEmpty) {
+      var Amount=0.0;
+      for(int i=0;i<cartListII.length;i++) {
+        if(cartListII[i].addon.isNotEmpty){
+          for(int j = 0;j<cartListII[i].addon.length;j++){
+            Amount = cartListII.elementAt(i).price + cartListII.elementAt(i).addon[j].price + Amount;
+          }
+        }
+        else Amount = cartListII.elementAt(i).price + Amount;
+      }
+      setState(() {
+        totalAmount = Amount;
+      });
+
+      if(radioId!=-1){
+        if(couponL[radioId].type=='percentage') {
+          setState(() {
+            couponAmount = ((double.parse(couponL[radioId].amount)/100)*totalAmount);
+          });
+        }
+        else{
+          setState(() {
+            couponAmount = double.parse(couponL[radioId].amount);
+          });
+        }
+      }
+
+    }
+  }
+
+  void clearCart() async {
+    setState(() {
+      isCartFetch = true;
+    });
+    var store = intMapStoreFactory.store();
+    var factory = databaseFactoryWeb;
+    var db = await factory.openDatabase(DatabaseHelper.table);
+    var db1 = await factory.openDatabase(DatabaseHelper.resturantOrder);
+    var db2 = await factory.openDatabase(DatabaseHelper.addontable);
+    await store.drop(db);
+    await store.drop(db1);
+    await store.drop(db2);
+
+    Navigator.pop(context);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => HomeOrderAccount(3,1)),
+          (Route<dynamic> route) => true,
+    );
+    //
+    // db.deleteAllRestProdcut().then((value) {
+    //   db.deleteAllAddOns().then((values) {
+    //     cartListII.clear();
+    //     getResCartItem();
+    //   });
+    // });
   }
 
 }
@@ -2868,11 +2927,11 @@ class _MyDialogContentState extends State<MyDialogContent> {
         children: List<CheckboxListTile>.generate(
             widget.cart.length,
                 (int index){
-                  if(widget.cart[index].addedBasket==0){
-                    _selectedIndex= false;
-                  }
+              if(widget.cart[index].addedBasket==0){
+                _selectedIndex= false;
+              }
 
-                  return  CheckboxListTile(
+              return  CheckboxListTile(
                 value: (widget.cart[index].addedBasket==0)?false:true,
                 ///groupValue: _selectedIndex,
                 title: Text(widget.cart[index].product_name),
@@ -2894,4 +2953,6 @@ class _MyDialogContentState extends State<MyDialogContent> {
   Widget build(BuildContext context) {
     return _getContent();
   }
+
+
 }

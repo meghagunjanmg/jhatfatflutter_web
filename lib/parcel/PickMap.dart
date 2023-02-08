@@ -174,6 +174,8 @@ class SetLocationState extends State<SetLocationss> {
       });
     });
   }
+
+
   void getPlaces(context) async {
 
     setState(() {
@@ -224,7 +226,13 @@ class SetLocationState extends State<SetLocationss> {
     final lng = detail.result.geometry!.location.lng;
     _getCameraMoveLocation(LatLng(lat, lng));
     print("${p.description} - $lat/$lng");
-
+    GeoData data = await Geocoder2.getDataFromCoordinates(
+        latitude: lat,
+        longitude: lng,
+        googleMapApiKey: apiKey);
+    setState(() {
+      currentAddress = data.address;
+    });
     final marker = Marker(
       markerId: const MarkerId('location'),
       position: LatLng(lat, lng),
@@ -238,15 +246,6 @@ class SetLocationState extends State<SetLocationss> {
 
 
   }
-  // Future<Null> displayPrediction(Prediction p) async {
-  //   if (p != null) {
-  //     PlacesDetailsResponse detail =
-  //         await _places.getDetailsByPlaceId(p.placeId!);
-  //     final lat = detail.result.geometry!.location.lat;
-  //     final lng = detail.result.geometry!.location.lng;
-  //     _getCameraMoveLocation(LatLng(lat, lng));
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {

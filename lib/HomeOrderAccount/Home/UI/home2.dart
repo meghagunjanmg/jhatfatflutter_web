@@ -361,22 +361,19 @@ class _HomeState extends State<Home> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
+
                     (admins!.surge==1)
                         ?
-                    Padding(
-                        padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                        child:
-                        Wrap(
-                            children:<Widget>[
-                              Text(
-                                admins!.surgeMsg.toString(),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 16,color: Colors.blue),
-                              )
-                            ]
-                        )
-                    )  :
+                    Wrap(
+                        children:<Widget>[
+                          Text(
+                            admins!.surgeMsg.toString(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.visible,
+                            style: TextStyle(fontSize: 16,color: Colors.blue),
+                          )]
+                    )
+                        :
                     Padding(
                         padding: EdgeInsets.only(top: 8.0, left: 24.0),
                         child: Text(
@@ -386,58 +383,70 @@ class _HomeState extends State<Home> {
                           style: TextStyle(fontSize: 12),
                         )
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                      child: Row(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: ()async {
 
-                              await showDialog(
-                                  context: context,
-                                  builder: (_) => Dialog(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: white_color,
-                                        borderRadius:
-                                        BorderRadius.circular(20.0),
+                    Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: 60,
+                      alignment: Alignment.center,
+                      child:
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0, left: 24.0),
+                        child:
+                        Row(
+                          children: <Widget>[
+
+                            GestureDetector(
+                              onTap: ()async {
+
+                                await showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: white_color,
+                                          borderRadius:
+                                          BorderRadius.circular(20.0),
+                                        ),
+                                        child: Image.network(
+                                          TopImage,
+                                          fit: BoxFit.fill,
+                                        ),
                                       ),
-                                      child: Image.network(
-                                        TopImage,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  )
-                              );
-                            },
-                            child:
-                            Container(
+                                    )
+                                );
+                              },
                               child:
-                              Stack(
-                                children: <Widget>[
-                                  Container(
-                                    alignment: Alignment.center,
-                                    child: Image.asset(
-                                      'assets/backgg.png',
-                                      fit: BoxFit.fitWidth,
-                                      width: MediaQuery.of(context).size.width * 0.85 ,
+                              Container(
+                                child:
+                                Stack(
+                                  children: <Widget>[
+                                    Container(
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        'assets/backgg.png',
+                                        fit: BoxFit.fitWidth,
+                                        width: MediaQuery.of(context).size.width * 0.85 ,
+                                      ),
                                     ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    width: MediaQuery.of(context).size.width * 0.70,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      admins!.topMessage.toString(),
-                                      maxLines: 2,
-                                      style:  orderMapAppBarTextStyle
-                                          .copyWith(color: Colors.white,fontWeight: FontWeight.w900,fontSize: 15,fontFamily: 'OpenSans'),
-                                    ),)
-                                ],
+                                    Container(
+                                      padding: EdgeInsets.all(5),
+                                      width: MediaQuery.of(context).size.width * 0.70,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        admins!.topMessage.toString(),
+                                        maxLines: 2,
+                                        style:  orderMapAppBarTextStyle
+                                            .copyWith(color: Colors.white,fontWeight: FontWeight.w900,fontSize: 15,fontFamily: 'OpenSans'),
+                                      ),)
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -549,14 +558,17 @@ class _HomeState extends State<Home> {
                     // ),
 
                     Padding(
-                        padding: EdgeInsets.all(20),
-                        child:
-                        ResponsiveGridList(
-                          rowMainAxisAlignment: MainAxisAlignment.center,
-                          squareCells: true,
-                          desiredItemWidth: 120,
-                          minSpacing: 2, children:
-                        (nearStores != null && nearStores.length > 0)
+                      padding: EdgeInsets.all(20),
+                      child: GridView.count(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 0,
+                        mainAxisSpacing: 0,
+                        childAspectRatio: 100 / 90,
+                        controller: ScrollController(keepScrollOffset: false),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        // childAspectRatio: itemWidth/(itemHeight),
+                        children: (nearStores != null && nearStores.length > 0)
                             ? nearStores.map((e) {
                           return ReusableCard(
                             cardChild: CardContent(
@@ -568,6 +580,7 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         }).toList()
+
                             : nearStoresShimmer.map((e) {
                           return ReusableCard(
                               cardChild: Shimmer(
@@ -585,102 +598,174 @@ class _HomeState extends State<Home> {
                               ),
                               onPress: () {});
                         }).toList(),
-                        )
+                      ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 2, bottom: 2),
+                      child: Builder(
+                        builder: (context) {
+                          return InkWell(
+                            onTap: () {
+                              if(pickBannerImage[0].vendorCategoryId=='18' || pickBannerImage[0].vendorCategoryId==18){
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height: 500,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Image.asset("images/id.png"),
+                                            Padding(padding: EdgeInsets.all(10),child:Text('You need to be above 18 years of age',style: TextStyle(
+                                                color:Colors.red, fontSize:18, fontWeight: FontWeight.w400)),
+                                            ),
+                                            Padding(padding: EdgeInsets.all(10),child:
+                                            Text('Do not buy tobacco products on behalf of underage persons.',style: TextStyle(
+                                                color: Colors.blueGrey, fontSize:16)
+                                            ),
+                                            ),
+                                            Padding(padding: EdgeInsets.all(10),child:Text('Your location must not be in and around school or college premises.',style: TextStyle(
+                                                color: Colors.blueGrey, fontSize:16)),
+                                            ),
+                                            Divider(),
+                                            Padding(padding: EdgeInsets.all(10),child:Text('Jhatfat reserves the right to report your account in case you are below 18 years of age and purchasing cigrattes',style: TextStyle(
+                                                color: Colors.blueGrey, fontSize:14)),
+                                            ),
+                                            new GestureDetector(onTap: (){Navigator.popAndPushNamed(context, PageRoutes.tncPage);}, child:    Padding(padding: EdgeInsets.all(10),child:Text('Read T&C',style: TextStyle(
+                                                color: Colors.green, fontSize:12)),
+                                            ),),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Spacer(),
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(30.0),
+                                                    ),
+                                                    primary: kWhiteColor,
+                                                    padding: EdgeInsets.all(10),),
+                                                  child: const Text("No,I'm not",style: TextStyle(
+                                                      color: Color(0xffeca53d), fontWeight: FontWeight.w400),),
+                                                  onPressed: () => Navigator.pop(context),
+                                                ),
+                                                Spacer(),
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(30.0),
+                                                    ),
+                                                    primary: kMainColor,
+                                                    padding: EdgeInsets.all(10),
+                                                  ),
 
-                    ResponsiveGridList(
-                        rowMainAxisAlignment: MainAxisAlignment.center,
-                        desiredItemWidth: MediaQuery
-                            .of(context)
-                            .size
-                            .width - 200,
-                        shrinkWrap: true,
-                        minSpacing: 2, children:[
-                      Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Builder(
-                          builder: (context) {
-                            return InkWell(
-                              onTap: () {
+                                                  child: const Text("Yes,I'm above 18"),
+                                                  onPressed: () => {
+                                                    Navigator.pop(context),
+                                                    Navigator.push(context, MaterialPageRoute
+                                                      (builder: (context) =>
+                                                    new AppCategory(pickBannerImage[0].vendorName,
+                                                        pickBannerImage[0].vendorId, "22")))
+                                                  },
+                                                ),
+                                                Spacer(),
+
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                              else
+                              {
                                 Navigator.push(context, MaterialPageRoute
                                   (builder: (context) =>
                                 new AppCategory(pickBannerImage[0].vendorName,
                                     pickBannerImage[0].vendorId, "22")));
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(20),
-                                child: Material(
-                                  borderRadius:
-                                  BorderRadius.circular(20.0),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Container(
+
+                              }
+
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 10),
+                              child: Material(
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                                clipBehavior: Clip.hardEdge,
+                                child: Container(
+                                  height: 100,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width *
+                                      0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: white_color,
-                                      borderRadius:
-                                      BorderRadius.circular(20.0),
-                                    ),
-                                    child: Image.network(
-                                      pickImage,
-                                      fit: BoxFit.fill,
-                                      height: 150,
-                                    ),
+                                  decoration: BoxDecoration(
+                                    color: white_color,
+                                    borderRadius:
+                                    BorderRadius.circular(20.0),
+                                  ),
+                                  child: Image.network(
+                                    pickImage,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
+
                       ),
-                    ]),
+                    ),
 
-                    ( !subscriptionbanner )?
-                    ResponsiveGridList(
-                        rowMainAxisAlignment: MainAxisAlignment.center,
-                        desiredItemWidth: MediaQuery
-                            .of(context)
-                            .size
-                            .width  - 200,
-                        shrinkWrap: true,
-                        minSpacing: 2, children:[
-                      Padding(
-                        padding: EdgeInsets.only(top: 2, bottom: 2),
-                        child: Builder(
-                          builder: (context) {
-                            return InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(context, PageRoutes.subscription);
-
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 10),
-                                child: Material(
-                                  borderRadius:
-                                  BorderRadius.circular(20.0),
-                                  clipBehavior: Clip.hardEdge,
-                                  child: Container(
+                    (subscriptionbanner)?
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 2),
+                      child: Builder(
+                        builder: (context) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(context, PageRoutes.subscription);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 10),
+                              child: Material(
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                                clipBehavior: Clip.hardEdge,
+                                child: Container(
+                                  height: 100,
+                                  width: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .width *
+                                      0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: white_color,
-                                      borderRadius:
-                                      BorderRadius.circular(20.0),
-                                    ),
-                                    child: Image.network(
-                                      subsImage,
-                                      fit: BoxFit.fill,
-                                      height: 150,
-                                    ),
+                                  decoration: BoxDecoration(
+                                    color: white_color,
+                                    borderRadius:
+                                    BorderRadius.circular(20.0),
+                                  ),
+                                  child: Image.network(
+                                    subsImage,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
+
                       ),
-                    ]):
+                    )        :
                     Container(),
-
                     (subscriptionStore)?
                     Padding(
                         padding: EdgeInsets.only(top: 5, bottom: 2),
@@ -729,22 +814,67 @@ class _HomeState extends State<Home> {
                                               ]),
                                         ),
                                         SizedBox(
-                                          height: 150,
+                                          height: 180,
                                           width: MediaQuery. of(context). size. width,
                                           child:
                                           ListView.builder(
-                                            itemCount: (substores.length/2).toInt()+1,
+                                            itemCount: substores.length,
                                             scrollDirection: Axis.horizontal,
                                             itemBuilder: (BuildContext context, int index) =>
-                                                Padding(padding: const EdgeInsets.all(2.0),
-                                                  child: InkWell(onTap: () {
-                                                    Navigator.push(context, MaterialPageRoute
-                                                      (builder: (context) =>
-                                                    new AppCategory(
-                                                        substores[index].vendorName.toString(), substores[index].vendorId,
-                                                        substores[index].distance)));
-                                                  },
-                                                    child: Container(
+                                            ((substores[index].onlineStatus ==
+                                                "off" ||
+                                                substores[index].onlineStatus == "Off" ||
+                                                substores[index].onlineStatus ==
+                                                    "OFF"))?
+                                            Container(padding: const EdgeInsets.all(2.0),
+                                                child: InkWell(onTap: () {},
+                                                  child:
+                                                  Card(
+                                                      color: Colors.grey,
+                                                      elevation: 2,
+                                                      child:
+                                                      Container(
+                                                          color: Colors.grey,
+                                                          width: 120.0,
+                                                          child:
+                                                          Stack(
+                                                            children: [
+                                                              ListTile(
+                                                                  title: Image.network('${imageBaseUrl}${substores[index].vendorLogo}',
+                                                                    width: 100.0,
+                                                                    height: 100.0,),
+                                                                  subtitle:
+                                                                  Text(substores[index].vendorName!, maxLines: 4, overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 12,fontWeight: FontWeight.normal,color: kMainTextColor))
+                                                              ),
+                                                              Align(
+                                                                alignment: Alignment.topCenter,
+                                                                child: Container(
+                                                                  height: 20,
+                                                                  color: Colors.white,
+                                                                  child: Text("Store Closed Now", style:  orderMapAppBarTextStyle
+                                                                      .copyWith(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18,fontFamily: 'OpenSans'),),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          )
+
+                                                      )),
+                                                )
+                                            ):
+
+                                            Padding(padding: const EdgeInsets.all(2.0),
+                                              child: InkWell(onTap: () {
+                                                Navigator.push(context, MaterialPageRoute
+                                                  (builder: (context) =>
+                                                new AppCategory(
+                                                    substores[index].vendorName.toString(), substores[index].vendorId,
+                                                    substores[index].distance)));
+                                              },
+                                                child:
+                                                Card(
+                                                    elevation: 2,
+                                                    child:
+                                                    Container(
                                                       width: 120.0,
                                                       child: ListTile(
                                                           title: Image.network('${imageBaseUrl}${substores[index].vendorLogo}',
@@ -752,12 +882,12 @@ class _HomeState extends State<Home> {
                                                             height: 100.0,),
                                                           subtitle: Container(
                                                             alignment: Alignment.topCenter,
-                                                            child: Text(substores[index].vendorName!),
+                                                            child:Text(substores[index].vendorName!, maxLines: 4, overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 12,fontWeight: FontWeight.normal,color: kMainTextColor)),
                                                           )
                                                       ),
-                                                    ),
-                                                  ),
-                                                ),
+                                                    )),
+                                              ),
+                                            ),
                                           ),
                                         )
                                       ]
@@ -767,14 +897,13 @@ class _HomeState extends State<Home> {
                         :
                     Container(),
 
-
                     Visibility(
                       visible: (!isFetch && listImage.length == 0) ? false : true,
                       child: Padding(
                         padding: EdgeInsets.only(top: 10, bottom: 5),
                         child: CarouselSlider(
                             options: CarouselOptions(
-                              height: 400.0,
+                              height: 200.0,
                               autoPlay: true,
                               initialPage: 0,
                               viewportFraction: 0.9,
@@ -802,11 +931,12 @@ class _HomeState extends State<Home> {
                                         BorderRadius.circular(20.0),
                                         clipBehavior: Clip.hardEdge,
                                         child: Container(
-                                          height: 400,
+                                          height: 200,
                                           width: MediaQuery
                                               .of(context)
                                               .size
-                                              .width - 200,
+                                              .width *
+                                              0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                                           decoration: BoxDecoration(
                                             color: white_color,
@@ -858,7 +988,7 @@ class _HomeState extends State<Home> {
 
 
                     Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.only(top: 2, bottom: 2),
                       child: Builder(
                         builder: (context) {
                           return InkWell(
