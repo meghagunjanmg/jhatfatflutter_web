@@ -93,6 +93,7 @@ dependencies:
   responsive_grid: ^2.1.0
   scroll_to_index: ^3.0.1
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
